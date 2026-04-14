@@ -54,6 +54,10 @@ export default function LoginPage() {
 
           {error && <p className="text-red-400 text-xs text-center">{error}</p>}
 
+          <div className="text-left">
+            <Link href="/reset-password" className="text-xs text-slate-400 hover:text-blue-400 transition-colors">نسيت كلمة المرور؟</Link>
+          </div>
+
           <button type="submit" disabled={loading}
             className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-500/20 transition-all disabled:opacity-50 text-base">
             {loading ? "جاري الدخول..." : "دخول"}
