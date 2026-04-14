@@ -4,9 +4,11 @@ import { createClient } from "../../lib/supabase";
 import { useRouter } from "next/navigation";
 import InvoiceModal from "../../components/InvoiceModal";
 import DeleteModal from "../../components/DeleteModal";
+import ImportModal from "../../components/ImportModal";
 import StatsCards from "../../components/StatsCards";
 import InvoiceTable from "../../components/InvoiceTable";
 import { printInvoice } from "../../lib/print-invoice";
+import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
@@ -42,6 +44,7 @@ export default function DashboardPage() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [showModal, setShowModal] = useState(false);
+  const [showImport, setShowImport] = useState(false);
   const [editInvoice, setEditInvoice] = useState<Invoice | null>(null);
   const [deleteInvoice, setDeleteInvoice] = useState<Invoice | null>(null);
   const router = useRouter();
@@ -113,6 +116,40 @@ export default function DashboardPage() {
     loadData();
   };
 
+  const handleImport = async (rows: { date: string; client: string; project: string; description: string; amount: number; status: string; category: string }[]) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    let maxSerial = invoices.reduce((max, inv) => {
+      const n = parseInt(inv.serial);
+      return !isNaN(n) && n > max ? n : max;
+    }, 0);
+
+    const toInsert = rows.map(row => {
+      maxSerial++;
+      return {
+        user_id: user.id,
+        serial: String(maxSerial).padStart(3, "0"),
+        date: row.date,
+        client: row.client,
+        project: row.project,
+        description: row.description,
+        amount: row.amount,
+        status: row.status,
+        category: row.category,
+        currency: "KWD",
+      };
+    });
+
+    // Insert in batches of 50
+    for (let i = 0; i < toInsert.length; i += 50) {
+      await supabase.from("invoices").insert(toInsert.slice(i, i + 50));
+    }
+
+    setShowImport(false);
+    loadData();
+  };
+
   const handleLogout = async () => {
     await supabase.auth.signOut();
     router.push("/");
@@ -162,16 +199,24 @@ export default function DashboardPage() {
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-sm font-black text-white">i</div>
             <div>
               <h1 className="text-sm font-bold text-white leading-tight">Invoicaty</h1>
-              <p className="text-[10px] text-slate-400 hidden sm:block">{profile?.full_name || profile?.email}</p>
+              <p className="text-[10px] text-slate-400">{profile?.full_name || profile?.business_name || 'مرحباً'}</p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
+            <button onClick={() => setShowImport(true)}
+              className="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-700/50 transition-all text-sm" title="استيراد">
+              📥
+            </button>
+            <Link href="/settings"
+              className="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-700/50 transition-all text-sm" title="الإعدادات">
+              ⚙️
+            </Link>
             <button onClick={() => { setEditInvoice(null); setShowModal(true); }}
               className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-lg shadow-blue-500/20">
-              <span>+</span> فاتورة جديدة
+              <span>+</span> <span className="hidden sm:inline">فاتورة جديدة</span><span className="sm:hidden">جديدة</span>
             </button>
             <button onClick={handleLogout}
-              className="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-700/50 transition-all text-sm">
+              className="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-700/50 transition-all text-sm" title="خروج">
               ⬅️
             </button>
           </div>
@@ -236,6 +281,12 @@ export default function DashboardPage() {
           serial={deleteInvoice.serial}
           onConfirm={handleDelete}
           onClose={() => setDeleteInvoice(null)}
+        />
+      )}
+      {showImport && (
+        <ImportModal
+          onImport={handleImport}
+          onClose={() => setShowImport(false)}
         />
       )}
     </div>
