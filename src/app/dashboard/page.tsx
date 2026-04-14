@@ -56,8 +56,19 @@ export default function DashboardPage() {
       supabase.from("profiles").select("*").eq("id", user.id).single()
     ]);
 
+    // Auto-create profile if missing
+    if (!prof) {
+      const { data: newProf } = await supabase.from("profiles").upsert({
+        id: user.id,
+        full_name: user.user_metadata?.full_name || '',
+        email: user.email || '',
+      }).select().single();
+      setProfile(newProf || null);
+    } else {
+      setProfile(prof);
+    }
+
     setInvoices(inv || []);
-    setProfile(prof || null);
     setLoading(false);
   }, [supabase, router]);
 

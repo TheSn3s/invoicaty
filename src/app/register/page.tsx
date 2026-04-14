@@ -30,6 +30,15 @@ export default function RegisterPage() {
       setError(error.message === "User already registered" ? "هذا البريد مسجل مسبقاً" : error.message);
       setLoading(false);
     } else {
+      // Create profile manually
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await supabase.from("profiles").upsert({
+          id: user.id,
+          full_name: name,
+          email: email,
+        });
+      }
       setSuccess(true);
       setTimeout(() => router.push("/dashboard"), 1500);
     }
