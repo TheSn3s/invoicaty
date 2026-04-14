@@ -51,11 +51,12 @@ export default function DashboardPage() {
   const supabase = createClient();
 
   const loadData = useCallback(async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { router.push("/login"); return; }
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (!user || authError) { router.push("/login"); return; }
 
+    // Force filter by user_id for extra safety
     const [{ data: inv }, { data: prof }] = await Promise.all([
-      supabase.from("invoices").select("*").order("date", { ascending: false }),
+      supabase.from("invoices").select("*").eq("user_id", user.id).order("date", { ascending: false }),
       supabase.from("profiles").select("*").eq("id", user.id).single()
     ]);
 
@@ -76,6 +77,14 @@ export default function DashboardPage() {
   }, [supabase, router]);
 
   useEffect(() => { loadData(); }, [loadData]);
+
+  // Re-load when auth state changes (user switch)
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
+      loadData();
+    });
+    return () => subscription.unsubscribe();
+  }, [supabase, loadData]);
 
   const handleSave = async (data: Partial<Invoice>) => {
     const { data: { user } } = await supabase.auth.getUser();
