@@ -23,7 +23,7 @@ export default function Home() {
       {/* Hero */}
       <main className="relative z-10 flex-1 flex flex-col items-center justify-center px-5 text-center pb-20">
         <div className="fade-in max-w-lg">
-          <img src="/logo-dark.png" alt="Invoicaty" className="w-20 h-20 mx-auto mb-6" />
+          
           <h1 className="text-3xl md:text-5xl font-black text-white mb-4 leading-tight">
             فواتيرك الاحترافية
             <br />
