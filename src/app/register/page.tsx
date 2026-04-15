@@ -23,34 +23,32 @@ export default function RegisterPage() {
     const { error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { full_name: name } }
+      options: {
+        data: { full_name: name },
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+      }
     });
 
     if (error) {
       setError(error.message === "User already registered" ? "هذا البريد مسجل مسبقاً" : error.message);
       setLoading(false);
     } else {
-      // Create profile manually
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        await supabase.from("profiles").upsert({
-          id: user.id,
-          full_name: name,
-          email: email,
-        });
-      }
       setSuccess(true);
-      setTimeout(() => router.push("/dashboard"), 1500);
     }
   };
 
   if (success) {
     return (
       <div className="min-h-screen flex items-center justify-center px-5">
-        <div className="glass rounded-3xl p-10 text-center fade-in">
-          <div className="text-5xl mb-4">✅</div>
-          <h2 className="text-xl font-bold text-white mb-2">تم التسجيل بنجاح!</h2>
-          <p className="text-slate-400 text-sm">جاري التحويل للوحة التحكم...</p>
+        <div className="glass rounded-3xl p-10 text-center fade-in max-w-sm">
+          <div className="text-5xl mb-4">✉️</div>
+          <h2 className="text-xl font-bold text-white mb-2">تم التسجيل!</h2>
+          <p className="text-slate-400 text-sm mb-4">أرسلنا رابط تأكيد على بريدك الإلكتروني</p>
+          <p className="text-blue-400 font-bold text-sm mb-4" dir="ltr">{email}</p>
+          <p className="text-slate-500 text-xs mb-6">افتح بريدك واضغط على رابط التأكيد عشان تقدر تسجل دخول</p>
+          <Link href="/login" className="inline-block bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-xl text-sm font-bold transition-all">
+            الذهاب لتسجيل الدخول
+          </Link>
         </div>
       </div>
     );
