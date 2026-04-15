@@ -35,6 +35,7 @@ interface Profile {
   bank_iban: string;
   bank_holder: string;
   brand_color: string;
+  role?: string;
 }
 
 export default function DashboardPage() {
@@ -212,6 +213,12 @@ export default function DashboardPage() {
             </div>
           </div>
           <div className="flex items-center gap-1.5">
+            {profile?.role === 'admin' && (
+              <Link href="/admin"
+                className="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-700/50 transition-all text-sm" title="لوحة الإدارة">
+                🛡
+              </Link>
+            )}
             <button onClick={() => setShowImport(true)}
               className="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-700/50 transition-all text-sm" title="استيراد">
               📥
