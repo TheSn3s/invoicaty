@@ -33,7 +33,7 @@ export default function LoginPage() {
       </div>
       <div className="glass rounded-3xl p-8 w-full max-w-sm relative z-10 fade-in">
         <div className="text-center mb-8">
-          <img src="/logo-dark.png" alt="Invoicaty" className="w-16 h-16 mx-auto mb-4" />
+          <img src="/logo-dark.png" alt="Invoicaty" className="w-16 h-20 mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-white">تسجيل الدخول</h1>
           <p className="text-slate-400 text-sm mt-1">ادخل حسابك للمتابعة</p>
         </div>
