@@ -157,7 +157,7 @@ export default function SettingsPage() {
                 <div>
                   <label className="block text-[11px] font-bold text-slate-400 mb-1.5">اسم العمل / الشركة</label>
                   <input type="text" value={businessName} onChange={e => setBusinessName(e.target.value)}
-                    placeholder="مثال: استوديو سنعوسي للإنتاج"
+                    placeholder="مثال: منصة الأعمال للإنتاج"
                     className="w-full bg-slate-800/50 border border-slate-600/30 rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:ring-2 focus:ring-blue-500/40 outline-none" />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
