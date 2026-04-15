@@ -81,7 +81,7 @@ body{padding:.5rem}
 </head>
 <body>
 <div class="inv">
-<div class="hdr"><h1>${name}</h1><p>${profile?.business_name || ''}</p></div>
+<div class="hdr"><img src="/logo-light.png" alt="Invoicaty" style="height:48px;margin:0 auto .5rem;display:block" /><h1>${name}</h1><p>${profile?.business_name || ''}</p></div>
 <div class="cnt">
 <div class="bar"><div>${inv.date}</div><div>Invoice #${inv.serial}</div><div>${inv.client}</div></div>
 <div class="ttl">Invoice #${inv.serial}</div>

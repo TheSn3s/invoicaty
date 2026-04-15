@@ -12,7 +12,7 @@ export default function Home() {
       {/* Header */}
       <header className="relative z-10 flex items-center justify-between px-5 py-4 md:px-12 md:py-6">
         <div className="flex items-center gap-2">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-lg font-black text-white">i</div>
+          <img src="/logo-dark.png" alt="Invoicaty" className="h-9 w-auto" />
           <span className="text-lg font-bold text-white">Invoicaty</span>
         </div>
         <Link href="/login" className="bg-white/10 hover:bg-white/15 text-white px-5 py-2.5 rounded-xl text-sm font-bold transition-all border border-white/10">
@@ -23,9 +23,7 @@ export default function Home() {
       {/* Hero */}
       <main className="relative z-10 flex-1 flex flex-col items-center justify-center px-5 text-center pb-20">
         <div className="fade-in max-w-lg">
-          <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-4xl shadow-xl shadow-blue-500/20">
-            📄
-          </div>
+          <img src="/logo-dark.png" alt="Invoicaty" className="w-20 h-20 mx-auto mb-6" />
           <h1 className="text-3xl md:text-5xl font-black text-white mb-4 leading-tight">
             فواتيرك الاحترافية
             <br />

@@ -206,7 +206,7 @@ export default function DashboardPage() {
       <header className="sticky top-0 z-30 glass border-b border-slate-700/50 px-4 py-3 md:px-8 md:py-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-sm font-black text-white">i</div>
+            <img src="/logo-dark.png" alt="Invoicaty" className="h-8 w-auto" />
             <div>
               <h1 className="text-sm font-bold text-white leading-tight">Invoicaty</h1>
               <p className="text-[10px] text-slate-400">{profile?.full_name || profile?.business_name || 'مرحباً'}</p>
