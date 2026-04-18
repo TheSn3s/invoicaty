@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 
 interface Invoice {
   id: string; serial: string; date: string; client: string;
@@ -13,7 +14,12 @@ interface Props {
   onPrint: (inv: Invoice) => void;
 }
 
+const PAGE_SIZE = 20;
+
 export default function InvoiceTable({ invoices, onEdit, onDelete, onPrint }: Props) {
+  const [page, setPage] = useState(0);
+  const totalPages = Math.ceil(invoices.length / PAGE_SIZE);
+  const paged = invoices.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
   if (invoices.length === 0) {
     return (
       <div className="mt-6 glass rounded-2xl p-12 text-center">
@@ -28,7 +34,7 @@ export default function InvoiceTable({ invoices, onEdit, onDelete, onPrint }: Pr
     <div className="mt-4 space-y-2">
       {/* Mobile Cards */}
       <div className="md:hidden space-y-2">
-        {invoices.map(inv => (
+        {paged.map(inv => (
           <div key={inv.id} className="glass rounded-xl p-4 fade-in">
             <div className="flex items-start justify-between mb-2">
               <div className="flex items-center gap-2">
@@ -74,7 +80,7 @@ export default function InvoiceTable({ invoices, onEdit, onDelete, onPrint }: Pr
             </tr>
           </thead>
           <tbody>
-            {invoices.map(inv => (
+            {paged.map(inv => (
               <tr key={inv.id} className="border-b border-slate-800/50 hover:bg-blue-500/5 transition-colors group">
                 <td className="p-4">
                   <span className="font-inter text-blue-400 font-bold text-xs bg-blue-500/10 border border-blue-500/20 px-2.5 py-1 rounded-lg">#{inv.serial}</span>
@@ -104,6 +110,41 @@ export default function InvoiceTable({ invoices, onEdit, onDelete, onPrint }: Pr
           </tbody>
         </table>
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-2 mt-4 pb-2">
+          <button
+            onClick={() => setPage(p => Math.max(0, p - 1))}
+            disabled={page === 0}
+            className="bg-slate-800/50 border border-slate-700/50 text-slate-300 px-3 py-2 rounded-xl text-xs font-bold transition-all hover:bg-slate-700/50 disabled:opacity-30 disabled:cursor-not-allowed"
+          >
+            ← السابق
+          </button>
+          <div className="flex items-center gap-1">
+            {Array.from({ length: totalPages }, (_, i) => (
+              <button
+                key={i}
+                onClick={() => setPage(i)}
+                className={`w-8 h-8 rounded-lg text-xs font-bold transition-all ${
+                  i === page
+                    ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20"
+                    : "bg-slate-800/50 text-slate-400 hover:bg-slate-700/50"
+                }`}
+              >
+                {i + 1}
+              </button>
+            ))}
+          </div>
+          <button
+            onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
+            disabled={page === totalPages - 1}
+            className="bg-slate-800/50 border border-slate-700/50 text-slate-300 px-3 py-2 rounded-xl text-xs font-bold transition-all hover:bg-slate-700/50 disabled:opacity-30 disabled:cursor-not-allowed"
+          >
+            التالي →
+          </button>
+        </div>
+      )}
     </div>
   );
 }
