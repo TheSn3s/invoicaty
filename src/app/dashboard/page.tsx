@@ -44,6 +44,9 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
+  const [showDateFilter, setShowDateFilter] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [showImport, setShowImport] = useState(false);
   const [editInvoice, setEditInvoice] = useState<Invoice | null>(null);
@@ -173,7 +176,9 @@ export default function DashboardPage() {
     const matchStatus = statusFilter === "all" ||
       (statusFilter === "Paid" && inv.status === "Paid") ||
       (statusFilter === "Not Paid" && inv.status === "Not Paid");
-    return matchSearch && matchStatus;
+    const matchDateFrom = !dateFrom || inv.date >= dateFrom;
+    const matchDateTo = !dateTo || inv.date <= dateTo;
+    return matchSearch && matchStatus && matchDateFrom && matchDateTo;
   });
 
   // Stats
@@ -263,11 +268,41 @@ export default function DashboardPage() {
             <option value="Paid">مدفوع ✅</option>
             <option value="Not Paid">معلق 🚩</option>
           </select>
+          <button onClick={() => setShowDateFilter(!showDateFilter)}
+            className={`flex items-center gap-1.5 px-4 py-3 rounded-xl text-xs font-bold transition-all border ${
+              dateFrom || dateTo
+                ? "bg-blue-500/15 border-blue-500/30 text-blue-400"
+                : "bg-slate-800/50 border-slate-700/50 text-slate-400 hover:bg-slate-700/50"
+            }`}>
+            📅 {dateFrom || dateTo ? "فلتر مفعّل" : "تاريخ"}
+          </button>
           <div className="flex items-center justify-center gap-1.5 bg-slate-800/30 rounded-xl px-4 py-3 border border-slate-700/30 min-w-[100px]">
             <span className="text-slate-500 text-xs">النتائج:</span>
             <span className="font-inter font-bold text-blue-400">{filtered.length}</span>
           </div>
         </div>
+
+        {/* Date Range Filter */}
+        {showDateFilter && (
+          <div className="mt-3 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 glass rounded-xl p-4 fade-in">
+            <div className="flex items-center gap-2 flex-1">
+              <label className="text-slate-400 text-xs font-bold whitespace-nowrap">من:</label>
+              <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)}
+                className="flex-1 bg-slate-800/50 border border-slate-700/50 rounded-xl px-3 py-2.5 text-sm text-white font-inter focus:outline-none focus:ring-2 focus:ring-blue-500/40" />
+            </div>
+            <div className="flex items-center gap-2 flex-1">
+              <label className="text-slate-400 text-xs font-bold whitespace-nowrap">إلى:</label>
+              <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)}
+                className="flex-1 bg-slate-800/50 border border-slate-700/50 rounded-xl px-3 py-2.5 text-sm text-white font-inter focus:outline-none focus:ring-2 focus:ring-blue-500/40" />
+            </div>
+            {(dateFrom || dateTo) && (
+              <button onClick={() => { setDateFrom(""); setDateTo(""); }}
+                className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-2.5 rounded-xl text-xs font-bold hover:bg-red-500/20 transition-all">
+                ✕ مسح
+              </button>
+            )}
+          </div>
+        )}
 
         {/* Table */}
         <InvoiceTable
