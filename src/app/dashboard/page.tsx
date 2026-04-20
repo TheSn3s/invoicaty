@@ -20,7 +20,7 @@ interface Invoice {
   project: string;
   description: string;
   amount: number;
-  discount: number;
+  discount?: number;
   currency: string;
   status: string;
   category: string;
