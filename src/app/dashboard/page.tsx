@@ -20,6 +20,7 @@ interface Invoice {
   project: string;
   description: string;
   amount: number;
+  discount: number;
   currency: string;
   status: string;
   category: string;
@@ -101,6 +102,7 @@ export default function DashboardPage() {
         project: data.project,
         description: data.description,
         amount: data.amount,
+        discount: data.discount,
         status: data.status,
         category: data.category,
       }).eq("id", editInvoice.id);
@@ -183,16 +185,16 @@ export default function DashboardPage() {
 
   // Stats
   const now = new Date();
-  const totalIncome = invoices.reduce((s, i) => s + (i.status !== "Canceled" ? Number(i.amount) || 0 : 0), 0);
+  const totalIncome = invoices.reduce((s, i) => s + (i.status !== "Canceled" ? (Number(i.amount) - (Number(i.discount) || 0)) : 0), 0);
   const monthIncome = invoices.filter(i => {
     const d = new Date(i.date);
     return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth() && i.status !== "Canceled";
-  }).reduce((s, i) => s + (Number(i.amount) || 0), 0);
+  }).reduce((s, i) => s + (Number(i.amount) - (Number(i.discount) || 0)), 0);
   const yearIncome = invoices.filter(i => {
     return new Date(i.date).getFullYear() === now.getFullYear() && i.status !== "Canceled";
-  }).reduce((s, i) => s + (Number(i.amount) || 0), 0);
+  }).reduce((s, i) => s + (Number(i.amount) - (Number(i.discount) || 0)), 0);
   const outstanding = invoices.filter(i => i.status === "Not Paid");
-  const outstandingTotal = outstanding.reduce((s, i) => s + (Number(i.amount) || 0), 0);
+  const outstandingTotal = outstanding.reduce((s, i) => s + (Number(i.amount) - (Number(i.discount) || 0)), 0);
 
   if (loading) {
     return (

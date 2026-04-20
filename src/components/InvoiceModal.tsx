@@ -5,6 +5,7 @@ interface Invoice {
   id: string; serial: string; date: string; client: string;
   project: string; description: string; amount: number;
   currency: string; status: string; category: string;
+  discount?: number;
 }
 
 interface Props {
@@ -19,6 +20,7 @@ export default function InvoiceModal({ invoice, onSave, onClose }: Props) {
   const [project, setProject] = useState("");
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
+  const [discount, setDiscount] = useState("");
   const [status, setStatus] = useState("Not Paid");
   const [category, setCategory] = useState("");
   const [saving, setSaving] = useState(false);
@@ -30,6 +32,7 @@ export default function InvoiceModal({ invoice, onSave, onClose }: Props) {
       setProject(invoice.project);
       setDescription(invoice.description || "");
       setAmount(String(invoice.amount));
+      setDiscount(String(invoice.discount || 0));
       setStatus(invoice.status);
       setCategory(invoice.category || "");
     }
@@ -38,7 +41,16 @@ export default function InvoiceModal({ invoice, onSave, onClose }: Props) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
-    await onSave({ date, client, project, description, amount: parseFloat(amount) || 0, status, category });
+    await onSave({ 
+      date, 
+      client, 
+      project, 
+      description, 
+      amount: parseFloat(amount) || 0, 
+      discount: parseFloat(discount) || 0,
+      status, 
+      category 
+    });
     setSaving(false);
   };
 
@@ -100,13 +112,19 @@ export default function InvoiceModal({ invoice, onSave, onClose }: Props) {
                 className="w-full bg-slate-800/50 border border-slate-600/30 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-blue-500/40 outline-none font-inter" />
             </div>
             <div>
-              <label className="block text-[11px] font-bold text-slate-400 mb-1.5">حالة الدفع</label>
-              <select value={status} onChange={e => setStatus(e.target.value)}
-                className="w-full bg-slate-800/50 border border-slate-600/30 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-blue-500/40 outline-none">
-                <option value="Paid">مدفوع ✅</option>
-                <option value="Not Paid">معلق 🚩</option>
-              </select>
+              <label className="block text-[11px] font-bold text-slate-400 mb-1.5">الخصم (د.ك)</label>
+              <input type="number" value={discount} onChange={e => setDiscount(e.target.value)} step="0.5"
+                className="w-full bg-slate-800/50 border border-slate-600/30 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-blue-500/40 outline-none font-inter" />
             </div>
+          </div>
+
+          <div>
+            <label className="block text-[11px] font-bold text-slate-400 mb-1.5">حالة الدفع</label>
+            <select value={status} onChange={e => setStatus(e.target.value)}
+              className="w-full bg-slate-800/50 border border-slate-600/30 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-blue-500/40 outline-none">
+              <option value="Paid">مدفوع ✅</option>
+              <option value="Not Paid">معلق 🚩</option>
+            </select>
           </div>
 
           <button type="submit" disabled={saving}

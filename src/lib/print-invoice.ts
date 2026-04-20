@@ -1,6 +1,6 @@
 interface Invoice {
   serial: string; date: string; client: string; project: string;
-  description: string; amount: number; currency: string;
+  description: string; amount: number; discount?: number; currency: string;
 }
 
 interface Profile {
@@ -11,7 +11,11 @@ interface Profile {
 
 export function printInvoice(inv: Invoice, profile: Profile | null) {
   const amt = Number(inv.amount) || 0;
+  const disc = Number(inv.discount) || 0;
+  const total = amt - disc;
   const amtFmt = `${inv.currency || 'KWD'} ${amt.toLocaleString()}`;
+  const discFmt = `${inv.currency || 'KWD'} ${disc.toLocaleString()}`;
+  const totalFmt = `${inv.currency || 'KWD'} ${total.toLocaleString()}`;
   const desc = inv.description || 'Professional services as agreed.';
   const name = profile?.full_name || profile?.business_name || 'Your Name';
   const color = profile?.brand_color || '#f04444';
@@ -94,8 +98,8 @@ body{padding:.5rem}
 <tbody><tr><td>1</td><td>1</td><td style="padding-right:2rem"><div class="pn">${inv.project}</div><div class="pd">${desc}</div></td><td>${amtFmt}</td></tr></tbody></table>
 <div class="tots"><div class="totb">
 <div class="totr"><span>Subtotal</span><span>${amtFmt}</span></div>
-<div class="totr"><span>Discount</span><span>${inv.currency || 'KWD'} 0</span></div>
-<div class="tott"><span>Total</span><span>${amtFmt}</span></div>
+<div class="totr"><span>Discount</span><span>${discFmt}</span></div>
+<div class="tott"><span>Total</span><span>${totalFmt}</span></div>
 </div></div>
 <div class="bank"><div class="bt">Banking Details:</div>
 <div><b>Account Holder:</b> ${bankHolder}</div>
