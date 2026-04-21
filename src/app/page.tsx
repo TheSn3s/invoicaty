@@ -28,7 +28,7 @@ export default function Home() {
             أفضل برنامج فواتير
             <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
-              للفريلانسرز والمستقلين
+              للفريلانسرز وأصحاب المشاريع الصغيرة
             </span>
           </h1>
           <p className="text-slate-400 text-base md:text-lg mb-8 leading-relaxed max-w-md mx-auto">
