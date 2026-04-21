@@ -25,15 +25,14 @@ export default function Home() {
         <div className="fade-in max-w-lg">
           
           <h1 className="text-3xl md:text-5xl font-black text-white mb-4 leading-tight">
-            فواتيرك الاحترافية
+            أفضل برنامج فواتير
             <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
-              بضغطة زر
+              للفريلانسرز والمستقلين
             </span>
           </h1>
           <p className="text-slate-400 text-base md:text-lg mb-8 leading-relaxed max-w-md mx-auto">
-            أنشئ وأدر فواتيرك باحترافية. تصميم أنيق، طباعة فورية،
-            وإحصائيات ذكية لمتابعة أعمالك.
+            انفويساتي (Invoicaty) هو الخيار الأسهل لإنشاء فواتير احترافية باللغة العربية. صمم فواتيرك، تابع مدفوعاتك، واطبعها كملف PDF في ثوانٍ معدودة.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link href="/register" className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white px-8 py-4 rounded-2xl font-bold text-base shadow-xl shadow-blue-500/20 transition-all">
@@ -46,19 +45,19 @@ export default function Home() {
         </div>
 
         {/* Features */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-16 w-full max-w-2xl fade-in">
+        <section className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-16 w-full max-w-2xl fade-in">
           {[
-            { icon: "⚡", title: "سريع وبسيط", desc: "أضف فاتورتك في ثوانٍ" },
-            { icon: "🖨️", title: "طباعة احترافية", desc: "قالب جاهز بضغطة زر" },
-            { icon: "📊", title: "إحصائيات ذكية", desc: "تابع دخلك ومصاريفك" },
+            { icon: "⚡", title: "فواتير عربية سريعة", desc: "أضف فاتورتك في ثوانٍ بواجهة عربية سهلة" },
+            { icon: "📄", title: "تحميل فواتير PDF", desc: "قالب فاتورة احترافي جاهز للطباعة والمشاركة" },
+            { icon: "💼", title: "مثالي للمشاريع الصغيرة", desc: "نظام متكامل لإدارة مستحقاتك المالية" },
           ].map((f, i) => (
-            <div key={i} className="glass rounded-2xl p-5 text-center">
+            <article key={i} className="glass rounded-2xl p-5 text-center">
               <div className="text-2xl mb-2">{f.icon}</div>
-              <div className="font-bold text-white text-sm mb-1">{f.title}</div>
-              <div className="text-slate-400 text-xs">{f.desc}</div>
-            </div>
+              <h2 className="font-bold text-white text-sm mb-1">{f.title}</h2>
+              <p className="text-slate-400 text-xs">{f.desc}</p>
+            </article>
           ))}
-        </div>
+        </section>
       </main>
 
       {/* Footer */}

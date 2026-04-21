@@ -99,7 +99,7 @@ export default function InvoiceTable({ invoices, onEdit, onDelete, onPrint }: Pr
                   </span>
                 </td>
                 <td className="p-4">
-                  <div className="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="flex items-center gap-1.5 md:opacity-60 group-hover:opacity-100 transition-opacity">
                     <button onClick={() => onPrint(inv)} className="bg-slate-500/10 hover:bg-slate-500/20 text-slate-300 p-2 rounded-lg transition-all" title="طباعة">📄</button>
                     <button onClick={() => onEdit(inv)} className="bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 p-2 rounded-lg transition-all" title="تعديل">✏️</button>
                     <button onClick={() => onDelete(inv)} className="bg-red-500/10 hover:bg-red-500/20 text-red-400 p-2 rounded-lg transition-all" title="حذف">🗑️</button>

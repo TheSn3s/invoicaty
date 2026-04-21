@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 export default function RegisterPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [confirmEmail, setConfirmEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -16,6 +17,10 @@ export default function RegisterPage() {
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (email !== confirmEmail) {
+      setError("البريد الإلكتروني غير متطابق");
+      return;
+    }
     if (password.length < 6) { setError("كلمة المرور يجب أن تكون 6 أحرف على الأقل"); return; }
     setLoading(true);
     setError("");
@@ -33,6 +38,7 @@ export default function RegisterPage() {
       setError(error.message === "User already registered" ? "هذا البريد مسجل مسبقاً" : error.message);
       setLoading(false);
     } else {
+      setLoading(false);
       setSuccess(true);
     }
   };
@@ -40,15 +46,24 @@ export default function RegisterPage() {
   if (success) {
     return (
       <div className="min-h-screen flex items-center justify-center px-5">
-        <div className="glass rounded-3xl p-10 text-center fade-in max-w-sm">
-          <div className="text-5xl mb-4">✉️</div>
-          <h2 className="text-xl font-bold text-white mb-2">تم التسجيل!</h2>
-          <p className="text-slate-400 text-sm mb-4">أرسلنا رابط تأكيد على بريدك الإلكتروني</p>
-          <p className="text-blue-400 font-bold text-sm mb-4" dir="ltr">{email}</p>
-          <p className="text-slate-500 text-xs mb-6">افتح بريدك واضغط على رابط التأكيد عشان تقدر تسجل دخول</p>
-          <Link href="/login" className="inline-block bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-xl text-sm font-bold transition-all">
-            الذهاب لتسجيل الدخول
-          </Link>
+        <div className="glass rounded-3xl p-10 text-center fade-in max-w-sm border-t-4 border-green-500">
+          <div className="text-6xl mb-6">📩</div>
+          <h2 className="text-2xl font-bold text-white mb-3">تفعيل الحساب</h2>
+          <p className="text-slate-300 text-sm mb-2">أرسلنا رابط تفعيل إلى:</p>
+          <p className="text-blue-400 font-bold text-base mb-6" dir="ltr">{email}</p>
+          <div className="bg-blue-500/10 border border-blue-500/20 rounded-2xl p-4 mb-8">
+            <p className="text-slate-400 text-xs leading-relaxed">
+              يرجى فتح بريدك الإلكتروني والضغط على الرابط لتفعيل حسابك. إذا لم تجد الرسالة، افحص صندوق الـ <span className="text-white font-bold">Spam</span>.
+            </p>
+          </div>
+          <div className="space-y-3">
+            <a href="https://mail.google.com" target="_blank" rel="noreferrer" className="block w-full bg-white text-slate-900 py-3.5 rounded-xl text-sm font-bold transition-all hover:bg-slate-200">
+              فتح Gmail
+            </a>
+            <Link href="/login" className="block w-full bg-slate-800 text-slate-300 py-3.5 rounded-xl text-sm font-bold transition-all hover:bg-slate-700">
+              العودة لتسجيل الدخول
+            </Link>
+          </div>
         </div>
       </div>
     );
@@ -78,6 +93,12 @@ export default function RegisterPage() {
             <label className="block text-xs font-bold text-slate-400 mb-2">البريد الإلكتروني</label>
             <input type="email" value={email} onChange={e => setEmail(e.target.value)} required
               placeholder="email@example.com" dir="ltr"
+              className="w-full bg-slate-800/50 border border-slate-600/30 rounded-xl px-4 py-3.5 text-sm text-white placeholder:text-slate-500 focus:ring-2 focus:ring-purple-500/50 outline-none" />
+          </div>
+          <div>
+            <label className="block text-xs font-bold text-slate-400 mb-2">تأكيد البريد الإلكتروني</label>
+            <input type="email" value={confirmEmail} onChange={e => setConfirmEmail(e.target.value)} required
+              placeholder="تأكيد البريد الإلكتروني" dir="ltr"
               className="w-full bg-slate-800/50 border border-slate-600/30 rounded-xl px-4 py-3.5 text-sm text-white placeholder:text-slate-500 focus:ring-2 focus:ring-purple-500/50 outline-none" />
           </div>
           <div>

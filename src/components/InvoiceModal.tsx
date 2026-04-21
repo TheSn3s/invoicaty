@@ -40,13 +40,18 @@ export default function InvoiceModal({ invoice, onSave, onClose }: Props) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const parsedAmount = parseFloat(amount);
+    if (isNaN(parsedAmount) || parsedAmount < 0) {
+      alert("يرجى إدخال مبلغ صحيح");
+      return;
+    }
     setSaving(true);
     await onSave({ 
       date, 
       client, 
       project, 
       description, 
-      amount: parseFloat(amount) || 0, 
+      amount: parsedAmount, 
       discount: parseFloat(discount) || 0,
       status, 
       category 

@@ -31,11 +31,24 @@ export default function ResetPasswordPage() {
   if (sent) {
     return (
       <div className="min-h-screen flex items-center justify-center px-5">
-        <div className="glass rounded-3xl p-10 text-center fade-in max-w-sm w-full">
-          <div className="text-5xl mb-4">📧</div>
-          <h2 className="text-xl font-bold text-white mb-2">تم إرسال الرابط!</h2>
-          <p className="text-slate-400 text-sm mb-6">تحقق من بريدك الإلكتروني <span className="text-blue-400 font-bold" dir="ltr">{email}</span> واتبع الرابط لإعادة تعيين كلمة المرور.</p>
-          <Link href="/login" className="text-blue-400 font-bold text-sm hover:underline">← العودة لتسجيل الدخول</Link>
+        <div className="glass rounded-3xl p-10 text-center fade-in max-w-sm w-full border-t-4 border-amber-500">
+          <div className="text-6xl mb-6">📩</div>
+          <h2 className="text-2xl font-bold text-white mb-3">رابط إعادة التعيين</h2>
+          <p className="text-slate-300 text-sm mb-2">أرسلنا رابطاً خاصاً إلى:</p>
+          <p className="text-blue-400 font-bold text-base mb-6" dir="ltr">{email}</p>
+          <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-4 mb-8">
+            <p className="text-slate-400 text-xs leading-relaxed">
+              يرجى التحقق من بريدك الإلكتروني والضغط على الرابط لتتمكن من اختيار كلمة مرور جديدة.
+            </p>
+          </div>
+          <div className="space-y-3">
+            <a href="https://mail.google.com" target="_blank" rel="noreferrer" className="block w-full bg-white text-slate-900 py-3.5 rounded-xl text-sm font-bold transition-all hover:bg-slate-200">
+              فتح Gmail
+            </a>
+            <Link href="/login" className="block w-full bg-slate-800 text-slate-300 py-3.5 rounded-xl text-sm font-bold transition-all hover:bg-slate-700">
+              العودة لتسجيل الدخول
+            </Link>
+          </div>
         </div>
       </div>
     );
