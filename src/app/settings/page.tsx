@@ -292,10 +292,12 @@ export default function SettingsPage() {
                   <select value={businessType} onChange={e => setBusinessType(e.target.value as BusinessType | "")}
                     className="w-full bg-slate-800/50 border border-slate-600/30 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-blue-500/40 outline-none">
                     <option value="">{t("settings.selectBusinessType")}</option>
-                    <option value="freelancer">{t("settings.freelancer")}</option>
-                    <option value="small_business">{t("settings.smallBusiness")}</option>
-                    <option value="agency">{t("settings.agency")}</option>
-                    <option value="enterprise">{t("settings.enterprise")}</option>
+                    <option value="influencer">{t("onboarding.influencer")}</option>
+                    <option value="freelancer">{t("onboarding.freelancer")}</option>
+                    <option value="professional">{t("onboarding.professional")}</option>
+                    <option value="commerce">{t("onboarding.commerce")}</option>
+                    <option value="small_business">{t("onboarding.smallBiz")}</option>
+                    <option value="other">{t("onboarding.other")}</option>
                   </select>
                 </div>
 

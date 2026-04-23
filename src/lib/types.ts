@@ -3,7 +3,7 @@
 // ============================================
 
 export type Language = 'ar' | 'en';
-export type BusinessType = 'freelancer' | 'small_business' | 'agency' | 'enterprise';
+export type BusinessType = 'influencer' | 'freelancer' | 'professional' | 'commerce' | 'small_business' | 'other';
 export type InvoiceStatus = 'Paid' | 'Not Paid' | 'Canceled';
 export type UserRole = 'user' | 'admin';
 
