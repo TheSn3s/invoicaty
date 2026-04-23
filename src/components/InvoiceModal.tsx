@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { useI18n } from "@/lib/i18n";
 
 interface Invoice {
   id: string; serial: string; date: string; client: string;
@@ -12,9 +13,10 @@ interface Props {
   invoice: Invoice | null;
   onSave: (data: Partial<Invoice>) => void;
   onClose: () => void;
+  currencySymbol?: string;
 }
 
-export default function InvoiceModal({ invoice, onSave, onClose }: Props) {
+export default function InvoiceModal({ invoice, onSave, onClose, currencySymbol = 'د.ك' }: Props) {
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
   const [client, setClient] = useState("");
   const [project, setProject] = useState("");
@@ -24,6 +26,7 @@ export default function InvoiceModal({ invoice, onSave, onClose }: Props) {
   const [status, setStatus] = useState("Not Paid");
   const [category, setCategory] = useState("");
   const [saving, setSaving] = useState(false);
+  const { t } = useI18n();
 
   useEffect(() => {
     if (invoice) {
@@ -41,20 +44,13 @@ export default function InvoiceModal({ invoice, onSave, onClose }: Props) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const parsedAmount = parseFloat(amount);
-    if (isNaN(parsedAmount) || parsedAmount < 0) {
-      alert("يرجى إدخال مبلغ صحيح");
-      return;
-    }
+    if (isNaN(parsedAmount) || parsedAmount < 0) return;
     setSaving(true);
-    await onSave({ 
-      date, 
-      client, 
-      project, 
-      description, 
-      amount: parsedAmount, 
+    await onSave({
+      date, client, project, description,
+      amount: parsedAmount,
       discount: parseFloat(discount) || 0,
-      status, 
-      category 
+      status, category
     });
     setSaving(false);
   };
@@ -62,14 +58,13 @@ export default function InvoiceModal({ invoice, onSave, onClose }: Props) {
   return (
     <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm flex items-end md:items-center justify-center z-50" onClick={onClose}>
       <div className="bg-slate-900 border border-slate-700/50 rounded-t-3xl md:rounded-3xl w-full max-w-md max-h-[90vh] overflow-y-auto slide-up" onClick={e => e.stopPropagation()}>
-        {/* Handle bar (mobile) */}
         <div className="md:hidden flex justify-center pt-3 pb-1">
           <div className="w-10 h-1 bg-slate-600 rounded-full" />
         </div>
 
         <div className="p-6 border-b border-slate-700/50 flex justify-between items-center">
           <h3 className="text-lg font-bold text-white">
-            {invoice ? `✏️ تعديل #${invoice.serial}` : "➕ فاتورة جديدة"}
+            {invoice ? `✏️ ${t("invoice.editInvoice")} #${invoice.serial}` : `➕ ${t("invoice.addInvoice")}`}
           </h3>
           <button onClick={onClose} className="text-slate-400 hover:text-white text-xl w-9 h-9 rounded-xl hover:bg-slate-700/50 flex items-center justify-center transition-all">✕</button>
         </div>
@@ -77,64 +72,64 @@ export default function InvoiceModal({ invoice, onSave, onClose }: Props) {
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-[11px] font-bold text-slate-400 mb-1.5">التاريخ</label>
+              <label className="block text-[11px] font-bold text-slate-400 mb-1.5">{t("invoice.date")}</label>
               <input type="date" value={date} onChange={e => setDate(e.target.value)} required
                 className="w-full bg-slate-800/50 border border-slate-600/30 rounded-xl px-3 py-3 text-sm text-white focus:ring-2 focus:ring-blue-500/40 outline-none" />
             </div>
             <div>
-              <label className="block text-[11px] font-bold text-slate-400 mb-1.5">التصنيف</label>
+              <label className="block text-[11px] font-bold text-slate-400 mb-1.5">{t("invoice.category")}</label>
               <input type="text" value={category} onChange={e => setCategory(e.target.value)}
-                placeholder="فيديو، تصميم..."
+                placeholder={t("invoice.category")}
                 className="w-full bg-slate-800/50 border border-slate-600/30 rounded-xl px-3 py-3 text-sm text-white placeholder:text-slate-500 focus:ring-2 focus:ring-blue-500/40 outline-none" />
             </div>
           </div>
 
           <div>
-            <label className="block text-[11px] font-bold text-slate-400 mb-1.5">العميل</label>
+            <label className="block text-[11px] font-bold text-slate-400 mb-1.5">{t("invoice.client")}</label>
             <input type="text" value={client} onChange={e => setClient(e.target.value)} required
-              placeholder="اسم العميل أو الشركة..."
+              placeholder={t("invoice.client")}
               className="w-full bg-slate-800/50 border border-slate-600/30 rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:ring-2 focus:ring-blue-500/40 outline-none" />
           </div>
 
           <div>
-            <label className="block text-[11px] font-bold text-slate-400 mb-1.5">المشروع</label>
+            <label className="block text-[11px] font-bold text-slate-400 mb-1.5">{t("invoice.project")}</label>
             <input type="text" value={project} onChange={e => setProject(e.target.value)} required
-              placeholder="اسم المشروع..."
+              placeholder={t("invoice.project")}
               className="w-full bg-slate-800/50 border border-slate-600/30 rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:ring-2 focus:ring-blue-500/40 outline-none" />
           </div>
 
           <div>
-            <label className="block text-[11px] font-bold text-slate-400 mb-1.5">تفاصيل العمل <span className="text-slate-500">(تظهر في الفاتورة)</span></label>
+            <label className="block text-[11px] font-bold text-slate-400 mb-1.5">{t("invoice.description")}</label>
             <textarea value={description} onChange={e => setDescription(e.target.value)} rows={2}
-              placeholder="وصف تفصيلي للعمل المنجز..."
+              placeholder={t("invoice.description")}
               className="w-full bg-slate-800/50 border border-slate-600/30 rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:ring-2 focus:ring-blue-500/40 outline-none resize-none" />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-[11px] font-bold text-slate-400 mb-1.5">المبلغ (د.ك)</label>
+              <label className="block text-[11px] font-bold text-slate-400 mb-1.5">{t("invoice.amount")} ({currencySymbol})</label>
               <input type="number" value={amount} onChange={e => setAmount(e.target.value)} required step="0.5"
                 className="w-full bg-slate-800/50 border border-slate-600/30 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-blue-500/40 outline-none font-inter" />
             </div>
             <div>
-              <label className="block text-[11px] font-bold text-slate-400 mb-1.5">الخصم (د.ك)</label>
+              <label className="block text-[11px] font-bold text-slate-400 mb-1.5">{t("invoice.discount")} ({currencySymbol})</label>
               <input type="number" value={discount} onChange={e => setDiscount(e.target.value)} step="0.5"
                 className="w-full bg-slate-800/50 border border-slate-600/30 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-blue-500/40 outline-none font-inter" />
             </div>
           </div>
 
           <div>
-            <label className="block text-[11px] font-bold text-slate-400 mb-1.5">حالة الدفع</label>
+            <label className="block text-[11px] font-bold text-slate-400 mb-1.5">{t("invoice.status")}</label>
             <select value={status} onChange={e => setStatus(e.target.value)}
               className="w-full bg-slate-800/50 border border-slate-600/30 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-blue-500/40 outline-none">
-              <option value="Paid">مدفوع ✅</option>
-              <option value="Not Paid">معلق 🚩</option>
+              <option value="Paid">{t("dashboard.paid")}</option>
+              <option value="Not Paid">{t("dashboard.notPaid")}</option>
             </select>
           </div>
 
           <button type="submit" disabled={saving}
             className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-500/20 transition-all disabled:opacity-50 text-base mt-2">
-            {saving ? "جاري الحفظ..." : "💾 حفظ"}
+            {saving ? t("settings.saving") : `💾 ${t("invoice.save")}`}
           </button>
         </form>
       </div>
