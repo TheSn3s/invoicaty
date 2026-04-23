@@ -49,7 +49,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // If logged in, on a protected page, but NOT onboarded → redirect to onboarding
-  if (user && !path.startsWith('/onboarding') && (path.startsWith('/dashboard') || path.startsWith('/admin') || path.startsWith('/settings'))) {
+  if (user && !path.startsWith('/onboarding') && (path.startsWith('/dashboard') || path.startsWith('/admin') || path.startsWith('/settings') || path.startsWith('/quotations'))) {
     const { data: profile } = await supabase
       .from('profiles')
       .select('onboarding_completed')
@@ -62,7 +62,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // If not logged in and visiting protected pages → redirect to login
-  if (!user && (path.startsWith('/dashboard') || path.startsWith('/admin') || path.startsWith('/settings') || path.startsWith('/onboarding'))) {
+  if (!user && (path.startsWith('/dashboard') || path.startsWith('/admin') || path.startsWith('/settings') || path.startsWith('/onboarding') || path.startsWith('/quotations'))) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
@@ -70,5 +70,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/', '/login', '/register', '/dashboard/:path*', '/admin/:path*', '/settings/:path*', '/onboarding/:path*', '/update-password'],
+  matcher: ['/', '/login', '/register', '/dashboard/:path*', '/admin/:path*', '/settings/:path*', '/onboarding/:path*', '/update-password', '/quotations/:path*'],
 }

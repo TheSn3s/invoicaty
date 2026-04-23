@@ -176,6 +176,7 @@ export default function DashboardPage() {
               <Link href="/admin" className="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-700/50 transition-all text-sm" title={t("nav.admin")}>🛡</Link>
             )}
             <button onClick={() => setShowImport(true)} className="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-700/50 transition-all text-sm" title={t("nav.import")}>📥</button>
+            <Link href="/quotations" className="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-700/50 transition-all text-sm" title={t("quotation.title")}>📋</Link>
             <Link href="/settings" className="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-700/50 transition-all text-sm" title={t("nav.settings")}>⚙️</Link>
             <button onClick={() => { setEditInvoice(null); setShowModal(true); }}
               className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-lg shadow-blue-500/20">
