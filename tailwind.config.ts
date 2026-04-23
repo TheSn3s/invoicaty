@@ -8,7 +8,8 @@ const config: Config = {
     extend: {
       fontFamily: {
         tajawal: ["var(--font-tajawal)", "sans-serif"],
-        inter: ["var(--font-inter)", "monospace"],
+        inter: ["var(--font-inter)", "sans-serif"],
+        sans: ["var(--font-inter)", "var(--font-tajawal)", "sans-serif"],
       },
     },
   },

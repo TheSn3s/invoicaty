@@ -34,7 +34,7 @@ function resolve(obj: any, path: string): string | undefined {
 
 export function I18nProvider({
   children,
-  initialLang = 'ar',
+  initialLang = 'en',
 }: {
   children: React.ReactNode;
   initialLang?: Language;
@@ -51,7 +51,7 @@ export function I18nProvider({
     // Update <html> attributes live
     document.documentElement.lang = newLang;
     document.documentElement.dir = newLang === 'ar' ? 'rtl' : 'ltr';
-    // Switch font family
+    // Switch font family (Tajawal for Arabic, Inter for English)
     document.body.style.fontFamily =
       newLang === 'ar'
         ? 'var(--font-tajawal), sans-serif'

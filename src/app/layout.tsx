@@ -11,20 +11,22 @@ const tajawal = Tajawal({
 
 const inter = Inter({
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800"],
   variable: "--font-inter",
 });
 
 export const metadata: Metadata = {
-  title: "انفويساتي (Invoicaty) — أسهل برنامج فواتير للفريلانسرز والمستقلين",
-  description: "أنشئ فواتير احترافية في دقائق مع انفويساتي. نظام فواتير متكامل يدعم اللغة العربية، العملات الخليجية، وتحميل PDF. الخيار الأول للمصممين والمبرمجين.",
-  keywords: ["انفويساتي", "Invoicaty", "برنامج فواتير", "فواتير فريلانسرز", "نظام فواتير عربي", "إنشاء فاتورة PDF", "فواتير المصممين"],
+  title: "Invoicaty — The Easiest Invoicing App for Freelancers & Small Businesses",
+  description: "Create professional invoices in minutes with Invoicaty. A complete invoicing system supporting multiple currencies, Arabic & English, and PDF export. The #1 choice for designers and developers.",
+  keywords: ["Invoicaty", "invoicing app", "freelancer invoices", "invoice software", "PDF invoice generator", "small business invoicing", "انفويساتي", "برنامج فواتير"],
   manifest: "/manifest.json",
   openGraph: {
-    title: "Invoicaty — نظام الفواتير الأسهل للمستقلين",
-    description: "ابدأ بإدارة فواتيرك وتحصيل مدفوعاتك باحترافية وسهولة.",
+    title: "Invoicaty — Effortless Invoicing for Freelancers",
+    description: "Start managing your invoices and collecting payments professionally and easily.",
     url: "https://invoicaty.com",
     siteName: "Invoicaty",
-    locale: "ar_KW",
+    locale: "en_US",
+    alternateLocale: ["ar_KW"],
     type: "website",
   },
   alternates: {
@@ -48,26 +50,26 @@ export default function RootLayout({
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
-    "name": "انفويساتي — Invoicaty",
+    "name": "Invoicaty",
     "operatingSystem": "Web",
     "applicationCategory": "BusinessApplication",
     "offers": {
       "@type": "Offer",
       "price": "0",
-      "priceCurrency": "KWD"
+      "priceCurrency": "USD"
     },
-    "description": "نظام انفويساتي لإنشاء وإدارة الفواتير الاحترافية للمستقلين وأصحاب المشاريع الصغيرة."
+    "description": "Invoicaty is a professional invoicing platform for freelancers and small business owners."
   };
 
   return (
-    <html lang="ar" dir="rtl" className={`${tajawal.variable} ${inter.variable}`}>
+    <html lang="en" dir="ltr" className={`${tajawal.variable} ${inter.variable}`}>
       <head>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className="font-tajawal bg-slate-950 text-slate-200 min-h-screen antialiased">
+      <body className="font-inter bg-slate-950 text-slate-200 min-h-screen antialiased">
         <I18nProvider>
           {children}
         </I18nProvider>
