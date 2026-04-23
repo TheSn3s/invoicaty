@@ -3,6 +3,8 @@ import { useState, useEffect, useCallback } from "react";
 import { createClient } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import { useI18n } from "@/lib/i18n";
+import { getCurrencyLabel } from "@/lib/currency";
+import type { Currency } from "@/lib/types";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import InvoiceModal from "@/components/InvoiceModal";
 import DeleteModal from "@/components/DeleteModal";
@@ -29,7 +31,7 @@ interface Profile {
 export default function DashboardPage() {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [currencySymbol, setCurrencySymbol] = useState<string>("");
+  const [currencyData, setCurrencyData] = useState<Currency | null>(null);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -44,8 +46,8 @@ export default function DashboardPage() {
   const supabase = createClient();
   const { t, lang } = useI18n();
 
-  // Default symbol fallback: KWD for Arabic UI, USD for English UI, until profile loads
-  const effectiveSymbol = currencySymbol || (lang === 'ar' ? 'د.ك' : '$');
+  // Currency label follows UI language: Arabic → symbol (د.ك), English → code (KWD)
+  const effectiveSymbol = getCurrencyLabel(currencyData, lang);
 
   const loadData = useCallback(async () => {
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -63,10 +65,10 @@ export default function DashboardPage() {
       setProfile(newProf || null);
     } else {
       setProfile(prof);
-      // Load currency symbol
+      // Load currency data
       if (prof.default_currency) {
-        const { data: curr } = await supabase.from("currencies").select("symbol").eq("code", prof.default_currency).single();
-        if (curr?.symbol) setCurrencySymbol(curr.symbol);
+        const { data: curr } = await supabase.from("currencies").select("*").eq("code", prof.default_currency).single();
+        if (curr) setCurrencyData(curr);
       }
     }
 

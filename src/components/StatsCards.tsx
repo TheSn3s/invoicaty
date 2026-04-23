@@ -17,7 +17,7 @@ function AnimatedNumber({ value }: { value: number }) {
 
 export default function StatsCards({ total, month, year, outstanding, outstandingCount, currencySymbol }: Props) {
   const { t, lang } = useI18n();
-  const symbol = currencySymbol || (lang === 'ar' ? 'د.ك' : '$');
+  const symbol = currencySymbol || (lang === 'ar' ? 'د.ك' : 'KWD');
   const monthNamesAr = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
   const monthNamesEn = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   const monthNames = lang === 'ar' ? monthNamesAr : monthNamesEn;

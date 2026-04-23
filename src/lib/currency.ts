@@ -4,6 +4,24 @@
 import type { Currency, Language } from './types';
 
 /**
+ * Get the display label for a currency based on UI language.
+ * Arabic UI → native symbol (د.ك, ر.س, د.إ)
+ * English UI → ISO code (KWD, SAR, AED)
+ * Non-Arabic currencies always show their symbol ($, €, £)
+ */
+export function getCurrencyLabel(
+  currency: Currency | null | undefined,
+  language: Language = 'en'
+): string {
+  if (!currency) return language === 'ar' ? 'د.ك' : 'KWD';
+  const isArabicSymbol = /[\u0600-\u06FF]/.test(currency.symbol);
+  if (isArabicSymbol) {
+    return language === 'ar' ? currency.symbol : currency.code;
+  }
+  return currency.symbol;
+}
+
+/**
  * Format a number using a currency's locale-aware rules.
  * Falls back gracefully if currency metadata is missing.
  */
@@ -20,13 +38,16 @@ export function formatAmount(
     maximumFractionDigits: decimals,
   }).format(amount || 0);
 
-  if (!currency) return formatted;
+  const label = getCurrencyLabel(currency, language);
+  const isArabicSymbol = currency ? /[\u0600-\u06FF]/.test(currency.symbol) : false;
 
-  // Symbol position: Arabic currencies usually come after, Western before
-  const isArabicSymbol = /[\u0600-\u06FF]/.test(currency.symbol);
-  return isArabicSymbol
-    ? `${formatted} ${currency.symbol}`
-    : `${currency.symbol} ${formatted}`;
+  // Arabic symbols & codes go after the number; Western symbols go before
+  if (!currency) {
+    return language === 'ar' ? `${formatted} ${label}` : `${formatted} ${label}`;
+  }
+  return isArabicSymbol || language === 'ar'
+    ? `${formatted} ${label}`
+    : `${label} ${formatted}`;
 }
 
 /**

@@ -21,7 +21,7 @@ const PAGE_SIZE = 20;
 export default function InvoiceTable({ invoices, onEdit, onDelete, onPrint, currencySymbol }: Props) {
   const [page, setPage] = useState(0);
   const { t, lang } = useI18n();
-  const symbol = currencySymbol || (lang === 'ar' ? 'د.ك' : '$');
+  const symbol = currencySymbol || (lang === 'ar' ? 'د.ك' : 'KWD');
   const totalPages = Math.ceil(invoices.length / PAGE_SIZE);
   const paged = invoices.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 
