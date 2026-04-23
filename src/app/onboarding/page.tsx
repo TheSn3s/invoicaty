@@ -163,7 +163,7 @@ export default function OnboardingPage() {
       <main className="flex-1 px-4 md:px-8 py-6 max-w-2xl mx-auto w-full">
         {/* STEP 1 — Business Type */}
         {step === 1 && (
-          <div className="fade-in">
+          <div className="fade-in text-center">
             <h2 className="text-2xl md:text-3xl font-black text-white mb-2">{t("onboarding.step1Title")}</h2>
             <p className="text-slate-400 text-sm mb-6">{t("onboarding.step1Subtitle")}</p>
 
@@ -172,12 +172,12 @@ export default function OnboardingPage() {
                 const selected = businessType === opt.value;
                 return (
                   <button key={opt.value} onClick={() => setBusinessType(opt.value)}
-                    className={`relative text-${lang === 'ar' ? 'right' : 'left'} p-4 rounded-2xl border-2 transition-all hover:scale-[1.02] active:scale-[0.98] ${
+                    className={`relative text-center p-4 rounded-2xl border-2 transition-all hover:scale-[1.02] active:scale-[0.98] ${
                       selected
                         ? "border-blue-500 bg-blue-500/10 shadow-lg shadow-blue-500/20"
                         : "border-slate-700/50 bg-slate-800/30 hover:border-slate-600"
                     }`}>
-                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${opt.gradient} flex items-center justify-center text-2xl mb-3`}>
+                    <div className={`w-12 h-12 mx-auto rounded-xl bg-gradient-to-br ${opt.gradient} flex items-center justify-center text-2xl mb-3`}>
                       {opt.icon}
                     </div>
                     <h3 className="text-sm font-bold text-white mb-1">{t(opt.titleKey)}</h3>
@@ -194,15 +194,15 @@ export default function OnboardingPage() {
 
         {/* STEP 2 — Country & Currency */}
         {step === 2 && (
-          <div className="fade-in">
+          <div className="fade-in text-center">
             <h2 className="text-2xl md:text-3xl font-black text-white mb-2">{t("onboarding.step2Title")}</h2>
             <p className="text-slate-400 text-sm mb-6">{t("onboarding.step2Subtitle")}</p>
 
-            <div className="space-y-4">
+            <div className="space-y-4 text-center">
               <div>
                 <label className="block text-xs font-bold text-slate-400 mb-2">{t("settings.country")}</label>
                 <select value={countryCode} onChange={e => onCountryChange(e.target.value)}
-                  className="w-full bg-slate-800/50 border border-slate-700/50 rounded-xl px-4 py-3.5 text-sm text-white focus:ring-2 focus:ring-blue-500/40 outline-none">
+                  className="w-full bg-slate-800/50 border border-slate-700/50 rounded-xl px-4 py-3.5 text-sm text-white focus:ring-2 focus:ring-blue-500/40 outline-none text-center">
                   <option value="">{t("settings.selectCountry")}</option>
                   {countries.map(c => (
                     <option key={c.code} value={c.code}>
@@ -215,7 +215,7 @@ export default function OnboardingPage() {
               <div>
                 <label className="block text-xs font-bold text-slate-400 mb-2">{t("settings.defaultCurrency")}</label>
                 <select value={defaultCurrency} onChange={e => setDefaultCurrency(e.target.value)}
-                  className="w-full bg-slate-800/50 border border-slate-700/50 rounded-xl px-4 py-3.5 text-sm text-white focus:ring-2 focus:ring-blue-500/40 outline-none">
+                  className="w-full bg-slate-800/50 border border-slate-700/50 rounded-xl px-4 py-3.5 text-sm text-white focus:ring-2 focus:ring-blue-500/40 outline-none text-center">
                   <option value="">{t("settings.selectCurrency")}</option>
                   {currencies.map(c => (
                     <option key={c.code} value={c.code}>
@@ -229,7 +229,7 @@ export default function OnboardingPage() {
                 <label className="block text-xs font-bold text-slate-400 mb-2">{t("settings.taxRate")}</label>
                 <input type="number" value={taxRate} onChange={e => setTaxRate(e.target.value)}
                   min="0" max="100" step="0.01" dir="ltr"
-                  className="w-full bg-slate-800/50 border border-slate-700/50 rounded-xl px-4 py-3.5 text-sm text-white focus:ring-2 focus:ring-blue-500/40 outline-none font-inter" />
+                  className="w-full bg-slate-800/50 border border-slate-700/50 rounded-xl px-4 py-3.5 text-sm text-white focus:ring-2 focus:ring-blue-500/40 outline-none font-inter text-center" />
               </div>
             </div>
           </div>
@@ -237,7 +237,7 @@ export default function OnboardingPage() {
 
         {/* STEP 3 — Logo Upload */}
         {step === 3 && (
-          <div className="fade-in">
+          <div className="fade-in text-center">
             <h2 className="text-2xl md:text-3xl font-black text-white mb-2">{t("onboarding.step3Title")}</h2>
             <p className="text-slate-400 text-sm mb-6">{t("onboarding.step3Subtitle")}</p>
 
