@@ -167,23 +167,23 @@ export default function OnboardingPage() {
             <h2 className="text-2xl md:text-3xl font-black text-white mb-2">{t("onboarding.step1Title")}</h2>
             <p className="text-slate-400 text-sm mb-6">{t("onboarding.step1Subtitle")}</p>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-3">
               {BIZ_OPTIONS.map(opt => {
                 const selected = businessType === opt.value;
                 return (
                   <button key={opt.value} onClick={() => setBusinessType(opt.value)}
-                    className={`relative text-center p-4 rounded-2xl border-2 transition-all hover:scale-[1.02] active:scale-[0.98] ${
+                    className={`relative text-center p-3 sm:p-4 rounded-2xl border-2 transition-all hover:scale-[1.02] active:scale-[0.98] ${
                       selected
                         ? "border-blue-500 bg-blue-500/10 shadow-lg shadow-blue-500/20"
                         : "border-slate-700/50 bg-slate-800/30 hover:border-slate-600"
                     }`}>
-                    <div className={`w-12 h-12 mx-auto rounded-xl bg-gradient-to-br ${opt.gradient} flex items-center justify-center text-2xl mb-3`}>
+                    <div className={`w-10 h-10 sm:w-12 sm:h-12 mx-auto rounded-xl bg-gradient-to-br ${opt.gradient} flex items-center justify-center text-xl sm:text-2xl mb-2 sm:mb-3`}>
                       {opt.icon}
                     </div>
-                    <h3 className="text-sm font-bold text-white mb-1">{t(opt.titleKey)}</h3>
-                    <p className="text-xs text-slate-400 leading-relaxed">{t(opt.descKey)}</p>
+                    <h3 className="text-xs sm:text-sm font-bold text-white mb-1">{t(opt.titleKey)}</h3>
+                    <p className="text-[10px] sm:text-xs text-slate-400 leading-relaxed">{t(opt.descKey)}</p>
                     {selected && (
-                      <div className={`absolute top-3 ${lang === 'ar' ? 'left-3' : 'right-3'} w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs`}>✓</div>
+                      <div className={`absolute top-2 sm:top-3 ${lang === 'ar' ? 'left-2 sm:left-3' : 'right-2 sm:right-3'} w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-blue-500 flex items-center justify-center text-white text-[10px] sm:text-xs`}>✓</div>
                     )}
                   </button>
                 );
