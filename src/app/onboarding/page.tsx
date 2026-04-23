@@ -88,19 +88,26 @@ export default function OnboardingPage() {
     reader.readAsDataURL(file);
   };
 
+  const [error, setError] = useState<string>("");
+
   const uploadLogo = async (): Promise<string | null> => {
     if (!logoFile || !userId) return null;
     setUploading(true);
     try {
       const ext = logoFile.name.split('.').pop();
       const path = `${userId}/logo-${Date.now()}.${ext}`;
-      const { error } = await supabase.storage.from("logos").upload(path, logoFile, { upsert: true });
-      if (error) {
-        console.error("Logo upload failed:", error);
+      const { error: uploadError } = await supabase.storage.from("logos").upload(path, logoFile, { upsert: true });
+      if (uploadError) {
+        console.error("Logo upload failed:", uploadError);
+        setError(`Logo upload failed: ${uploadError.message}`);
         return null;
       }
       const { data } = supabase.storage.from("logos").getPublicUrl(path);
       return data.publicUrl;
+    } catch (e) {
+      console.error("Logo upload exception:", e);
+      setError(`Upload error: ${e instanceof Error ? e.message : String(e)}`);
+      return null;
     } finally {
       setUploading(false);
     }
@@ -108,22 +115,40 @@ export default function OnboardingPage() {
 
   const finish = async () => {
     setSaving(true);
-    let logo_url: string | null = null;
-    if (logoFile) logo_url = await uploadLogo();
+    setError("");
+    try {
+      let logo_url: string | null = null;
+      if (logoFile) {
+        logo_url = await uploadLogo();
+        // If upload failed and user chose a logo, stop — show error
+        if (!logo_url) {
+          setSaving(false);
+          return;
+        }
+      }
 
-    const updates: Record<string, unknown> = {
-      business_type: businessType || null,
-      country_code: countryCode || null,
-      default_currency: defaultCurrency || null,
-      tax_rate: Number(taxRate) || 0,
-      preferred_language: lang,
-      onboarding_completed: true,
-      updated_at: new Date().toISOString(),
-    };
-    if (logo_url) updates.logo_url = logo_url;
+      const updates: Record<string, unknown> = {
+        business_type: businessType || null,
+        country_code: countryCode || null,
+        default_currency: defaultCurrency || null,
+        tax_rate: Number(taxRate) || 0,
+        preferred_language: lang,
+        onboarding_completed: true,
+        updated_at: new Date().toISOString(),
+      };
+      if (logo_url) updates.logo_url = logo_url;
 
-    await supabase.from("profiles").update(updates).eq("id", userId);
-    router.push("/dashboard");
+      const { error: updateError } = await supabase.from("profiles").update(updates).eq("id", userId);
+      if (updateError) {
+        setError(`Save failed: ${updateError.message}`);
+        setSaving(false);
+        return;
+      }
+      router.push("/dashboard");
+    } catch (e) {
+      setError(`Error: ${e instanceof Error ? e.message : String(e)}`);
+      setSaving(false);
+    }
   };
 
   if (loading) {
@@ -266,7 +291,13 @@ export default function OnboardingPage() {
 
       {/* Footer Actions */}
       <footer className="border-t border-slate-700/30 px-4 md:px-8 py-4">
-        <div className="max-w-2xl mx-auto flex items-center justify-between gap-3">
+        <div className="max-w-2xl mx-auto">
+          {error && (
+            <div className="mb-3 bg-red-500/10 border border-red-500/30 text-red-400 text-xs px-3 py-2 rounded-xl text-center">
+              ⚠️ {error}
+            </div>
+          )}
+          <div className="flex items-center justify-between gap-3">
           <button
             onClick={() => setStep(s => Math.max(1, s - 1))}
             disabled={step === 1}
@@ -291,10 +322,11 @@ export default function OnboardingPage() {
             ) : (
               <button onClick={finish} disabled={saving || uploading}
                 className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white px-8 py-3 rounded-xl text-sm font-bold transition-all disabled:opacity-50 shadow-lg shadow-green-500/20">
-                {saving || uploading ? t("common.loading") : t("onboarding.finish")}
+                {uploading ? '↑ Uploading logo...' : saving ? t("common.loading") : t("onboarding.finish")}
               </button>
             )}
           </div>
+        </div>
         </div>
       </footer>
     </div>
