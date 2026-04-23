@@ -146,17 +146,14 @@ export default function InvoiceModal({ invoice, onSave, onClose, currencySymbol,
             </div>
           </div>
 
+          {defaultTaxRate > 0 && (
           <div>
             <label className="block text-[11px] font-bold text-slate-400 mb-1.5">{t("invoice.taxRate")}</label>
             <input type="number" value={taxRate} onChange={e => setTaxRate(e.target.value)} step="0.01" min="0" max="100" dir="ltr"
               placeholder="0"
               className="w-full bg-slate-800/50 border border-slate-600/30 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-blue-500/40 outline-none font-inter" />
-            <p className="text-[10px] text-slate-500 mt-1">
-              {totals.rate === 0
-                ? (lang === 'ar' ? 'اتركها 0 لإخفاء الضريبة من الفاتورة' : 'Set to 0 to hide tax from the invoice')
-                : ''}
-            </p>
           </div>
+          )}
 
           {/* Live totals summary */}
           {totals.sub > 0 && (
