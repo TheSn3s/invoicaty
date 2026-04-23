@@ -20,12 +20,14 @@ interface Invoice {
   id: string; serial: string; date: string; client: string;
   project: string; description: string; amount: number;
   discount?: number; currency: string; status: string; category: string;
+  tax_rate?: number; tax_amount?: number; total?: number; notes?: string;
 }
 
 interface Profile {
   full_name: string; business_name: string; phone: string; email: string;
   bank_name: string; bank_account: string; bank_iban: string; bank_holder: string;
   brand_color: string; role?: string; default_currency?: string;
+  tax_rate?: number; logo_url?: string;
 }
 
 export default function DashboardPage() {
@@ -86,15 +88,28 @@ export default function DashboardPage() {
   const handleSave = async (data: Partial<Invoice>) => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
+
+    // Calculate derived financial fields server-side too
+    const amt = Number(data.amount) || 0;
+    const disc = Number(data.discount) || 0;
+    const rate = Number(data.tax_rate) || 0;
+    const taxableBase = Math.max(amt - disc, 0);
+    const taxAmount = +(taxableBase * (rate / 100)).toFixed(3);
+    const total = +(taxableBase + taxAmount).toFixed(3);
+
+    const payload = {
+      date: data.date, client: data.client, project: data.project,
+      description: data.description, amount: data.amount, discount: data.discount,
+      tax_rate: rate, tax_amount: taxAmount, total,
+      notes: data.notes || "",
+      status: data.status, category: data.category,
+    };
+
     if (editInvoice) {
-      await supabase.from("invoices").update({
-        date: data.date, client: data.client, project: data.project,
-        description: data.description, amount: data.amount, discount: data.discount,
-        status: data.status, category: data.category,
-      }).eq("id", editInvoice.id);
+      await supabase.from("invoices").update(payload).eq("id", editInvoice.id);
     } else {
       const maxSerial = invoices.reduce((max, inv) => { const n = parseInt(inv.serial); return !isNaN(n) && n > max ? n : max; }, 0);
-      await supabase.from("invoices").insert({ user_id: user.id, serial: String(maxSerial + 1).padStart(3, "0"), ...data });
+      await supabase.from("invoices").insert({ user_id: user.id, serial: String(maxSerial + 1).padStart(3, "0"), ...payload });
     }
     setShowModal(false); setEditInvoice(null); loadData();
   };
@@ -125,11 +140,13 @@ export default function DashboardPage() {
   });
 
   const now = new Date();
-  const totalIncome = invoices.reduce((s, i) => s + (i.status !== "Canceled" ? (Number(i.amount) - (Number(i.discount) || 0)) : 0), 0);
-  const monthIncome = invoices.filter(i => { const d = new Date(i.date); return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth() && i.status !== "Canceled"; }).reduce((s, i) => s + (Number(i.amount) - (Number(i.discount) || 0)), 0);
-  const yearIncome = invoices.filter(i => new Date(i.date).getFullYear() === now.getFullYear() && i.status !== "Canceled").reduce((s, i) => s + (Number(i.amount) - (Number(i.discount) || 0)), 0);
+  // Use invoice total (incl. tax) if available, else fallback to amount - discount
+  const effectiveTotal = (i: Invoice) => Number(i.total) || (Number(i.amount) - (Number(i.discount) || 0));
+  const totalIncome = invoices.reduce((s, i) => s + (i.status !== "Canceled" ? effectiveTotal(i) : 0), 0);
+  const monthIncome = invoices.filter(i => { const d = new Date(i.date); return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth() && i.status !== "Canceled"; }).reduce((s, i) => s + effectiveTotal(i), 0);
+  const yearIncome = invoices.filter(i => new Date(i.date).getFullYear() === now.getFullYear() && i.status !== "Canceled").reduce((s, i) => s + effectiveTotal(i), 0);
   const outstanding = invoices.filter(i => i.status === "Not Paid");
-  const outstandingTotal = outstanding.reduce((s, i) => s + (Number(i.amount) - (Number(i.discount) || 0)), 0);
+  const outstandingTotal = outstanding.reduce((s, i) => s + effectiveTotal(i), 0);
 
   if (loading) {
     return (
@@ -218,7 +235,7 @@ export default function DashboardPage() {
       <button onClick={() => { setEditInvoice(null); setShowModal(true); }}
         className="md:hidden fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl shadow-2xl shadow-blue-500/30 flex items-center justify-center text-white text-2xl z-20 active:scale-95 transition-transform safe-bottom">+</button>
 
-      {showModal && <InvoiceModal invoice={editInvoice} onSave={handleSave} onClose={() => { setShowModal(false); setEditInvoice(null); }} currencySymbol={effectiveSymbol} />}
+      {showModal && <InvoiceModal invoice={editInvoice} onSave={handleSave} onClose={() => { setShowModal(false); setEditInvoice(null); }} currencySymbol={effectiveSymbol} defaultTaxRate={profile?.tax_rate || 0} />}
       {deleteInvoice && <DeleteModal serial={deleteInvoice.serial} onConfirm={handleDelete} onClose={() => setDeleteInvoice(null)} />}
       {showImport && <ImportModal onImport={handleImport} onClose={() => setShowImport(false)} />}
     </div>

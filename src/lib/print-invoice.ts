@@ -1,21 +1,24 @@
 interface Invoice {
   serial: string; date: string; client: string; project: string;
   description: string; amount: number; discount?: number; currency: string;
+  tax_rate?: number; tax_amount?: number; total?: number; notes?: string;
 }
 
 interface Profile {
   full_name: string; business_name: string; phone: string; email: string;
   bank_name: string; bank_account: string; bank_iban: string; bank_holder: string;
-  brand_color: string;
+  brand_color: string; logo_url?: string;
 }
 
 export function printInvoice(inv: Invoice, profile: Profile | null) {
   const amt = Number(inv.amount) || 0;
   const disc = Number(inv.discount) || 0;
-  const total = amt - disc;
-  const amtFmt = `${inv.currency || 'KWD'} ${amt.toLocaleString()}`;
-  const discFmt = `${inv.currency || 'KWD'} ${disc.toLocaleString()}`;
-  const totalFmt = `${inv.currency || 'KWD'} ${total.toLocaleString()}`;
+  const taxRate = Number(inv.tax_rate) || 0;
+  const taxableBase = Math.max(amt - disc, 0);
+  const taxAmount = Number(inv.tax_amount) || +(taxableBase * (taxRate / 100)).toFixed(3);
+  const total = Number(inv.total) || +(taxableBase + taxAmount).toFixed(3);
+  const cur = inv.currency || 'KWD';
+  const fmt = (n: number) => `${cur} ${n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 3 })}`;
   const desc = inv.description || 'Professional services as agreed.';
   const name = profile?.full_name || profile?.business_name || 'Your Name';
   const color = profile?.brand_color || '#f04444';
@@ -25,6 +28,31 @@ export function printInvoice(inv: Invoice, profile: Profile | null) {
   const bankName = profile?.bank_name || '—';
   const bankAccount = profile?.bank_account || '—';
   const bankIban = profile?.bank_iban || '—';
+  const notes = inv.notes || '';
+  const logoUrl = profile?.logo_url || '';
+
+  const showTax = taxRate > 0;
+  const showDiscount = disc > 0;
+
+  // Build totals rows dynamically
+  let totalsHtml = `<div class="totr"><span>Subtotal</span><span>${fmt(amt)}</span></div>`;
+  if (showDiscount) {
+    totalsHtml += `<div class="totr"><span>Discount</span><span>- ${fmt(disc)}</span></div>`;
+  }
+  if (showTax) {
+    totalsHtml += `<div class="totr"><span>Tax (${taxRate}%)</span><span>${fmt(taxAmount)}</span></div>`;
+  }
+  totalsHtml += `<div class="tott"><span>Total</span><span>${fmt(total)}</span></div>`;
+
+  // Logo HTML
+  const logoHtml = logoUrl
+    ? `<img src="${logoUrl}" alt="Logo" style="max-height:50px;max-width:180px;margin-bottom:0.3rem;border-radius:4px" /><br>`
+    : '';
+
+  // Notes HTML
+  const notesHtml = notes
+    ? `<div class="notes"><div class="notes-t">Notes</div><div class="notes-b">${notes}</div></div>`
+    : '';
 
   const html = `<!DOCTYPE html>
 <html lang="en">
@@ -54,9 +82,12 @@ td:last-child{text-align:right;font-weight:900;font-size:.875rem;white-space:now
 .pd{font-size:.625rem;line-height:1.5;color:#334155}
 tbody tr{border-bottom:1px solid #f1f5f9}
 .tots{display:flex;justify-content:flex-end;margin-bottom:1.25rem}
-.totb{width:12rem;font-size:.7rem;font-weight:700}
+.totb{width:14rem;font-size:.7rem;font-weight:700}
 .totr{display:flex;justify-content:space-between;color:#334155;margin-bottom:.35rem}
 .tott{display:flex;justify-content:space-between;border-top:2px solid #000;padding-top:.35rem;font-size:.875rem;font-weight:900;color:#1e293b}
+.notes{font-size:.65rem;color:#334155;background:#f8fafc;padding:.6rem .8rem;border-radius:.375rem;border:1px solid #f1f5f9;margin-bottom:1rem;line-height:1.7}
+.notes-t{font-weight:900;font-size:.65rem;color:#0f172a;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.3rem}
+.notes-b{white-space:pre-wrap}
 .bank{font-size:.625rem;color:#1e293b;background:#f8fafc;padding:.6rem .8rem;border-radius:.375rem;border:1px solid #f1f5f9;display:inline-block;margin-bottom:1rem;line-height:1.7}
 .bank b{font-weight:900;color:#334155}
 .bank .bt{font-weight:900;font-size:.65rem;color:#0f172a;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.3rem}
@@ -76,7 +107,7 @@ body{padding:0;background:#fff!important;-webkit-print-color-adjust:exact!import
 thead tr{border-bottom-color:${color}!important}
 .ttl{color:${color}!important}
 .ftr{color:${color}!important}
-.bank{background:#f8fafc!important;-webkit-print-color-adjust:exact!important}
+.bank,.notes{background:#f8fafc!important;-webkit-print-color-adjust:exact!important}
 .tott{border-top:2px solid #000!important}
 }
 @media(max-width:900px){
@@ -89,18 +120,17 @@ body{padding:.5rem}
 </head>
 <body>
 <div class="inv">
-<div class="hdr"><h1>${name}</h1><p>${profile?.business_name || ''}</p></div>
+<div class="hdr">${logoHtml}<h1>${name}</h1><p>${profile?.business_name || ''}</p></div>
 <div class="cnt">
 <div class="bar"><div>${inv.date}</div><div>Invoice #${inv.serial}</div><div>${inv.client}</div></div>
 <div class="ttl">Invoice #${inv.serial}</div>
 <div class="cli">${inv.client}</div>
 <table><thead><tr><th>ID</th><th>QTY</th><th>DESCRIPTION</th><th>COST</th></tr></thead>
-<tbody><tr><td>1</td><td>1</td><td style="padding-right:2rem"><div class="pn">${inv.project}</div><div class="pd">${desc}</div></td><td>${amtFmt}</td></tr></tbody></table>
+<tbody><tr><td>1</td><td>1</td><td style="padding-right:2rem"><div class="pn">${inv.project}</div><div class="pd">${desc}</div></td><td>${fmt(amt)}</td></tr></tbody></table>
 <div class="tots"><div class="totb">
-<div class="totr"><span>Subtotal</span><span>${amtFmt}</span></div>
-<div class="totr"><span>Discount</span><span>${discFmt}</span></div>
-<div class="tott"><span>Total</span><span>${totalFmt}</span></div>
+${totalsHtml}
 </div></div>
+${notesHtml}
 <div class="bank"><div class="bt">Banking Details:</div>
 <div><b>Account Holder:</b> ${bankHolder}</div>
 <div><b>Bank Name:</b> ${bankName}</div>

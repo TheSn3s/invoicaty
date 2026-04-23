@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useI18n } from "@/lib/i18n";
 
 interface Invoice {
@@ -7,6 +7,8 @@ interface Invoice {
   project: string; description: string; amount: number;
   currency: string; status: string; category: string;
   discount?: number;
+  tax_rate?: number;
+  notes?: string;
 }
 
 interface Props {
@@ -14,15 +16,18 @@ interface Props {
   onSave: (data: Partial<Invoice>) => void;
   onClose: () => void;
   currencySymbol?: string;
+  defaultTaxRate?: number;
 }
 
-export default function InvoiceModal({ invoice, onSave, onClose, currencySymbol }: Props) {
+export default function InvoiceModal({ invoice, onSave, onClose, currencySymbol, defaultTaxRate = 0 }: Props) {
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
   const [client, setClient] = useState("");
   const [project, setProject] = useState("");
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
   const [discount, setDiscount] = useState("");
+  const [taxRate, setTaxRate] = useState<string>(defaultTaxRate > 0 ? String(defaultTaxRate) : "0");
+  const [notes, setNotes] = useState("");
   const [status, setStatus] = useState("Not Paid");
   const [category, setCategory] = useState("");
   const [saving, setSaving] = useState(false);
@@ -37,10 +42,28 @@ export default function InvoiceModal({ invoice, onSave, onClose, currencySymbol 
       setDescription(invoice.description || "");
       setAmount(String(invoice.amount));
       setDiscount(String(invoice.discount || 0));
+      setTaxRate(String(invoice.tax_rate ?? defaultTaxRate ?? 0));
+      setNotes(invoice.notes || "");
       setStatus(invoice.status);
       setCategory(invoice.category || "");
+    } else {
+      // New invoice: use default tax rate from profile
+      setTaxRate(defaultTaxRate > 0 ? String(defaultTaxRate) : "0");
     }
-  }, [invoice]);
+  }, [invoice, defaultTaxRate]);
+
+  // Live calculations
+  const totals = useMemo(() => {
+    const sub = parseFloat(amount) || 0;
+    const disc = parseFloat(discount) || 0;
+    const rate = parseFloat(taxRate) || 0;
+    const taxableBase = Math.max(sub - disc, 0);
+    const taxAmount = taxableBase * (rate / 100);
+    const total = taxableBase + taxAmount;
+    return { sub, disc, rate, taxAmount, total };
+  }, [amount, discount, taxRate]);
+
+  const showTax = totals.rate > 0;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,10 +74,14 @@ export default function InvoiceModal({ invoice, onSave, onClose, currencySymbol 
       date, client, project, description,
       amount: parsedAmount,
       discount: parseFloat(discount) || 0,
+      tax_rate: parseFloat(taxRate) || 0,
+      notes: notes.trim() || "",
       status, category
     });
     setSaving(false);
   };
+
+  const fmt = (n: number) => n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 3 });
 
   return (
     <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm flex items-end md:items-center justify-center z-50" onClick={onClose}>
@@ -117,6 +144,51 @@ export default function InvoiceModal({ invoice, onSave, onClose, currencySymbol 
               <input type="number" value={discount} onChange={e => setDiscount(e.target.value)} step="0.5"
                 className="w-full bg-slate-800/50 border border-slate-600/30 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-blue-500/40 outline-none font-inter" />
             </div>
+          </div>
+
+          <div>
+            <label className="block text-[11px] font-bold text-slate-400 mb-1.5">{t("invoice.taxRate")}</label>
+            <input type="number" value={taxRate} onChange={e => setTaxRate(e.target.value)} step="0.01" min="0" max="100" dir="ltr"
+              placeholder="0"
+              className="w-full bg-slate-800/50 border border-slate-600/30 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-blue-500/40 outline-none font-inter" />
+            <p className="text-[10px] text-slate-500 mt-1">
+              {totals.rate === 0
+                ? (lang === 'ar' ? 'اتركها 0 لإخفاء الضريبة من الفاتورة' : 'Set to 0 to hide tax from the invoice')
+                : ''}
+            </p>
+          </div>
+
+          {/* Live totals summary */}
+          {totals.sub > 0 && (
+            <div className="bg-slate-800/40 border border-slate-700/40 rounded-xl p-3 space-y-1.5">
+              <div className="flex justify-between text-xs">
+                <span className="text-slate-400">{t("invoice.subtotal")}</span>
+                <span className="font-inter text-white">{fmt(totals.sub)} {symbol}</span>
+              </div>
+              {totals.disc > 0 && (
+                <div className="flex justify-between text-xs">
+                  <span className="text-slate-400">- {t("invoice.discount")}</span>
+                  <span className="font-inter text-red-400">{fmt(totals.disc)} {symbol}</span>
+                </div>
+              )}
+              {showTax && (
+                <div className="flex justify-between text-xs">
+                  <span className="text-slate-400">+ {t("invoice.tax")} ({totals.rate}%)</span>
+                  <span className="font-inter text-amber-400">{fmt(totals.taxAmount)} {symbol}</span>
+                </div>
+              )}
+              <div className="flex justify-between text-sm pt-1.5 border-t border-slate-700/40 font-bold">
+                <span className="text-white">{t("invoice.total")}</span>
+                <span className="font-inter text-blue-400">{fmt(totals.total)} {symbol}</span>
+              </div>
+            </div>
+          )}
+
+          <div>
+            <label className="block text-[11px] font-bold text-slate-400 mb-1.5">{t("invoice.notes")}</label>
+            <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={2}
+              placeholder={t("invoice.notes")}
+              className="w-full bg-slate-800/50 border border-slate-600/30 rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:ring-2 focus:ring-blue-500/40 outline-none resize-none" />
           </div>
 
           <div>
