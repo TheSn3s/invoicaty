@@ -28,6 +28,11 @@ export async function middleware(request: NextRequest) {
 
   const path = request.nextUrl.pathname
 
+  // Allow update-password page always (password recovery flow)
+  if (path === '/update-password') {
+    return response
+  }
+
   // If logged in and visiting login/register/landing → check onboarding first
   if (user && (path === '/' || path === '/login' || path === '/register')) {
     // Check if onboarding is completed
@@ -65,5 +70,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/', '/login', '/register', '/dashboard/:path*', '/admin/:path*', '/settings/:path*', '/onboarding/:path*'],
+  matcher: ['/', '/login', '/register', '/dashboard/:path*', '/admin/:path*', '/settings/:path*', '/onboarding/:path*', '/update-password'],
 }
