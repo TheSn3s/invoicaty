@@ -18,9 +18,10 @@ interface Props {
 
 const PAGE_SIZE = 20;
 
-export default function InvoiceTable({ invoices, onEdit, onDelete, onPrint, currencySymbol = 'د.ك' }: Props) {
+export default function InvoiceTable({ invoices, onEdit, onDelete, onPrint, currencySymbol }: Props) {
   const [page, setPage] = useState(0);
   const { t, lang } = useI18n();
+  const symbol = currencySymbol || (lang === 'ar' ? 'د.ك' : '$');
   const totalPages = Math.ceil(invoices.length / PAGE_SIZE);
   const paged = invoices.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 
@@ -55,7 +56,7 @@ export default function InvoiceTable({ invoices, onEdit, onDelete, onPrint, curr
                   {statusLabel(inv.status)}
                 </span>
               </div>
-              <span className="font-inter font-bold text-white text-sm">{Number(inv.amount).toLocaleString()} <span className="text-[10px] text-slate-400">{currencySymbol}</span></span>
+              <span className="font-inter font-bold text-white text-sm">{Number(inv.amount).toLocaleString()} <span className="text-[10px] text-slate-400">{symbol}</span></span>
             </div>
             <div className="mb-2">
               <div className="font-bold text-white text-sm">{inv.client}</div>
@@ -96,7 +97,7 @@ export default function InvoiceTable({ invoices, onEdit, onDelete, onPrint, curr
                 <td className="p-4 font-inter text-slate-400 text-sm">{inv.date}</td>
                 <td className="p-4 font-bold text-white text-sm">{inv.client}</td>
                 <td className="p-4 text-slate-300 text-xs max-w-[200px] truncate">{inv.project}</td>
-                <td className="p-4 font-inter font-bold text-white text-sm">{Number(inv.amount).toLocaleString()} {currencySymbol}</td>
+                <td className="p-4 font-inter font-bold text-white text-sm">{Number(inv.amount).toLocaleString()} {symbol}</td>
                 <td className="p-4">
                   <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold ${
                     inv.status === "Not Paid"

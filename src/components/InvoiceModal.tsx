@@ -16,7 +16,7 @@ interface Props {
   currencySymbol?: string;
 }
 
-export default function InvoiceModal({ invoice, onSave, onClose, currencySymbol = 'د.ك' }: Props) {
+export default function InvoiceModal({ invoice, onSave, onClose, currencySymbol }: Props) {
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
   const [client, setClient] = useState("");
   const [project, setProject] = useState("");
@@ -26,7 +26,8 @@ export default function InvoiceModal({ invoice, onSave, onClose, currencySymbol 
   const [status, setStatus] = useState("Not Paid");
   const [category, setCategory] = useState("");
   const [saving, setSaving] = useState(false);
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
+  const symbol = currencySymbol || (lang === 'ar' ? 'د.ك' : '$');
 
   useEffect(() => {
     if (invoice) {
@@ -107,12 +108,12 @@ export default function InvoiceModal({ invoice, onSave, onClose, currencySymbol 
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-[11px] font-bold text-slate-400 mb-1.5">{t("invoice.amount")} ({currencySymbol})</label>
+              <label className="block text-[11px] font-bold text-slate-400 mb-1.5">{t("invoice.amount")} ({symbol})</label>
               <input type="number" value={amount} onChange={e => setAmount(e.target.value)} required step="0.5"
                 className="w-full bg-slate-800/50 border border-slate-600/30 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-blue-500/40 outline-none font-inter" />
             </div>
             <div>
-              <label className="block text-[11px] font-bold text-slate-400 mb-1.5">{t("invoice.discount")} ({currencySymbol})</label>
+              <label className="block text-[11px] font-bold text-slate-400 mb-1.5">{t("invoice.discount")} ({symbol})</label>
               <input type="number" value={discount} onChange={e => setDiscount(e.target.value)} step="0.5"
                 className="w-full bg-slate-800/50 border border-slate-600/30 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-blue-500/40 outline-none font-inter" />
             </div>

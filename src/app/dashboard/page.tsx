@@ -29,7 +29,7 @@ interface Profile {
 export default function DashboardPage() {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [currencySymbol, setCurrencySymbol] = useState("د.ك");
+  const [currencySymbol, setCurrencySymbol] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -42,7 +42,10 @@ export default function DashboardPage() {
   const [deleteInvoice, setDeleteInvoice] = useState<Invoice | null>(null);
   const router = useRouter();
   const supabase = createClient();
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
+
+  // Default symbol fallback: KWD for Arabic UI, USD for English UI, until profile loads
+  const effectiveSymbol = currencySymbol || (lang === 'ar' ? 'د.ك' : '$');
 
   const loadData = useCallback(async () => {
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -165,7 +168,7 @@ export default function DashboardPage() {
       </header>
 
       <main className="max-w-6xl mx-auto px-4 md:px-8 pt-5">
-        <StatsCards total={totalIncome} month={monthIncome} year={yearIncome} outstanding={outstandingTotal} outstandingCount={outstanding.length} currencySymbol={currencySymbol} />
+        <StatsCards total={totalIncome} month={monthIncome} year={yearIncome} outstanding={outstandingTotal} outstandingCount={outstanding.length} currencySymbol={effectiveSymbol} />
 
         <div className="mt-6 flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
@@ -207,13 +210,13 @@ export default function DashboardPage() {
           </div>
         )}
 
-        <InvoiceTable invoices={filtered} onEdit={(inv) => { setEditInvoice(inv); setShowModal(true); }} onDelete={(inv) => setDeleteInvoice(inv)} onPrint={(inv) => printInvoice(inv, profile)} currencySymbol={currencySymbol} />
+        <InvoiceTable invoices={filtered} onEdit={(inv) => { setEditInvoice(inv); setShowModal(true); }} onDelete={(inv) => setDeleteInvoice(inv)} onPrint={(inv) => printInvoice(inv, profile)} currencySymbol={effectiveSymbol} />
       </main>
 
       <button onClick={() => { setEditInvoice(null); setShowModal(true); }}
         className="md:hidden fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl shadow-2xl shadow-blue-500/30 flex items-center justify-center text-white text-2xl z-20 active:scale-95 transition-transform safe-bottom">+</button>
 
-      {showModal && <InvoiceModal invoice={editInvoice} onSave={handleSave} onClose={() => { setShowModal(false); setEditInvoice(null); }} currencySymbol={currencySymbol} />}
+      {showModal && <InvoiceModal invoice={editInvoice} onSave={handleSave} onClose={() => { setShowModal(false); setEditInvoice(null); }} currencySymbol={effectiveSymbol} />}
       {deleteInvoice && <DeleteModal serial={deleteInvoice.serial} onConfirm={handleDelete} onClose={() => setDeleteInvoice(null)} />}
       {showImport && <ImportModal onImport={handleImport} onClose={() => setShowImport(false)} />}
     </div>
