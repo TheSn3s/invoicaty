@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import { Tajawal, Inter } from "next/font/google";
 import "./globals.css";
 import { I18nProvider } from "@/lib/i18n";
@@ -64,6 +65,19 @@ export default function RootLayout({
   return (
     <html lang="en" dir="ltr" className={`${tajawal.variable} ${inter.variable}`}>
       <head>
+        {/* Google tag (gtag.js) — Google Ads conversion tracking */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=AW-18117219196"
+          strategy="afterInteractive"
+        />
+        <Script id="google-ads-gtag" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'AW-18117219196');
+          `}
+        </Script>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
