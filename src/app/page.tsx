@@ -35,7 +35,7 @@ export default function Home() {
 
       <main className="relative z-10 flex-1 flex flex-col items-center justify-center px-5 text-center pb-20">
         <div className="fade-in max-w-2xl">
-          <h1 className="text-3xl md:text-5xl font-black text-white mb-4 leading-[1.35]">
+          <h1 className="text-2xl sm:text-3xl md:text-5xl font-black text-white mb-4 leading-[1.35]">
             {t("home.title")}
             <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
