@@ -6,6 +6,9 @@ import LanguageSwitcher from "@/components/LanguageSwitcher";
 import AppFooter from "@/components/AppFooter";
 import ImportModal from "@/components/ImportModal";
 import { SUPPORT_LINKS } from "@/lib/developer-info";
+import { buildInvoiceHtml } from "@/lib/print-invoice";
+import type { TemplateId } from "@/lib/print-templates/types";
+import TemplateThumb from "@/components/TemplateThumb";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import type { Country, Currency, Language, BusinessType } from "@/lib/types";
@@ -38,6 +41,7 @@ interface Profile {
   preferred_language: Language;
   tax_rate: number;
   business_type: BusinessType | null;
+  invoice_template?: TemplateId | null;
 }
 
 export default function SettingsPage() {
@@ -77,6 +81,8 @@ export default function SettingsPage() {
   const [logoUrl, setLogoUrl] = useState<string>("");
   const [logoBusy, setLogoBusy] = useState(false);
   const [logoError, setLogoError] = useState<string>("");
+  const [invoiceTemplate, setInvoiceTemplate] = useState<TemplateId>("modern");
+  const [templateSaving, setTemplateSaving] = useState<TemplateId | null>(null);
 
   const router = useRouter();
   const supabase = createClient();
@@ -112,6 +118,7 @@ export default function SettingsPage() {
         setTaxRate(String(prof.tax_rate ?? 0));
         setBusinessType((prof.business_type as BusinessType) || "");
         setLogoUrl(prof.logo_url || "");
+        setInvoiceTemplate(((prof as { invoice_template?: string }).invoice_template as TemplateId) || "modern");
       }
       setLoading(false);
     })();
@@ -360,6 +367,64 @@ export default function SettingsPage() {
     } finally {
       setLogoBusy(false);
     }
+  };
+
+  // ============ Invoice Template ============
+  const handleSelectTemplate = async (id: TemplateId) => {
+    if (!profile || id === invoiceTemplate) return;
+    setTemplateSaving(id);
+    try {
+      const { error: updateErr } = await supabase.from("profiles")
+        .update({ invoice_template: id, updated_at: new Date().toISOString() })
+        .eq("id", profile.id);
+      if (updateErr) {
+        // Likely the column doesn't exist yet — fall back to local state so UI still works
+        console.warn("Could not persist invoice_template:", updateErr.message);
+      }
+      setInvoiceTemplate(id);
+    } finally {
+      setTemplateSaving(null);
+    }
+  };
+
+  const buildSampleProfile = (templateOverride: TemplateId) => ({
+    full_name: fullName || (lang === "ar" ? "اسمك الكامل" : "Your Name"),
+    business_name: businessName || (lang === "ar" ? "اسم العلامة التجارية" : "Your Business"),
+    phone: phone || "+965 9000 0000",
+    email: email || "hello@example.com",
+    bank_name: bankName || "National Bank",
+    bank_account: bankAccount || "01234567890",
+    bank_iban: bankIban || "KW00 NBOK 0000 0000 0000 0000 0000 00",
+    bank_holder: bankHolder || fullName || "Your Name",
+    brand_color: brandColor || "#3b82f6",
+    logo_url: logoUrl || "",
+    invoice_template: templateOverride,
+  });
+
+  const buildSampleDoc = () => ({
+    serial: "001",
+    date: new Date().toISOString().split("T")[0],
+    client: lang === "ar" ? "شركة عميل تجريبي" : "Sample Client Co.",
+    project: lang === "ar" ? "مشروع تجريبي" : "Sample Project",
+    description: "",
+    amount: 0,
+    currency: defaultCurrency || "KWD",
+    discount: 0,
+    tax_rate: Number(taxRate) || 0,
+    notes: lang === "ar" ? "شكراً لثقتكم بنا. يرجى السداد بعد الاستلام." : "Thank you for your business. Payment is due within 14 days of receipt.",
+    items: [
+      { description: lang === "ar" ? "تصميم هوية بصرية كاملة" : "Brand identity design — full package", quantity: 1, unit_price: 750 },
+      { description: lang === "ar" ? "تطوير صفحة هبوط" : "Landing page development", quantity: 1, unit_price: 1200 },
+      { description: lang === "ar" ? "دعم وصيانة (شهريّ)" : "Monthly support & maintenance", quantity: 3, unit_price: 150 },
+    ],
+  });
+
+  const handlePreviewTemplate = (id: TemplateId) => {
+    const sampleProfile = buildSampleProfile(id);
+    const sampleDoc = buildSampleDoc();
+    const html = buildInvoiceHtml(sampleDoc, sampleProfile, "invoice", id);
+    const w = window.open("", "_blank");
+    if (w) { w.document.write(html); w.document.close(); }
   };
 
   if (loading) {
@@ -650,6 +715,54 @@ export default function SettingsPage() {
 
         {tab === "invoice" && (
           <div className="space-y-6 fade-in">
+            {/* Template picker */}
+            <div className="glass rounded-2xl p-5">
+              <h3 className="text-sm font-bold text-white mb-1 flex items-center gap-2">
+                <span className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center text-sm">📄</span>
+                {t("settings.templateTitle")}
+              </h3>
+              <p className="text-[11px] text-slate-400 mb-4 ms-10">{t("settings.templateDesc")}</p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {([
+                  { id: "modern" as TemplateId, label: t("settings.modern"), desc: t("settings.modernDesc") },
+                  { id: "classic" as TemplateId, label: t("settings.classic"), desc: t("settings.classicDesc") },
+                  { id: "minimal" as TemplateId, label: t("settings.minimal"), desc: t("settings.minimalDesc") },
+                ]).map(tpl => {
+                  const active = invoiceTemplate === tpl.id;
+                  return (
+                    <div key={tpl.id} className={`rounded-xl border-2 transition-all overflow-hidden ${active ? "border-blue-500 bg-blue-500/5" : "border-slate-700/50 bg-slate-900/30 hover:border-slate-600"}`}>
+                      <button type="button" onClick={() => handleSelectTemplate(tpl.id)} className="w-full text-start">
+                        {/* Mini preview thumbnail (pure CSS) */}
+                        <TemplateThumb id={tpl.id} brandColor={brandColor} />
+                      </button>
+                      <div className="px-3 py-3">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-sm font-bold text-white">{tpl.label}</span>
+                          {active && <span className="text-[10px] font-bold text-blue-400 bg-blue-500/15 px-2 py-0.5 rounded-full">✓ {t("settings.active")}</span>}
+                        </div>
+                        <p className="text-[11px] text-slate-400 mb-3 line-clamp-2">{tpl.desc}</p>
+                        <div className="flex gap-2">
+                          {!active && (
+                            <button onClick={() => handleSelectTemplate(tpl.id)} disabled={templateSaving === tpl.id}
+                              className="flex-1 bg-blue-600/90 hover:bg-blue-500 text-white text-[11px] font-bold py-2 rounded-lg transition-all disabled:opacity-50">
+                              {templateSaving === tpl.id ? "⏳…" : t("settings.save")}
+                            </button>
+                          )}
+                          <button onClick={() => handlePreviewTemplate(tpl.id)}
+                            className={`${active ? "flex-1" : ""} bg-slate-800/60 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700/50 text-[11px] font-bold py-2 px-3 rounded-lg transition-all`}
+                            title={t("settings.previewHint")}>
+                            🔍 {t("settings.livePreview")}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Brand Color */}
             <div className="glass rounded-2xl p-5">
               <h3 className="text-sm font-bold text-white mb-4 flex items-center gap-2">
                 <span className="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center text-sm">🎨</span>
@@ -670,16 +783,10 @@ export default function SettingsPage() {
                   className="w-10 h-10 rounded-lg border-0 cursor-pointer bg-transparent" />
                 <span className="font-inter text-xs text-slate-500">{brandColor}</span>
               </div>
-            </div>
-
-            <div className="glass rounded-2xl overflow-hidden">
-              <div className="p-4 text-center" style={{ backgroundColor: brandColor }}>
-                <p className="text-white font-black text-lg">{fullName || t("settings.yourName")}</p>
-                <p className="text-white/70 text-xs">{businessName || t("settings.yourBusiness")}</p>
-              </div>
-              <div className="p-4 text-center">
-                <p className="text-slate-400 text-xs">{t("settings.previewHeader")}</p>
-              </div>
+              <button onClick={() => handlePreviewTemplate(invoiceTemplate)}
+                className="mt-4 w-full bg-gradient-to-r from-blue-600/80 to-purple-600/80 hover:from-blue-500 hover:to-purple-500 text-white text-xs font-bold py-2.5 rounded-xl transition-all">
+                🔍 {t("settings.livePreview")} — {t(`settings.${invoiceTemplate}`)}
+              </button>
             </div>
           </div>
         )}
