@@ -78,9 +78,6 @@ export default function RegisterPage() {
             <p className="text-slate-400 text-xs leading-relaxed" dangerouslySetInnerHTML={{ __html: t("auth.activationNote") }} />
           </div>
           <div className="space-y-3">
-            <a href="https://mail.google.com" target="_blank" rel="noreferrer" className="block w-full bg-white text-slate-900 py-3.5 rounded-xl text-sm font-bold transition-all hover:bg-slate-200">
-              {t("auth.openGmail")}
-            </a>
             <button
               onClick={handleResend}
               disabled={resending}
