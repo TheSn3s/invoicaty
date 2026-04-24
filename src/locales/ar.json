@@ -207,6 +207,8 @@
     "rejected": "مرفوض",
     "expired": "منتهي",
     "convertToInvoice": "تحويل لفاتورة",
+    "convertShort": "فاتورة",
+    "print": "طباعة PDF",
     "converted": "تم التحويل ✅",
     "convertConfirm": "تحويل عرض السعر #{{serial}} إلى فاتورة؟",
     "convertNote": "سيتم إنشاء فاتورة جديدة بنفس التفاصيل.",

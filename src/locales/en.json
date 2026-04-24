@@ -207,6 +207,8 @@
     "rejected": "Rejected",
     "expired": "Expired",
     "convertToInvoice": "Convert to Invoice",
+    "convertShort": "Invoice",
+    "print": "Print PDF",
     "converted": "Converted ✅",
     "convertConfirm": "Convert quotation #{{serial}} to an invoice?",
     "convertNote": "A new invoice will be created with the same details.",
