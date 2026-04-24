@@ -52,6 +52,14 @@ export default function SettingsPage() {
   const [exportBusy, setExportBusy] = useState<null | "csv" | "backup">(null);
   const [exportDone, setExportDone] = useState(false);
 
+  // Password change
+  const [currentPwd, setCurrentPwd] = useState("");
+  const [newPwd, setNewPwd] = useState("");
+  const [confirmPwd, setConfirmPwd] = useState("");
+  const [pwdBusy, setPwdBusy] = useState(false);
+  const [pwdError, setPwdError] = useState<string | null>(null);
+  const [pwdSuccess, setPwdSuccess] = useState(false);
+
   // Form fields
   const [fullName, setFullName] = useState("");
   const [businessName, setBusinessName] = useState("");
@@ -219,6 +227,54 @@ export default function SettingsPage() {
     }
   };
 
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPwdError(null);
+    setPwdSuccess(false);
+
+    if (newPwd.length < 6) {
+      setPwdError(t("settings.passwordTooShort"));
+      return;
+    }
+    if (newPwd !== confirmPwd) {
+      setPwdError(t("settings.passwordMismatch"));
+      return;
+    }
+
+    setPwdBusy(true);
+    try {
+      // Verify current password via re-authentication
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user?.email) {
+        setPwdError(t("settings.wrongCurrent"));
+        return;
+      }
+      const { error: verifyErr } = await supabase.auth.signInWithPassword({
+        email: user.email,
+        password: currentPwd,
+      });
+      if (verifyErr) {
+        setPwdError(t("settings.wrongCurrent"));
+        return;
+      }
+
+      // Update password
+      const { error: updateErr } = await supabase.auth.updateUser({ password: newPwd });
+      if (updateErr) {
+        setPwdError(updateErr.message);
+        return;
+      }
+
+      setPwdSuccess(true);
+      setCurrentPwd("");
+      setNewPwd("");
+      setConfirmPwd("");
+      setTimeout(() => setPwdSuccess(false), 4000);
+    } finally {
+      setPwdBusy(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -331,6 +387,49 @@ export default function SettingsPage() {
                     className="w-full bg-slate-800/50 border border-slate-600/30 rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:ring-2 focus:ring-blue-500/40 outline-none font-inter" />
                 </div>
               </div>
+            </div>
+
+            {/* Change Password Card */}
+            <div className="glass rounded-2xl p-5">
+              <h3 className="text-sm font-bold text-white mb-1 flex items-center gap-2">
+                <span className="w-8 h-8 rounded-lg bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-sm">🔐</span>
+                {t("settings.changePassword")}
+              </h3>
+              <p className="text-[11px] text-slate-400 mt-1 ms-10 mb-4">{t("settings.changePasswordDesc")}</p>
+
+              <form onSubmit={handleChangePassword} className="space-y-3">
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-400 mb-1.5">{t("settings.currentPassword")}</label>
+                  <input type="password" value={currentPwd} onChange={e => setCurrentPwd(e.target.value)} required autoComplete="current-password"
+                    className="w-full bg-slate-800/50 border border-slate-600/30 rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:ring-2 focus:ring-blue-500/40 outline-none" />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-400 mb-1.5">{t("settings.newPasswordLabel")}</label>
+                  <input type="password" value={newPwd} onChange={e => setNewPwd(e.target.value)} required minLength={6} autoComplete="new-password"
+                    className="w-full bg-slate-800/50 border border-slate-600/30 rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:ring-2 focus:ring-blue-500/40 outline-none" />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-400 mb-1.5">{t("settings.confirmPassword")}</label>
+                  <input type="password" value={confirmPwd} onChange={e => setConfirmPwd(e.target.value)} required minLength={6} autoComplete="new-password"
+                    className="w-full bg-slate-800/50 border border-slate-600/30 rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:ring-2 focus:ring-blue-500/40 outline-none" />
+                </div>
+
+                {pwdError && (
+                  <div className="bg-red-500/10 border border-red-500/30 text-red-300 text-[12px] font-bold px-3 py-2.5 rounded-xl">
+                    ⚠️ {pwdError}
+                  </div>
+                )}
+                {pwdSuccess && (
+                  <div className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-[12px] font-bold px-3 py-2.5 rounded-xl">
+                    {t("settings.passwordUpdated")}
+                  </div>
+                )}
+
+                <button type="submit" disabled={pwdBusy || !currentPwd || !newPwd || !confirmPwd}
+                  className="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white font-bold py-3 rounded-xl text-sm transition-all shadow-lg shadow-amber-500/20 active:scale-[.99] disabled:opacity-50">
+                  {pwdBusy ? `⏳ ${t("settings.updatingPassword")}` : `🔐 ${t("settings.updatePasswordBtn")}`}
+                </button>
+              </form>
             </div>
           </div>
         )}
