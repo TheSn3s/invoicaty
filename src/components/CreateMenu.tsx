@@ -21,17 +21,30 @@ export default function CreateMenu({ onNewInvoice, onNewQuotation, variant = "he
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const btnRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (!open) return;
     const onDoc = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+      const target = e.target as Node;
+      // Ignore clicks on the trigger button itself (prevents immediate close on toggle)
+      if (btnRef.current && btnRef.current.contains(target)) return;
+      if (ref.current && ref.current.contains(target)) return;
+      setOpen(false);
     };
     const onEsc = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
-    document.addEventListener("mousedown", onDoc);
-    document.addEventListener("keydown", onEsc);
+    // Delay listener registration by a tick so the opening click doesn't
+    // immediately trigger the handler (fab uses position:fixed which escapes
+    // the wrapper's bounding box, so contains() check is unreliable).
+    const timer = setTimeout(() => {
+      document.addEventListener("mousedown", onDoc);
+      document.addEventListener("touchstart", onDoc as unknown as EventListener);
+      document.addEventListener("keydown", onEsc);
+    }, 0);
     return () => {
+      clearTimeout(timer);
       document.removeEventListener("mousedown", onDoc);
+      document.removeEventListener("touchstart", onDoc as unknown as EventListener);
       document.removeEventListener("keydown", onEsc);
     };
   }, [open]);
@@ -56,8 +69,9 @@ export default function CreateMenu({ onNewInvoice, onNewQuotation, variant = "he
     : (align === "left" ? "left-0 top-full mt-2" : "right-0 top-full mt-2");
 
   return (
-    <div className="relative inline-block" ref={ref}>
+    <div className={variant === "fab" ? "" : "relative inline-block"} ref={ref}>
       <button
+        ref={btnRef}
         type="button"
         onClick={() => setOpen(o => !o)}
         className={triggerClass}
@@ -83,7 +97,11 @@ export default function CreateMenu({ onNewInvoice, onNewQuotation, variant = "he
         <div
           role="menu"
           style={{ backgroundColor: "rgb(15 23 42 / 0.97)" }}
-          className={`absolute ${menuAlignClass} w-60 backdrop-blur-2xl border border-slate-600/70 rounded-xl shadow-2xl shadow-black/70 z-50 overflow-hidden fade-in ring-1 ring-black/30`}
+          className={
+            variant === "fab"
+              ? `fixed ${align === "left" ? "left-6" : "right-6"} bottom-24 w-60 backdrop-blur-2xl border border-slate-600/70 rounded-xl shadow-2xl shadow-black/70 z-50 overflow-hidden fade-in ring-1 ring-black/30`
+              : `absolute ${menuAlignClass} w-60 backdrop-blur-2xl border border-slate-600/70 rounded-xl shadow-2xl shadow-black/70 z-50 overflow-hidden fade-in ring-1 ring-black/30`
+          }
         >
           <div className="px-3 py-2 border-b border-slate-700/60 bg-slate-800/60">
             <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{t("nav.createNew") || (lang === "ar" ? "إنشاء جديد" : "Create new")}</div>
