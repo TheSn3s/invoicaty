@@ -8,7 +8,7 @@ import type { PrintableDoc, Profile, DocType } from "./types";
  */
 export function renderMinimal(doc: PrintableDoc, profile: Profile | null, type: DocType): string {
   const ctx = buildContext(doc, profile, type);
-  const { totals, color, name, businessName, phone, email, logoUrl, notes,
+  const { totals, color, name, businessName, displayLine1, displayLine2, phone, email, logoUrl, notes,
           bankHolder, bankName, bankAccount, bankIban, isQuotation, docLabel } = ctx;
   const { fmt } = totals;
 
@@ -25,7 +25,7 @@ export function renderMinimal(doc: PrintableDoc, profile: Profile | null, type: 
   }).join('');
 
   const logoBlock = logoUrl
-    ? `<img src="${logoUrl}" alt="${escapeHtml(businessName || name)}" class="logo" />`
+    ? `<img src="${logoUrl}" alt="${escapeHtml(displayLine1)}" class="logo" />`
     : '';
 
   let totalsHtml = `<div class="tot-row"><span>Subtotal</span><span>${fmt(totals.subtotal)}</span></div>`;
@@ -152,7 +152,7 @@ tbody tr:last-child td{border-bottom:none}
     <div class="top">
       <div class="brand">
         ${logoBlock}
-        <div class="biz-name">${escapeHtml(businessName || name)}</div>
+        <div class="biz-name">${escapeHtml(displayLine1)}</div>
       </div>
       <div class="doc-meta">
         <div class="doc-meta-label">${docLabel}</div>
@@ -168,8 +168,8 @@ tbody tr:last-child td{border-bottom:none}
     <section class="addr-grid">
       <div class="addr-block">
         <div class="addr-lbl">From</div>
-        <div class="addr-primary">${escapeHtml(businessName || name)}</div>
-        ${businessName ? `<div class="addr-secondary">${escapeHtml(name)}</div>` : ''}
+        <div class="addr-primary">${escapeHtml(displayLine1)}</div>
+        ${displayLine2 ? `<div class="addr-secondary">${escapeHtml(displayLine2)}</div>` : ''}
         ${phone ? `<div class="addr-secondary">${escapeHtml(phone)}</div>` : ''}
         ${email ? `<div class="addr-secondary">${escapeHtml(email)}</div>` : ''}
       </div>

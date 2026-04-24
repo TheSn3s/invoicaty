@@ -78,6 +78,8 @@ export default function SettingsPage() {
   const [defaultCurrency, setDefaultCurrency] = useState<string>("");
   const [taxRate, setTaxRate] = useState<string>("0");
   const [businessType, setBusinessType] = useState<BusinessType | "">("");
+  const [companyName, setCompanyName] = useState("");
+  const [invoiceDisplay, setInvoiceDisplay] = useState<"name" | "company" | "both">("name");
   const [logoUrl, setLogoUrl] = useState<string>("");
   const [logoBusy, setLogoBusy] = useState(false);
   const [logoError, setLogoError] = useState<string>("");
@@ -117,6 +119,8 @@ export default function SettingsPage() {
         setDefaultCurrency(prof.default_currency || "");
         setTaxRate(String(prof.tax_rate ?? 0));
         setBusinessType((prof.business_type as BusinessType) || "");
+        setCompanyName(prof.company_name || "");
+        setInvoiceDisplay(prof.invoice_display || "name");
         setLogoUrl(prof.logo_url || "");
         setInvoiceTemplate(((prof as { invoice_template?: string }).invoice_template as TemplateId) || "modern");
       }
@@ -151,6 +155,8 @@ export default function SettingsPage() {
       default_currency: defaultCurrency || null,
       tax_rate: Number(taxRate) || 0,
       business_type: businessType || null,
+      company_name: companyName || null,
+      invoice_display: invoiceDisplay,
       preferred_language: lang,
       updated_at: new Date().toISOString(),
     }).eq("id", profile.id);
@@ -390,6 +396,8 @@ export default function SettingsPage() {
   const buildSampleProfile = (templateOverride: TemplateId) => ({
     full_name: fullName || (lang === "ar" ? "اسمك الكامل" : "Your Name"),
     business_name: businessName || (lang === "ar" ? "اسم العلامة التجارية" : "Your Business"),
+    company_name: companyName || "",
+    invoice_display: invoiceDisplay,
     phone: phone || "+965 9000 0000",
     email: email || "hello@example.com",
     bank_name: bankName || "National Bank",
@@ -545,6 +553,34 @@ export default function SettingsPage() {
                     placeholder={t("settings.businessNamePlaceholder")}
                     className="w-full bg-slate-800/50 border border-slate-600/30 rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:ring-2 focus:ring-blue-500/40 outline-none" />
                 </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-400 mb-1.5">{t("settings.companyName")}</label>
+                  <input type="text" value={companyName} onChange={e => setCompanyName(e.target.value)}
+                    placeholder={t("settings.companyNamePlaceholder")}
+                    className="w-full bg-slate-800/50 border border-slate-600/30 rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:ring-2 focus:ring-blue-500/40 outline-none" />
+                </div>
+                {companyName && (
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-400 mb-2">{t("settings.invoiceDisplay")}</label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {(["name", "company", "both"] as const).map(opt => (
+                        <button key={opt} onClick={() => setInvoiceDisplay(opt)}
+                          className={`p-2.5 rounded-xl text-[11px] font-bold border transition-all ${
+                            invoiceDisplay === opt
+                              ? "bg-blue-600/20 border-blue-500/50 text-blue-400"
+                              : "bg-slate-800/50 border-slate-600/30 text-slate-400 hover:border-slate-500/50"
+                          }`}>
+                          {t(`settings.display_${opt}`)}
+                        </button>
+                      ))}
+                    </div>
+                    <p className="text-[10px] text-slate-500 mt-2">
+                      {invoiceDisplay === "name" && t("settings.displayPreviewName", { name: fullName || "—" })}
+                      {invoiceDisplay === "company" && t("settings.displayPreviewCompany", { company: companyName })}
+                      {invoiceDisplay === "both" && t("settings.displayPreviewBoth", { company: companyName, name: fullName || "—" })}
+                    </p>
+                  </div>
+                )}
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="block text-[11px] font-bold text-slate-400 mb-1.5">{t("settings.phone")}</label>

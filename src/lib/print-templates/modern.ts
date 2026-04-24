@@ -9,7 +9,7 @@ import type { PrintableDoc, Profile, DocType } from "./types";
  */
 export function renderModern(doc: PrintableDoc, profile: Profile | null, type: DocType): string {
   const ctx = buildContext(doc, profile, type);
-  const { totals, color, name, businessName, phone, email, logoUrl, notes,
+  const { totals, color, name, businessName, displayLine1, displayLine2, phone, email, logoUrl, notes,
           bankHolder, bankName, bankAccount, bankIban, isQuotation, docLabel } = ctx;
   const { fmt } = totals;
 
@@ -27,13 +27,13 @@ export function renderModern(doc: PrintableDoc, profile: Profile | null, type: D
   }).join('');
 
   const logoBlock = logoUrl
-    ? `<img src="${logoUrl}" alt="${escapeHtml(businessName || name)}" class="logo" />`
-    : `<div class="logo-fallback" style="background:${color}">${escapeHtml((businessName || name).charAt(0).toUpperCase())}</div>`;
+    ? `<img src="${logoUrl}" alt="${escapeHtml(displayLine1)}" class="logo" />`
+    : `<div class="logo-fallback" style="background:${color}">${escapeHtml(displayLine1.charAt(0).toUpperCase())}</div>`;
 
-  const businessLine = businessName
-    ? `<div class="biz-name">${escapeHtml(businessName)}</div>
-       <div class="biz-person">${escapeHtml(name)}</div>`
-    : `<div class="biz-name">${escapeHtml(name)}</div>`;
+  const businessLine = displayLine2
+    ? `<div class="biz-name">${escapeHtml(displayLine1)}</div>
+       <div class="biz-person">${escapeHtml(displayLine2)}</div>`
+    : `<div class="biz-name">${escapeHtml(displayLine1)}</div>`;
 
   const contactHtml = [
     phone ? `<div class="contact-line"><span class="contact-lbl">Phone</span><span>${escapeHtml(phone)}</span></div>` : '',

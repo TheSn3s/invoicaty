@@ -26,6 +26,8 @@ export interface PrintableDoc {
 export interface Profile {
   full_name: string;
   business_name: string;
+  company_name?: string;
+  invoice_display?: 'name' | 'company' | 'both';
   phone: string;
   email: string;
   bank_name: string;

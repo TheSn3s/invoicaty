@@ -9,6 +9,22 @@ export function escapeHtml(s: string): string {
     .replace(/'/g, '&#39;');
 }
 
+/** Returns { line1, line2 } for the sender block based on invoice_display setting */
+export function getDisplayName(profile: Profile): { line1: string; line2: string } {
+  const display = profile.invoice_display || 'name';
+  const name = profile.full_name || '';
+  const company = profile.company_name || '';
+
+  if (display === 'company' && company) {
+    return { line1: company, line2: '' };
+  }
+  if (display === 'both' && company) {
+    return { line1: company, line2: name };
+  }
+  // 'name' or fallback
+  return { line1: name, line2: '' };
+}
+
 export interface ComputedTotals {
   items: LineItem[];
   subtotal: number;
@@ -69,6 +85,8 @@ export interface TemplateContext {
   // Convenience fields derived from profile/doc
   name: string;
   businessName: string;
+  displayLine1: string;
+  displayLine2: string;
   color: string;
   phone: string;
   email: string;
@@ -90,6 +108,7 @@ export function buildContext(
   const totals = computeTotals(doc);
   const name = profile?.full_name || profile?.business_name || 'Your Name';
   const businessName = profile?.business_name || '';
+  const { line1: displayLine1, line2: displayLine2 } = profile ? getDisplayName(profile) : { line1: name, line2: '' };
   return {
     doc,
     profile,
@@ -97,6 +116,8 @@ export function buildContext(
     totals,
     name,
     businessName,
+    displayLine1,
+    displayLine2,
     color: profile?.brand_color || '#3b82f6',
     phone: profile?.phone || '',
     email: profile?.email || '',

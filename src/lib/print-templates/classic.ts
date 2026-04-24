@@ -9,7 +9,7 @@ import type { PrintableDoc, Profile, DocType } from "./types";
  */
 export function renderClassic(doc: PrintableDoc, profile: Profile | null, type: DocType): string {
   const ctx = buildContext(doc, profile, type);
-  const { totals, color, name, businessName, phone, email, logoUrl, notes,
+  const { totals, color, name, businessName, displayLine1, displayLine2, phone, email, logoUrl, notes,
           bankHolder, bankName, bankAccount, bankIban, isQuotation, docLabel } = ctx;
   const { fmt } = totals;
 
@@ -26,7 +26,7 @@ export function renderClassic(doc: PrintableDoc, profile: Profile | null, type: 
   }).join('');
 
   const logoBlock = logoUrl
-    ? `<img src="${logoUrl}" alt="${escapeHtml(businessName || name)}" class="logo" />`
+    ? `<img src="${logoUrl}" alt="${escapeHtml(displayLine1)}" class="logo" />`
     : '';
 
   let totalsHtml = `<div class="tot-row"><span>Subtotal</span><span>${fmt(totals.subtotal)}</span></div>`;
@@ -151,8 +151,8 @@ tbody td{padding:16px 8px;font-size:15px;color:var(--ink-2);border-bottom:1px so
     <header class="hdr">
       <div class="hdr-rule"></div>
       ${logoBlock}
-      <div class="biz-name">${escapeHtml(businessName || name)}</div>
-      ${businessName ? `<div class="biz-person">${escapeHtml(name)}</div>` : ''}
+      <div class="biz-name">${escapeHtml(displayLine1)}</div>
+      ${displayLine2 ? `<div class="biz-person">${escapeHtml(displayLine2)}</div>` : ''}
       <div class="hdr-bottom-rule"></div>
     </header>
 
@@ -202,7 +202,7 @@ tbody td{padding:16px 8px;font-size:15px;color:var(--ink-2);border-bottom:1px so
 
     <div class="regards">
       <div class="regards-line">With sincere regards,</div>
-      <div class="regards-name">${escapeHtml(name)}</div>
+      <div class="regards-name">${escapeHtml(displayLine1)}</div>
     </div>
   </div>
 
