@@ -128,6 +128,7 @@
     "profileTab": "Profile",
     "invoiceTab": "Invoice Template",
     "regionTab": "Region & Language",
+    "dataTab": "Data",
     "personalInfo": "Personal Information",
     "bankInfo": "Bank Details",
     "bankInfoNote": "(shown on invoice)",
@@ -240,5 +241,27 @@
     "lineTotal": "Line total",
     "addItem": "Add another item",
     "remove": "Remove"
+  },
+  "support": {
+    "contactDeveloper": "Contact developer",
+    "contactSupport": "Contact Support",
+    "supportTitle": "Need help?",
+    "supportDesc": "Reach out to the developer for technical support",
+    "emailUs": "Email Support"
+  },
+  "data": {
+    "title": "Data Management",
+    "subtitle": "Import, export and backup your invoices",
+    "importTitle": "Import Invoices",
+    "importDesc": "Upload a CSV or Excel file to import multiple invoices at once",
+    "importBtn": "Import File",
+    "exportTitle": "Export Invoices",
+    "exportDesc": "Download all your invoices as a CSV spreadsheet",
+    "exportBtn": "Export CSV",
+    "backupTitle": "Full Backup",
+    "backupDesc": "Download a JSON backup of all your data (invoices, quotations, profile)",
+    "backupBtn": "Download Backup",
+    "exporting": "Exporting…",
+    "exported": "Exported ✅"
   }
 }

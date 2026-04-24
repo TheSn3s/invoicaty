@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useI18n } from "@/lib/i18n";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import AppFooter from "@/components/AppFooter";
 
 export default function Home() {
   const { t } = useI18n();
@@ -65,9 +66,7 @@ export default function Home() {
         </section>
       </main>
 
-      <footer className="relative z-10 text-center py-6 text-slate-500 text-xs">
-        {t("home.footer", { year: String(new Date().getFullYear()) })}
-      </footer>
+      <AppFooter />
     </div>
   );
 }

@@ -12,6 +12,7 @@ import ImportModal from "@/components/ImportModal";
 import StatsCards from "@/components/StatsCards";
 import InvoiceTable from "@/components/InvoiceTable";
 import CreateMenu from "@/components/CreateMenu";
+import AppFooter from "@/components/AppFooter";
 import { printInvoice } from "@/lib/print-invoice";
 import Link from "next/link";
 
@@ -258,6 +259,8 @@ export default function DashboardPage() {
       {showModal && <InvoiceModal invoice={editInvoice} onSave={handleSave} onClose={() => { setShowModal(false); setEditInvoice(null); }} currencySymbol={effectiveSymbol} defaultTaxRate={profile?.tax_rate || 0} />}
       {deleteInvoice && <DeleteModal serial={deleteInvoice.serial} onConfirm={handleDelete} onClose={() => setDeleteInvoice(null)} />}
       {showImport && <ImportModal onImport={handleImport} onClose={() => setShowImport(false)} />}
+
+      <AppFooter compact />
     </div>
   );
 }

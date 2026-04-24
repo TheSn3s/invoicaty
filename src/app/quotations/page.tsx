@@ -7,6 +7,7 @@ import { getCurrencyLabel } from "@/lib/currency";
 import type { Currency } from "@/lib/types";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import CreateMenu from "@/components/CreateMenu";
+import AppFooter from "@/components/AppFooter";
 import LineItemsEditor, { LineItem, makeEmptyItem, calcSubtotal } from "@/components/LineItemsEditor";
 import { printQuotation } from "@/lib/print-invoice";
 import Link from "next/link";
@@ -279,6 +280,8 @@ export default function QuotationsPage() {
           </div>
         </div>
       )}
+
+      <AppFooter compact />
     </div>
   );
 }

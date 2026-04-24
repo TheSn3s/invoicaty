@@ -128,6 +128,7 @@
     "profileTab": "الملف الشخصي",
     "invoiceTab": "قالب الفاتورة",
     "regionTab": "المنطقة واللغة",
+    "dataTab": "البيانات",
     "personalInfo": "المعلومات الشخصية",
     "bankInfo": "البيانات البنكية",
     "bankInfoNote": "(تظهر في الفاتورة)",
@@ -240,5 +241,27 @@
     "lineTotal": "إجمالي البند",
     "addItem": "إضافة بند آخر",
     "remove": "حذف"
+  },
+  "support": {
+    "contactDeveloper": "تواصل مع المطور",
+    "contactSupport": "تواصل مع الدعم",
+    "supportTitle": "تحتاج مساعدة؟",
+    "supportDesc": "تواصل مع المطور للحصول على الدعم الفني",
+    "emailUs": "راسلنا على البريد"
+  },
+  "data": {
+    "title": "إدارة البيانات",
+    "subtitle": "استيراد وتصدير ونسخ احتياطي لفواتيرك",
+    "importTitle": "استيراد الفواتير",
+    "importDesc": "ارفع ملف CSV أو Excel لاستيراد عدة فواتير دفعة واحدة",
+    "importBtn": "استيراد ملف",
+    "exportTitle": "تصدير الفواتير",
+    "exportDesc": "تحميل جميع فواتيرك كملف CSV",
+    "exportBtn": "تصدير CSV",
+    "backupTitle": "نسخة احتياطية شاملة",
+    "backupDesc": "تحميل نسخة احتياطية (JSON) لجميع بياناتك (الفواتير والعروض والملف الشخصي)",
+    "backupBtn": "تحميل النسخة",
+    "exporting": "جارٍ التصدير…",
+    "exported": "تم التصدير ✅"
   }
 }
