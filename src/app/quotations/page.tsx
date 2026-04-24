@@ -6,6 +6,7 @@ import { useI18n } from "@/lib/i18n";
 import { getCurrencyLabel } from "@/lib/currency";
 import type { Currency } from "@/lib/types";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import LineItemsEditor, { LineItem, makeEmptyItem, calcSubtotal } from "@/components/LineItemsEditor";
 import { printQuotation } from "@/lib/print-invoice";
 import Link from "next/link";
 
@@ -16,6 +17,7 @@ interface Quotation {
   client: string; project: string; description: string; amount: number;
   discount: number; tax_rate: number; tax_amount: number; total: number;
   notes: string; status: string; converted_invoice_id: string | null;
+  items?: LineItem[] | null;
 }
 
 interface Profile {
@@ -74,11 +76,11 @@ export default function QuotationsPage() {
     const taxableBase = Math.max(amt - disc, 0);
     const taxAmount = +(taxableBase * (rate / 100)).toFixed(3);
     const total = +(taxableBase + taxAmount).toFixed(3);
-    const payload = { date: data.date, valid_until: data.valid_until || null, client: data.client, project: data.project, description: data.description, amount: amt, discount: disc, tax_rate: rate, tax_amount: taxAmount, total, notes: data.notes || "", status: data.status || "Draft" };
+    const payload = { date: data.date, valid_until: data.valid_until || null, client: data.client, project: data.project, description: data.description, amount: amt, discount: disc, tax_rate: rate, tax_amount: taxAmount, total, notes: data.notes || "", status: data.status || "Draft", items: (data as { items?: unknown[] }).items || null };
     if (editQuotation) {
       await supabase.from("quotations").update(payload).eq("id", editQuotation.id);
     } else {
-      const maxSerial = quotations.reduce((max, q) => { const n = parseInt(q.serial); return !isNaN(n) && n > max ? n : max; }, 0);
+      const maxSerial = quotations.reduce((max, q) => { const n = parseInt(q.serial.replace(/^Q/i, '')); return !isNaN(n) && n > max ? n : max; }, 0);
       await supabase.from("quotations").insert({ user_id: user.id, serial: `Q${String(maxSerial + 1).padStart(3, "0")}`, ...payload });
     }
     setShowModal(false); setEditQuotation(null); loadData();
@@ -265,7 +267,7 @@ export default function QuotationsPage() {
 
 /* ========== Quotation Modal ========== */
 function QuotationModal({ quotation, onSave, onClose, currencySymbol, defaultTaxRate = 0 }: {
-  quotation: Quotation | null; onSave: (d: Partial<Quotation>) => void; onClose: () => void; currencySymbol: string; defaultTaxRate?: number;
+  quotation: Quotation | null; onSave: (d: Partial<Quotation> & { items: LineItem[] }) => void; onClose: () => void; currencySymbol: string; defaultTaxRate?: number;
 }) {
   const { t, lang } = useI18n();
   const symbol = currencySymbol || (lang === 'ar' ? 'د.ك' : 'KWD');
@@ -274,7 +276,7 @@ function QuotationModal({ quotation, onSave, onClose, currencySymbol, defaultTax
   const [client, setClient] = useState("");
   const [project, setProject] = useState("");
   const [description, setDescription] = useState("");
-  const [amount, setAmount] = useState("");
+  const [items, setItems] = useState<LineItem[]>([makeEmptyItem()]);
   const [discount, setDiscount] = useState("");
   const [taxRate, setTaxRate] = useState(defaultTaxRate > 0 ? String(defaultTaxRate) : "0");
   const [notes, setNotes] = useState("");
@@ -288,32 +290,40 @@ function QuotationModal({ quotation, onSave, onClose, currencySymbol, defaultTax
       setClient(quotation.client);
       setProject(quotation.project);
       setDescription(quotation.description || "");
-      setAmount(String(quotation.amount));
+      // Populate items from quotation.items or fallback to legacy
+      if (Array.isArray(quotation.items) && quotation.items.length > 0) {
+        setItems(quotation.items.map(it => ({ description: it.description || "", quantity: Number(it.quantity) || 1, unit_price: Number(it.unit_price) || 0 })));
+      } else {
+        setItems([{ description: quotation.project + (quotation.description ? ` — ${quotation.description}` : ""), quantity: 1, unit_price: Number(quotation.amount) || 0 }]);
+      }
       setDiscount(String(quotation.discount || 0));
       setTaxRate(String(quotation.tax_rate ?? defaultTaxRate ?? 0));
       setNotes(quotation.notes || "");
       setStatus(quotation.status);
+    } else {
+      setItems([makeEmptyItem()]);
     }
   }, [quotation, defaultTaxRate]);
 
   const totals = useMemo(() => {
-    const sub = parseFloat(amount) || 0;
+    const sub = calcSubtotal(items);
     const disc = parseFloat(discount) || 0;
     const rate = parseFloat(taxRate) || 0;
     const taxableBase = Math.max(sub - disc, 0);
     const taxAmount = taxableBase * (rate / 100);
     const total = taxableBase + taxAmount;
     return { sub, disc, rate, taxAmount, total };
-  }, [amount, discount, taxRate]);
+  }, [items, discount, taxRate]);
 
   const showTax = totals.rate > 0;
   const fmt = (n: number) => n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 3 });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!parseFloat(amount)) return;
+    const validItems = items.filter(it => it.description.trim() && (Number(it.quantity) * Number(it.unit_price)) >= 0);
+    if (validItems.length === 0 || totals.sub < 0) return;
     setSaving(true);
-    await onSave({ date, valid_until: validUntil || null, client, project, description, amount: parseFloat(amount), discount: parseFloat(discount) || 0, tax_rate: parseFloat(taxRate) || 0, notes, status });
+    await onSave({ date, valid_until: validUntil || null, client, project, description, amount: totals.sub, items: validItems, discount: parseFloat(discount) || 0, tax_rate: parseFloat(taxRate) || 0, notes, status });
     setSaving(false);
   };
 
@@ -345,25 +355,25 @@ function QuotationModal({ quotation, onSave, onClose, currencySymbol, defaultTax
             <input type="text" value={project} onChange={e => setProject(e.target.value)} required placeholder={t("quotation.project")} className="w-full bg-slate-800/50 border border-slate-600/30 rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:ring-2 focus:ring-blue-500/40 outline-none" />
           </div>
           <div>
-            <label className="block text-[11px] font-bold text-slate-400 mb-1.5">{t("quotation.description")}</label>
-            <textarea value={description} onChange={e => setDescription(e.target.value)} rows={2} placeholder={t("quotation.description")} className="w-full bg-slate-800/50 border border-slate-600/30 rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:ring-2 focus:ring-blue-500/40 outline-none resize-none" />
+            <label className="block text-[11px] font-bold text-slate-400 mb-1.5">{t("quotation.description")} <span className="text-slate-600 font-normal">({lang === "ar" ? "اختياري" : "optional"})</span></label>
+            <textarea value={description} onChange={e => setDescription(e.target.value)} rows={2} placeholder={lang === "ar" ? "نبذة عن المشروع" : "Brief about the project"} className="w-full bg-slate-800/50 border border-slate-600/30 rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:ring-2 focus:ring-blue-500/40 outline-none resize-none" />
           </div>
+
+          {/* Line items editor */}
+          <LineItemsEditor items={items} onChange={setItems} currencySymbol={symbol} />
+
           <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-[11px] font-bold text-slate-400 mb-1.5">{t("quotation.amount")} ({symbol})</label>
-              <input type="number" value={amount} onChange={e => setAmount(e.target.value)} required step="0.5" className="w-full bg-slate-800/50 border border-slate-600/30 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-blue-500/40 outline-none font-inter" />
-            </div>
             <div>
               <label className="block text-[11px] font-bold text-slate-400 mb-1.5">{t("invoice.discount")} ({symbol})</label>
               <input type="number" value={discount} onChange={e => setDiscount(e.target.value)} step="0.5" className="w-full bg-slate-800/50 border border-slate-600/30 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-blue-500/40 outline-none font-inter" />
             </div>
+            {defaultTaxRate > 0 && (
+              <div>
+                <label className="block text-[11px] font-bold text-slate-400 mb-1.5">{t("invoice.taxRate")}</label>
+                <input type="number" value={taxRate} onChange={e => setTaxRate(e.target.value)} step="0.01" min="0" max="100" dir="ltr" className="w-full bg-slate-800/50 border border-slate-600/30 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-blue-500/40 outline-none font-inter" />
+              </div>
+            )}
           </div>
-          {defaultTaxRate > 0 && (
-            <div>
-              <label className="block text-[11px] font-bold text-slate-400 mb-1.5">{t("invoice.taxRate")}</label>
-              <input type="number" value={taxRate} onChange={e => setTaxRate(e.target.value)} step="0.01" min="0" max="100" dir="ltr" className="w-full bg-slate-800/50 border border-slate-600/30 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-blue-500/40 outline-none font-inter" />
-            </div>
-          )}
           {totals.sub > 0 && (
             <div className="bg-slate-800/40 border border-slate-700/40 rounded-xl p-3 space-y-1.5">
               <div className="flex justify-between text-xs"><span className="text-slate-400">{t("invoice.subtotal")}</span><span className="font-inter text-white">{fmt(totals.sub)} {symbol}</span></div>

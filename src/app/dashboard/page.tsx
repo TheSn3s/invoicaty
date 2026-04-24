@@ -103,6 +103,7 @@ export default function DashboardPage() {
       tax_rate: rate, tax_amount: taxAmount, total,
       notes: data.notes || "",
       status: data.status, category: data.category,
+      items: (data as { items?: unknown[] }).items || null,
     };
 
     if (editInvoice) {

@@ -1,8 +1,15 @@
+interface LineItem {
+  description: string;
+  quantity: number;
+  unit_price: number;
+}
+
 interface PrintableDoc {
   serial: string; date: string; client: string; project: string;
   description: string; amount: number; discount?: number; currency: string;
   tax_rate?: number; tax_amount?: number; total?: number; notes?: string;
   valid_until?: string | null;
+  items?: LineItem[] | null;
 }
 
 interface Profile {
@@ -14,7 +21,17 @@ interface Profile {
 type DocType = 'invoice' | 'quotation';
 
 function buildHtml(doc: PrintableDoc, profile: Profile | null, type: DocType) {
-  const amt = Number(doc.amount) || 0;
+  // Build effective line items (fallback to legacy single-line if none)
+  const rawItems: LineItem[] = Array.isArray(doc.items) && doc.items.length > 0
+    ? doc.items
+    : [{
+        description: doc.project + (doc.description ? ` — ${doc.description}` : ''),
+        quantity: 1,
+        unit_price: Number(doc.amount) || 0,
+      }];
+
+  const itemsSubtotal = rawItems.reduce((s, it) => s + (Number(it.quantity) || 0) * (Number(it.unit_price) || 0), 0);
+  const amt = itemsSubtotal > 0 ? itemsSubtotal : (Number(doc.amount) || 0);
   const disc = Number(doc.discount) || 0;
   const taxRate = Number(doc.tax_rate) || 0;
   const taxableBase = Math.max(amt - disc, 0);
@@ -22,7 +39,6 @@ function buildHtml(doc: PrintableDoc, profile: Profile | null, type: DocType) {
   const total = Number(doc.total) || +(taxableBase + taxAmount).toFixed(3);
   const cur = doc.currency || 'KWD';
   const fmt = (n: number) => `${cur} ${n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 3 })}`;
-  const desc = doc.description || 'Professional services as agreed.';
   const name = profile?.full_name || profile?.business_name || 'Your Name';
   const color = profile?.brand_color || '#f04444';
   const phone = profile?.phone || '';
@@ -34,6 +50,26 @@ function buildHtml(doc: PrintableDoc, profile: Profile | null, type: DocType) {
   const notes = doc.notes || '';
   const logoUrl = profile?.logo_url || '';
 
+  // Build dynamic line-items HTML
+  const escapeHtml = (s: string) => String(s || '')
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+  const rowsHtml = rawItems.map((it, idx) => {
+    const q = Number(it.quantity) || 0;
+    const p = Number(it.unit_price) || 0;
+    const lineTotal = q * p;
+    return `<tr>
+<td>${idx + 1}</td>
+<td>${q}</td>
+<td style="padding-right:2rem"><div class="pn">${escapeHtml(it.description)}</div></td>
+<td>${fmt(lineTotal)}</td>
+</tr>`;
+  }).join('');
+
+  // Optional project brief (shown above items if present and different from a single-item desc)
+  const briefHtml = (doc.description && doc.project)
+    ? `<div class="brief"><b>${escapeHtml(doc.project)}</b> — ${escapeHtml(doc.description)}</div>`
+    : (doc.project ? `<div class="brief"><b>${escapeHtml(doc.project)}</b></div>` : '');
   const isQuotation = type === 'quotation';
   const docLabel = isQuotation ? 'Quotation' : 'Invoice';
   const showTax = taxRate > 0;
@@ -84,6 +120,7 @@ body{font-family:'Montserrat',sans-serif;background:#f9fafb;color:#000;display:f
 .ttl{color:${color};font-size:1.1rem;font-weight:900;margin-bottom:.4rem}
 .cli{font-weight:700;font-size:.875rem;color:#1e293b;margin-bottom:.5rem}
 .validity{font-size:.7rem;color:#64748b;margin-bottom:1.25rem;font-weight:700}
+.brief{font-size:.75rem;color:#334155;background:#f8fafc;padding:.5rem .75rem;border-radius:.375rem;border:1px solid #f1f5f9;margin-bottom:1rem;line-height:1.6}
 table{width:100%;border-collapse:collapse;margin-bottom:1.25rem;text-align:left}
 thead tr{border-bottom:2px solid ${color}}
 th{font-size:.6rem;font-weight:900;text-transform:uppercase;letter-spacing:.1em;color:#334155;padding:.35rem 0}
@@ -140,8 +177,9 @@ body{padding:.5rem}
 <div class="ttl">${docLabel} #${doc.serial}</div>
 <div class="cli">${doc.client}</div>
 ${validityHtml}
+${briefHtml}
 <table><thead><tr><th>ID</th><th>QTY</th><th>DESCRIPTION</th><th>COST</th></tr></thead>
-<tbody><tr><td>1</td><td>1</td><td style="padding-right:2rem"><div class="pn">${doc.project}</div><div class="pd">${desc}</div></td><td>${fmt(amt)}</td></tr></tbody></table>
+<tbody>${rowsHtml}</tbody></table>
 <div class="tots"><div class="totb">
 ${totalsHtml}
 </div></div>

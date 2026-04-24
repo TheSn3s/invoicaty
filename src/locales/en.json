@@ -225,5 +225,17 @@
     "no": "No",
     "ok": "OK",
     "close": "Close"
+  },
+  "items": {
+    "title": "Line Items",
+    "item": "item",
+    "items": "items",
+    "itemNum": "Item",
+    "description": "Item / Service description",
+    "quantity": "Qty",
+    "unitPrice": "Price",
+    "lineTotal": "Line total",
+    "addItem": "Add another item",
+    "remove": "Remove"
   }
 }
