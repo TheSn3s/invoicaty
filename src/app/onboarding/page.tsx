@@ -80,8 +80,16 @@ export default function OnboardingPage() {
   };
 
   const onLogoSelect = (file: File | null) => {
+    setError("");
     if (!file) { setLogoFile(null); setLogoPreview(""); return; }
-    if (file.size > 2 * 1024 * 1024) { alert("Max 2MB"); return; }
+    if (!file.type.startsWith("image/")) {
+      setError(lang === "ar" ? "يجب أن يكون الملف صورة (PNG, JPG, SVG)" : "File must be an image (PNG, JPG, SVG)");
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      setError(lang === "ar" ? "حجم الملف أكبر من 2 ميجابايت" : "File size exceeds 2MB");
+      return;
+    }
     setLogoFile(file);
     const reader = new FileReader();
     reader.onload = (e) => setLogoPreview(e.target?.result as string || "");
@@ -94,19 +102,39 @@ export default function OnboardingPage() {
     if (!logoFile || !userId) return null;
     setUploading(true);
     try {
-      const ext = logoFile.name.split('.').pop();
+      const ext = (logoFile.name.split('.').pop() || "png").toLowerCase();
       const path = `${userId}/logo-${Date.now()}.${ext}`;
-      const { error: uploadError } = await supabase.storage.from("logos").upload(path, logoFile, { upsert: true });
-      if (uploadError) {
-        console.error("Logo upload failed:", uploadError);
-        setError(`Logo upload failed: ${uploadError.message}`);
+
+      // Race the upload against a 15-second timeout so we never hang forever
+      const uploadPromise = supabase.storage.from("logos").upload(path, logoFile, { upsert: true, contentType: logoFile.type });
+      const timeoutPromise = new Promise<{ error: Error }>((resolve) => {
+        setTimeout(() => resolve({ error: new Error(lang === "ar" ? "انتهت مهلة رفع الشعار (15 ثانية). تحقق من اتصال الإنترنت وحاول مرة أخرى" : "Logo upload timed out (15s). Check your connection and try again") }), 15000);
+      });
+      const result = await Promise.race([uploadPromise, timeoutPromise]) as { error: Error | null };
+
+      if (result.error) {
+        console.error("Logo upload failed:", result.error);
+        const msg = result.error.message || String(result.error);
+        // Friendlier messages for common cases
+        let friendly = msg;
+        if (/policy|unauthorized|permission|403/i.test(msg)) {
+          friendly = lang === "ar"
+            ? "فشل رفع الشعار: صلاحيات غير كافية (تحقق من سياسات Storage في Supabase)"
+            : "Logo upload failed: insufficient permissions (check Supabase Storage policies)";
+        } else if (/network|failed to fetch|timeout/i.test(msg)) {
+          friendly = lang === "ar"
+            ? "فشل الرفع بسبب الشبكة. تحقق من الإنترنت وحاول مرة أخرى"
+            : "Upload failed due to network error. Check your connection and retry";
+        }
+        setError(friendly);
         return null;
       }
       const { data } = supabase.storage.from("logos").getPublicUrl(path);
       return data.publicUrl;
     } catch (e) {
       console.error("Logo upload exception:", e);
-      setError(`Upload error: ${e instanceof Error ? e.message : String(e)}`);
+      const msg = e instanceof Error ? e.message : String(e);
+      setError(lang === "ar" ? `خطأ أثناء رفع الشعار: ${msg}` : `Logo upload error: ${msg}`);
       return null;
     } finally {
       setUploading(false);

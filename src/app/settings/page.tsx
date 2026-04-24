@@ -74,6 +74,9 @@ export default function SettingsPage() {
   const [defaultCurrency, setDefaultCurrency] = useState<string>("");
   const [taxRate, setTaxRate] = useState<string>("0");
   const [businessType, setBusinessType] = useState<BusinessType | "">("");
+  const [logoUrl, setLogoUrl] = useState<string>("");
+  const [logoBusy, setLogoBusy] = useState(false);
+  const [logoError, setLogoError] = useState<string>("");
 
   const router = useRouter();
   const supabase = createClient();
@@ -108,6 +111,7 @@ export default function SettingsPage() {
         setDefaultCurrency(prof.default_currency || "");
         setTaxRate(String(prof.tax_rate ?? 0));
         setBusinessType((prof.business_type as BusinessType) || "");
+        setLogoUrl(prof.logo_url || "");
       }
       setLoading(false);
     })();
@@ -275,6 +279,89 @@ export default function SettingsPage() {
     }
   };
 
+  // ============ Logo Management ============
+  const handleLogoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = ""; // allow re-selecting the same file
+    if (!file || !profile) return;
+    setLogoError("");
+
+    if (!file.type.startsWith("image/")) {
+      setLogoError(lang === "ar" ? "يجب أن يكون الملف صورة (PNG, JPG, SVG)" : "File must be an image (PNG, JPG, SVG)");
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      setLogoError(lang === "ar" ? "حجم الملف أكبر من 2 ميجابايت" : "File size exceeds 2MB");
+      return;
+    }
+
+    setLogoBusy(true);
+    try {
+      const ext = (file.name.split('.').pop() || "png").toLowerCase();
+      const path = `${profile.id}/logo-${Date.now()}.${ext}`;
+
+      const uploadPromise = supabase.storage.from("logos").upload(path, file, { upsert: true, contentType: file.type });
+      const timeoutPromise = new Promise<{ error: Error }>((resolve) => {
+        setTimeout(() => resolve({ error: new Error(lang === "ar" ? "انتهت مهلة الرفع (15 ثانية)" : "Upload timed out (15s)") }), 15000);
+      });
+      const result = await Promise.race([uploadPromise, timeoutPromise]) as { error: Error | null };
+
+      if (result.error) {
+        setLogoError(lang === "ar" ? `فشل الرفع: ${result.error.message}` : `Upload failed: ${result.error.message}`);
+        return;
+      }
+
+      const { data: urlData } = supabase.storage.from("logos").getPublicUrl(path);
+      const newUrl = urlData.publicUrl;
+
+      // Update profile row
+      const { error: updateErr } = await supabase.from("profiles").update({ logo_url: newUrl, updated_at: new Date().toISOString() }).eq("id", profile.id);
+      if (updateErr) {
+        setLogoError(lang === "ar" ? `فشل حفظ الشعار: ${updateErr.message}` : `Save failed: ${updateErr.message}`);
+        return;
+      }
+
+      // Try to delete the previous logo file (best-effort, no error if it fails)
+      if (logoUrl) {
+        try {
+          const oldPath = logoUrl.split("/logos/")[1];
+          if (oldPath) await supabase.storage.from("logos").remove([oldPath]);
+        } catch { /* ignore cleanup errors */ }
+      }
+
+      setLogoUrl(newUrl);
+    } catch (err) {
+      setLogoError(lang === "ar" ? `خطأ: ${err instanceof Error ? err.message : String(err)}` : `Error: ${err instanceof Error ? err.message : String(err)}`);
+    } finally {
+      setLogoBusy(false);
+    }
+  };
+
+  const handleLogoRemove = async () => {
+    if (!profile || !logoUrl) return;
+    if (!confirm(lang === "ar" ? "هل أنت متأكد من حذف الشعار؟" : "Are you sure you want to remove the logo?")) return;
+
+    setLogoBusy(true);
+    setLogoError("");
+    try {
+      // Delete file from storage (best-effort)
+      try {
+        const oldPath = logoUrl.split("/logos/")[1];
+        if (oldPath) await supabase.storage.from("logos").remove([oldPath]);
+      } catch { /* ignore */ }
+
+      // Clear logo_url in profile
+      const { error: updateErr } = await supabase.from("profiles").update({ logo_url: null, updated_at: new Date().toISOString() }).eq("id", profile.id);
+      if (updateErr) {
+        setLogoError(lang === "ar" ? `فشل الحذف: ${updateErr.message}` : `Remove failed: ${updateErr.message}`);
+        return;
+      }
+      setLogoUrl("");
+    } finally {
+      setLogoBusy(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -335,6 +422,47 @@ export default function SettingsPage() {
 
         {tab === "profile" && (
           <div className="space-y-6 fade-in">
+            {/* Brand Logo */}
+            <div className="glass rounded-2xl p-5">
+              <h3 className="text-sm font-bold text-white mb-4 flex items-center gap-2">
+                <span className="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center text-sm">🖼️</span>
+                {lang === "ar" ? "شعار العلامة التجارية" : "Brand Logo"}
+              </h3>
+
+              <div className="flex items-center gap-4">
+                <div className="w-24 h-24 rounded-2xl bg-slate-800/60 border-2 border-dashed border-slate-600/40 flex items-center justify-center overflow-hidden shrink-0">
+                  {logoUrl ? (
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img src={logoUrl} alt="Logo" className="w-full h-full object-contain p-1" />
+                  ) : (
+                    <span className="text-3xl opacity-30">🖼️</span>
+                  )}
+                </div>
+
+                <div className="flex-1 space-y-2">
+                  <p className="text-[11px] text-slate-400">{lang === "ar" ? "يظهر في الفواتير وعروض الأسعار المطبوعة. PNG / JPG / SVG — حتى 2 ميجابايت." : "Shown on printed invoices and quotations. PNG / JPG / SVG — max 2MB."}</p>
+                  <div className="flex flex-wrap gap-2">
+                    <label className={`flex-1 min-w-[120px] text-center bg-blue-600/90 hover:bg-blue-500 text-white text-xs font-bold py-2.5 px-3 rounded-xl cursor-pointer transition-all shadow-lg shadow-blue-500/20 ${logoBusy ? "opacity-50 pointer-events-none" : ""}`}>
+                      {logoBusy ? `⏳ ${lang === "ar" ? "جارٍ الرفع…" : "Uploading…"}` : (logoUrl ? (lang === "ar" ? "🔄 تغيير الشعار" : "🔄 Change Logo") : (lang === "ar" ? "📤 رفع شعار" : "📤 Upload Logo"))}
+                      <input type="file" accept="image/*" onChange={handleLogoChange} className="hidden" disabled={logoBusy} />
+                    </label>
+                    {logoUrl && (
+                      <button type="button" onClick={handleLogoRemove} disabled={logoBusy}
+                        className="bg-red-600/20 hover:bg-red-600/30 border border-red-500/30 text-red-300 text-xs font-bold py-2.5 px-3 rounded-xl transition-all disabled:opacity-50">
+                        {lang === "ar" ? "🗑️ حذف" : "🗑️ Remove"}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {logoError && (
+                <div className="mt-3 bg-red-500/10 border border-red-500/30 text-red-300 text-[12px] font-bold px-3 py-2.5 rounded-xl">
+                  ⚠️ {logoError}
+                </div>
+              )}
+            </div>
+
             <div className="glass rounded-2xl p-5">
               <h3 className="text-sm font-bold text-white mb-4 flex items-center gap-2">
                 <span className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center text-sm">👤</span>
