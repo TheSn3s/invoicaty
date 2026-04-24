@@ -33,7 +33,7 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="relative z-10 flex-1 flex flex-col items-center justify-center px-5 text-center pb-20">
+      <main className="relative z-10 flex-1 flex flex-col items-center justify-center px-5 pt-12 sm:pt-16 md:pt-8 text-center pb-20">
         <div className="fade-in max-w-2xl">
           <h1 className="text-2xl sm:text-3xl md:text-5xl font-black text-white mb-4 leading-[1.35]">
             {t("home.title")}
