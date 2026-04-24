@@ -116,6 +116,7 @@
     "edit": "Edit",
     "delete": "Delete",
     "print": "Print",
+    "markPaid": "Mark as Paid",
     "save": "Save",
     "cancel": "Cancel",
     "addInvoice": "Add Invoice",

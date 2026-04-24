@@ -16,12 +16,13 @@ interface Props {
   onEdit: (inv: Invoice) => void;
   onDelete: (inv: Invoice) => void;
   onPrint: (inv: Invoice) => void;
+  onMarkPaid: (inv: Invoice) => void;
   currencySymbol?: string;
 }
 
 const PAGE_SIZE = 20;
 
-export default function InvoiceTable({ invoices, onEdit, onDelete, onPrint, currencySymbol }: Props) {
+export default function InvoiceTable({ invoices, onEdit, onDelete, onPrint, onMarkPaid, currencySymbol }: Props) {
   const [page, setPage] = useState(0);
   const { t, lang } = useI18n();
   const symbol = currencySymbol || (lang === 'ar' ? 'د.ك' : 'KWD');
@@ -68,6 +69,9 @@ export default function InvoiceTable({ invoices, onEdit, onDelete, onPrint, curr
             <div className="flex items-center justify-between">
               <span className="font-inter text-slate-500 text-[11px]">{inv.date}</span>
               <div className="flex gap-1.5">
+                {inv.status === "Not Paid" && (
+                  <button onClick={() => onMarkPaid(inv)} className="bg-green-500/10 hover:bg-green-500/20 p-2 rounded-lg text-sm transition-all active:scale-95" title={t("invoice.markPaid")}>💰</button>
+                )}
                 <button onClick={() => onPrint(inv)} className="bg-slate-700/50 hover:bg-slate-600/50 p-2 rounded-lg text-sm transition-all active:scale-95">📄</button>
                 <button onClick={() => onEdit(inv)} className="bg-blue-500/10 hover:bg-blue-500/20 p-2 rounded-lg text-sm transition-all active:scale-95">✏️</button>
                 <button onClick={() => onDelete(inv)} className="bg-red-500/10 hover:bg-red-500/20 p-2 rounded-lg text-sm transition-all active:scale-95">🗑️</button>
@@ -112,6 +116,9 @@ export default function InvoiceTable({ invoices, onEdit, onDelete, onPrint, curr
                 </td>
                 <td className="p-4">
                   <div className="flex items-center gap-1.5 md:opacity-60 group-hover:opacity-100 transition-opacity">
+                    {inv.status === "Not Paid" && (
+                      <button onClick={() => onMarkPaid(inv)} className="bg-green-500/10 hover:bg-green-500/20 text-green-400 p-2 rounded-lg transition-all" title={t("invoice.markPaid")}>💰</button>
+                    )}
                     <button onClick={() => onPrint(inv)} className="bg-slate-500/10 hover:bg-slate-500/20 text-slate-300 p-2 rounded-lg transition-all" title={t("invoice.print")}>📄</button>
                     <button onClick={() => onEdit(inv)} className="bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 p-2 rounded-lg transition-all" title={t("invoice.edit")}>✏️</button>
                     <button onClick={() => onDelete(inv)} className="bg-red-500/10 hover:bg-red-500/20 text-red-400 p-2 rounded-lg transition-all" title={t("invoice.delete")}>🗑️</button>

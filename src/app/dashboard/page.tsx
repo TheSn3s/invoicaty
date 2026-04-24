@@ -245,7 +245,12 @@ export default function DashboardPage() {
           </div>
         )}
 
-        <InvoiceTable invoices={filtered} onEdit={(inv) => { setEditInvoice(inv); setShowModal(true); }} onDelete={(inv) => setDeleteInvoice(inv)} onPrint={(inv) => printInvoice(inv, profile)} currencySymbol={effectiveSymbol} />
+        <InvoiceTable invoices={filtered} onEdit={(inv) => { setEditInvoice(inv); setShowModal(true); }} onDelete={(inv) => setDeleteInvoice(inv)} onPrint={(inv) => printInvoice(inv, profile)} onMarkPaid={async (inv) => {
+          const { error } = await supabase.from("invoices").update({ status: "Paid" }).eq("id", inv.id);
+          if (!error) {
+            setInvoices(prev => prev.map(i => i.id === inv.id ? { ...i, status: "Paid" } : i));
+          }
+        }} currencySymbol={effectiveSymbol} />
       </main>
 
       <CreateMenu
