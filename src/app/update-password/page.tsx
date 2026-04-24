@@ -53,7 +53,7 @@ export default function UpdatePasswordPage() {
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (password.length < 6) { setError(t("auth.passwordTooShort")); return; }
-    if (password !== confirm) { setError(t("auth.emailMismatch")); return; }
+    if (password !== confirm) { setError(t("auth.passwordMismatch")); return; }
 
     setLoading(true);
     setError("");
@@ -105,7 +105,7 @@ export default function UpdatePasswordPage() {
                 className="w-full bg-slate-800/50 border border-slate-600/30 rounded-xl px-4 py-3.5 text-sm text-white placeholder:text-slate-500 focus:ring-2 focus:ring-green-500/50 outline-none" />
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-400 mb-2">{t("auth.confirmEmail")}</label>
+              <label className="block text-xs font-bold text-slate-400 mb-2">{t("auth.confirmPassword")}</label>
               <input type="password" value={confirm} onChange={e => setConfirm(e.target.value)} required
                 placeholder={t("auth.passwordPlaceholder")} dir="ltr"
                 className="w-full bg-slate-800/50 border border-slate-600/30 rounded-xl px-4 py-3.5 text-sm text-white placeholder:text-slate-500 focus:ring-2 focus:ring-green-500/50 outline-none" />
