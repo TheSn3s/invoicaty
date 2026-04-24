@@ -82,22 +82,23 @@ export default function CreateMenu({ onNewInvoice, onNewQuotation, variant = "he
       {open && (
         <div
           role="menu"
-          className={`absolute ${menuAlignClass} w-60 bg-slate-900/98 backdrop-blur-xl border border-slate-700/60 rounded-xl shadow-2xl shadow-black/50 z-50 overflow-hidden fade-in`}
+          style={{ backgroundColor: "rgb(15 23 42 / 0.97)" }}
+          className={`absolute ${menuAlignClass} w-60 backdrop-blur-2xl border border-slate-600/70 rounded-xl shadow-2xl shadow-black/70 z-50 overflow-hidden fade-in ring-1 ring-black/30`}
         >
-          <div className="px-3 py-2 border-b border-slate-800/60">
-            <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{t("nav.createNew") || (lang === "ar" ? "إنشاء جديد" : "Create new")}</div>
+          <div className="px-3 py-2 border-b border-slate-700/60 bg-slate-800/60">
+            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{t("nav.createNew") || (lang === "ar" ? "إنشاء جديد" : "Create new")}</div>
           </div>
 
           <button
             type="button"
             role="menuitem"
             onClick={handleInvoice}
-            className="w-full flex items-center gap-3 px-3 py-3 hover:bg-blue-500/10 transition-colors text-start group"
+            className="w-full flex items-center gap-3 px-3 py-3 bg-slate-900 hover:bg-blue-600/20 transition-colors text-start group"
           >
-            <span className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500/20 to-blue-600/10 border border-blue-500/30 flex items-center justify-center text-lg group-hover:scale-110 transition-transform">🧾</span>
+            <span className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500/30 to-blue-600/20 border border-blue-500/40 flex items-center justify-center text-lg group-hover:scale-110 transition-transform">🧾</span>
             <div className="flex-1">
               <div className="text-sm text-white font-bold">{t("nav.newInvoice") || (lang === "ar" ? "فاتورة جديدة" : "New Invoice")}</div>
-              <div className="text-[10px] text-slate-500">{lang === "ar" ? "إصدار فاتورة للعميل" : "Issue an invoice to a client"}</div>
+              <div className="text-[10px] text-slate-400">{lang === "ar" ? "إصدار فاتورة للعميل" : "Issue an invoice to a client"}</div>
             </div>
           </button>
 
@@ -105,12 +106,12 @@ export default function CreateMenu({ onNewInvoice, onNewQuotation, variant = "he
             type="button"
             role="menuitem"
             onClick={handleQuotation}
-            className="w-full flex items-center gap-3 px-3 py-3 hover:bg-purple-500/10 transition-colors text-start group border-t border-slate-800/60"
+            className="w-full flex items-center gap-3 px-3 py-3 bg-slate-900 hover:bg-purple-600/20 transition-colors text-start group border-t border-slate-700/60"
           >
-            <span className="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-500/20 to-purple-600/10 border border-purple-500/30 flex items-center justify-center text-lg group-hover:scale-110 transition-transform">📋</span>
+            <span className="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-500/30 to-purple-600/20 border border-purple-500/40 flex items-center justify-center text-lg group-hover:scale-110 transition-transform">📋</span>
             <div className="flex-1">
               <div className="text-sm text-white font-bold">{t("nav.newQuotation") || (lang === "ar" ? "عرض سعر جديد" : "New Quotation")}</div>
-              <div className="text-[10px] text-slate-500">{lang === "ar" ? "إعداد عرض سعر للعميل" : "Prepare a quote for a client"}</div>
+              <div className="text-[10px] text-slate-400">{lang === "ar" ? "إعداد عرض سعر للعميل" : "Prepare a quote for a client"}</div>
             </div>
           </button>
         </div>
