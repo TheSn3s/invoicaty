@@ -6,6 +6,10 @@ import { useI18n } from "@/lib/i18n";
 import { getCurrencyLabel } from "@/lib/currency";
 import type { Currency } from "@/lib/types";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import CreateMenu from "@/components/CreateMenu";
+import AppFooter from "@/components/AppFooter";
+import LineItemsEditor, { LineItem, makeEmptyItem, calcSubtotal } from "@/components/LineItemsEditor";
+import { printQuotation } from "@/lib/print-invoice";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
@@ -15,6 +19,7 @@ interface Quotation {
   client: string; project: string; description: string; amount: number;
   discount: number; tax_rate: number; tax_amount: number; total: number;
   notes: string; status: string; converted_invoice_id: string | null;
+  items?: LineItem[] | null;
 }
 
 interface Profile {
@@ -39,6 +44,17 @@ export default function QuotationsPage() {
   const supabase = createClient();
   const { t, lang } = useI18n();
   const effectiveSymbol = getCurrencyLabel(currencyData, lang);
+
+  // Auto-open quotation modal when arriving via ?new=1 (from CreateMenu)
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("new") === "1") {
+      setEditQuotation(null);
+      setShowModal(true);
+      router.replace("/quotations", { scroll: false });
+    }
+  }, [router]);
 
   const loadData = useCallback(async () => {
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -73,11 +89,11 @@ export default function QuotationsPage() {
     const taxableBase = Math.max(amt - disc, 0);
     const taxAmount = +(taxableBase * (rate / 100)).toFixed(3);
     const total = +(taxableBase + taxAmount).toFixed(3);
-    const payload = { date: data.date, valid_until: data.valid_until || null, client: data.client, project: data.project, description: data.description, amount: amt, discount: disc, tax_rate: rate, tax_amount: taxAmount, total, notes: data.notes || "", status: data.status || "Draft" };
+    const payload = { date: data.date, valid_until: data.valid_until || null, client: data.client, project: data.project, description: data.description, amount: amt, discount: disc, tax_rate: rate, tax_amount: taxAmount, total, notes: data.notes || "", status: data.status || "Draft", items: (data as { items?: unknown[] }).items || null };
     if (editQuotation) {
       await supabase.from("quotations").update(payload).eq("id", editQuotation.id);
     } else {
-      const maxSerial = quotations.reduce((max, q) => { const n = parseInt(q.serial); return !isNaN(n) && n > max ? n : max; }, 0);
+      const maxSerial = quotations.reduce((max, q) => { const n = parseInt(q.serial.replace(/^Q/i, '')); return !isNaN(n) && n > max ? n : max; }, 0);
       await supabase.from("quotations").insert({ user_id: user.id, serial: `Q${String(maxSerial + 1).padStart(3, "0")}`, ...payload });
     }
     setShowModal(false); setEditQuotation(null); loadData();
@@ -97,7 +113,8 @@ export default function QuotationsPage() {
       date: new Date().toISOString().split("T")[0], client: q.client, project: q.project,
       description: q.description, amount: q.amount, discount: q.discount,
       tax_rate: q.tax_rate, tax_amount: q.tax_amount, total: q.total,
-      notes: q.notes, status: "Not Paid", category: ""
+      notes: q.notes, status: "Not Paid", category: "",
+      items: q.items || null
     }).select("id").single();
     if (newInv) {
       await supabase.from("quotations").update({ status: "Accepted", converted_invoice_id: newInv.id }).eq("id", q.id);
@@ -138,10 +155,11 @@ export default function QuotationsPage() {
           <div className="flex items-center gap-1.5">
             <LanguageSwitcher />
             <Link href="/dashboard" className="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-700/50 transition-all text-sm" title={t("nav.dashboard")}>🏠</Link>
-            <button onClick={() => { setEditQuotation(null); setShowModal(true); }}
-              className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-lg shadow-blue-500/20">
-              <span>+</span> <span className="hidden sm:inline">{t("quotation.new")}</span><span className="sm:hidden">{t("nav.new")}</span>
-            </button>
+            <CreateMenu
+              onNewInvoice={() => router.push("/dashboard?new=1")}
+              onNewQuotation={() => { setEditQuotation(null); setShowModal(true); }}
+              align={lang === 'ar' ? 'left' : 'right'}
+            />
           </div>
         </div>
       </header>
@@ -194,12 +212,40 @@ export default function QuotationsPage() {
                     <span className="font-inter text-slate-500 text-[11px]">{q.date}</span>
                     {q.valid_until && <span className="text-slate-600 text-[10px]">→ {q.valid_until}</span>}
                   </div>
-                  <div className="flex gap-1.5">
+                  <div className="flex flex-wrap gap-1.5">
+                    <button
+                      onClick={() => printQuotation({ ...q, currency: currencyData?.code || profile?.default_currency || 'KWD' }, profile)}
+                      className="bg-purple-500/15 hover:bg-purple-500/25 text-purple-300 border border-purple-500/30 px-3 py-2 rounded-lg text-[11px] font-bold transition-all active:scale-95 flex items-center gap-1.5"
+                      title={t("quotation.print")}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                      <span>{t("quotation.print")}</span>
+                    </button>
                     {q.status !== "Accepted" && !q.converted_invoice_id && (
-                      <button onClick={() => setConvertQuotation(q)} className="bg-green-500/10 hover:bg-green-500/20 p-2 rounded-lg text-sm transition-all active:scale-95" title={t("quotation.convertToInvoice")}>📄→🧾</button>
+                      <button
+                        onClick={() => setConvertQuotation(q)}
+                        className="bg-green-500/15 hover:bg-green-500/25 text-green-300 border border-green-500/30 px-3 py-2 rounded-lg text-[11px] font-bold transition-all active:scale-95 flex items-center gap-1.5"
+                        title={t("quotation.convertToInvoice")}
+                      >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+                        <span className="hidden sm:inline">{t("quotation.convertToInvoice")}</span>
+                        <span className="sm:hidden">{t("quotation.convertShort") || "Invoice"}</span>
+                      </button>
                     )}
-                    <button onClick={() => { setEditQuotation(q); setShowModal(true); }} className="bg-blue-500/10 hover:bg-blue-500/20 p-2 rounded-lg text-sm transition-all active:scale-95">✏️</button>
-                    <button onClick={() => handleDelete(q.id)} className="bg-red-500/10 hover:bg-red-500/20 p-2 rounded-lg text-sm transition-all active:scale-95">🗑️</button>
+                    <button
+                      onClick={() => { setEditQuotation(q); setShowModal(true); }}
+                      className="bg-blue-500/15 hover:bg-blue-500/25 text-blue-300 border border-blue-500/30 p-2 rounded-lg transition-all active:scale-95"
+                      title={t("invoice.edit") || "Edit"}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    </button>
+                    <button
+                      onClick={() => handleDelete(q.id)}
+                      className="bg-red-500/15 hover:bg-red-500/25 text-red-300 border border-red-500/30 p-2 rounded-lg transition-all active:scale-95"
+                      title={t("invoice.delete") || "Delete"}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -208,8 +254,12 @@ export default function QuotationsPage() {
         )}
       </main>
 
-      <button onClick={() => { setEditQuotation(null); setShowModal(true); }}
-        className="md:hidden fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl shadow-2xl shadow-blue-500/30 flex items-center justify-center text-white text-2xl z-20 active:scale-95 transition-transform safe-bottom">+</button>
+      <CreateMenu
+        variant="fab"
+        onNewInvoice={() => router.push("/dashboard?new=1")}
+        onNewQuotation={() => { setEditQuotation(null); setShowModal(true); }}
+        align={lang === 'ar' ? 'right' : 'left'}
+      />
 
       {/* Quotation Modal */}
       {showModal && <QuotationModal quotation={editQuotation} onSave={handleSave} onClose={() => { setShowModal(false); setEditQuotation(null); }} currencySymbol={effectiveSymbol} defaultTaxRate={profile?.tax_rate || 0} />}
@@ -230,13 +280,15 @@ export default function QuotationsPage() {
           </div>
         </div>
       )}
+
+      <AppFooter compact />
     </div>
   );
 }
 
 /* ========== Quotation Modal ========== */
 function QuotationModal({ quotation, onSave, onClose, currencySymbol, defaultTaxRate = 0 }: {
-  quotation: Quotation | null; onSave: (d: Partial<Quotation>) => void; onClose: () => void; currencySymbol: string; defaultTaxRate?: number;
+  quotation: Quotation | null; onSave: (d: Partial<Quotation> & { items: LineItem[] }) => void; onClose: () => void; currencySymbol: string; defaultTaxRate?: number;
 }) {
   const { t, lang } = useI18n();
   const symbol = currencySymbol || (lang === 'ar' ? 'د.ك' : 'KWD');
@@ -245,7 +297,7 @@ function QuotationModal({ quotation, onSave, onClose, currencySymbol, defaultTax
   const [client, setClient] = useState("");
   const [project, setProject] = useState("");
   const [description, setDescription] = useState("");
-  const [amount, setAmount] = useState("");
+  const [items, setItems] = useState<LineItem[]>([makeEmptyItem()]);
   const [discount, setDiscount] = useState("");
   const [taxRate, setTaxRate] = useState(defaultTaxRate > 0 ? String(defaultTaxRate) : "0");
   const [notes, setNotes] = useState("");
@@ -259,32 +311,40 @@ function QuotationModal({ quotation, onSave, onClose, currencySymbol, defaultTax
       setClient(quotation.client);
       setProject(quotation.project);
       setDescription(quotation.description || "");
-      setAmount(String(quotation.amount));
+      // Populate items from quotation.items or fallback to legacy
+      if (Array.isArray(quotation.items) && quotation.items.length > 0) {
+        setItems(quotation.items.map(it => ({ description: it.description || "", quantity: Number(it.quantity) || 1, unit_price: Number(it.unit_price) || 0 })));
+      } else {
+        setItems([{ description: quotation.project + (quotation.description ? ` — ${quotation.description}` : ""), quantity: 1, unit_price: Number(quotation.amount) || 0 }]);
+      }
       setDiscount(String(quotation.discount || 0));
       setTaxRate(String(quotation.tax_rate ?? defaultTaxRate ?? 0));
       setNotes(quotation.notes || "");
       setStatus(quotation.status);
+    } else {
+      setItems([makeEmptyItem()]);
     }
   }, [quotation, defaultTaxRate]);
 
   const totals = useMemo(() => {
-    const sub = parseFloat(amount) || 0;
+    const sub = calcSubtotal(items);
     const disc = parseFloat(discount) || 0;
     const rate = parseFloat(taxRate) || 0;
     const taxableBase = Math.max(sub - disc, 0);
     const taxAmount = taxableBase * (rate / 100);
     const total = taxableBase + taxAmount;
     return { sub, disc, rate, taxAmount, total };
-  }, [amount, discount, taxRate]);
+  }, [items, discount, taxRate]);
 
   const showTax = totals.rate > 0;
   const fmt = (n: number) => n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 3 });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!parseFloat(amount)) return;
+    const validItems = items.filter(it => it.description.trim() && (Number(it.quantity) * Number(it.unit_price)) >= 0);
+    if (validItems.length === 0 || totals.sub < 0) return;
     setSaving(true);
-    await onSave({ date, valid_until: validUntil || null, client, project, description, amount: parseFloat(amount), discount: parseFloat(discount) || 0, tax_rate: parseFloat(taxRate) || 0, notes, status });
+    await onSave({ date, valid_until: validUntil || null, client, project, description, amount: totals.sub, items: validItems, discount: parseFloat(discount) || 0, tax_rate: parseFloat(taxRate) || 0, notes, status });
     setSaving(false);
   };
 
@@ -316,25 +376,25 @@ function QuotationModal({ quotation, onSave, onClose, currencySymbol, defaultTax
             <input type="text" value={project} onChange={e => setProject(e.target.value)} required placeholder={t("quotation.project")} className="w-full bg-slate-800/50 border border-slate-600/30 rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:ring-2 focus:ring-blue-500/40 outline-none" />
           </div>
           <div>
-            <label className="block text-[11px] font-bold text-slate-400 mb-1.5">{t("quotation.description")}</label>
-            <textarea value={description} onChange={e => setDescription(e.target.value)} rows={2} placeholder={t("quotation.description")} className="w-full bg-slate-800/50 border border-slate-600/30 rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:ring-2 focus:ring-blue-500/40 outline-none resize-none" />
+            <label className="block text-[11px] font-bold text-slate-400 mb-1.5">{t("quotation.description")} <span className="text-slate-600 font-normal">({lang === "ar" ? "اختياري" : "optional"})</span></label>
+            <textarea value={description} onChange={e => setDescription(e.target.value)} rows={2} placeholder={lang === "ar" ? "نبذة عن المشروع" : "Brief about the project"} className="w-full bg-slate-800/50 border border-slate-600/30 rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:ring-2 focus:ring-blue-500/40 outline-none resize-none" />
           </div>
+
+          {/* Line items editor */}
+          <LineItemsEditor items={items} onChange={setItems} currencySymbol={symbol} />
+
           <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-[11px] font-bold text-slate-400 mb-1.5">{t("quotation.amount")} ({symbol})</label>
-              <input type="number" value={amount} onChange={e => setAmount(e.target.value)} required step="0.5" className="w-full bg-slate-800/50 border border-slate-600/30 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-blue-500/40 outline-none font-inter" />
-            </div>
             <div>
               <label className="block text-[11px] font-bold text-slate-400 mb-1.5">{t("invoice.discount")} ({symbol})</label>
               <input type="number" value={discount} onChange={e => setDiscount(e.target.value)} step="0.5" className="w-full bg-slate-800/50 border border-slate-600/30 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-blue-500/40 outline-none font-inter" />
             </div>
+            {defaultTaxRate > 0 && (
+              <div>
+                <label className="block text-[11px] font-bold text-slate-400 mb-1.5">{t("invoice.taxRate")}</label>
+                <input type="number" value={taxRate} onChange={e => setTaxRate(e.target.value)} step="0.01" min="0" max="100" dir="ltr" className="w-full bg-slate-800/50 border border-slate-600/30 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-blue-500/40 outline-none font-inter" />
+              </div>
+            )}
           </div>
-          {defaultTaxRate > 0 && (
-            <div>
-              <label className="block text-[11px] font-bold text-slate-400 mb-1.5">{t("invoice.taxRate")}</label>
-              <input type="number" value={taxRate} onChange={e => setTaxRate(e.target.value)} step="0.01" min="0" max="100" dir="ltr" className="w-full bg-slate-800/50 border border-slate-600/30 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-blue-500/40 outline-none font-inter" />
-            </div>
-          )}
           {totals.sub > 0 && (
             <div className="bg-slate-800/40 border border-slate-700/40 rounded-xl p-3 space-y-1.5">
               <div className="flex justify-between text-xs"><span className="text-slate-400">{t("invoice.subtotal")}</span><span className="font-inter text-white">{fmt(totals.sub)} {symbol}</span></div>

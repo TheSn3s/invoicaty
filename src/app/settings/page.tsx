@@ -3,6 +3,9 @@ import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase";
 import { useI18n } from "@/lib/i18n";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import AppFooter from "@/components/AppFooter";
+import ImportModal from "@/components/ImportModal";
+import { SUPPORT_LINKS } from "@/lib/developer-info";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import type { Country, Currency, Language, BusinessType } from "@/lib/types";
@@ -44,7 +47,10 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
-  const [tab, setTab] = useState<"profile" | "region" | "invoice">("profile");
+  const [tab, setTab] = useState<"profile" | "region" | "invoice" | "data">("profile");
+  const [showImport, setShowImport] = useState(false);
+  const [exportBusy, setExportBusy] = useState<null | "csv" | "backup">(null);
+  const [exportDone, setExportDone] = useState(false);
 
   // Form fields
   const [fullName, setFullName] = useState("");
@@ -134,6 +140,85 @@ export default function SettingsPage() {
     setTimeout(() => setSaved(false), 3000);
   };
 
+  // ============ Data Management ============
+  const handleImport = async (rows: { date: string; client: string; project: string; description: string; amount: number; status: string; category: string }[]) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const { data: existing } = await supabase.from("invoices").select("serial").eq("user_id", user.id);
+    let maxSerial = (existing || []).reduce((max, inv) => { const n = parseInt(inv.serial); return !isNaN(n) && n > max ? n : max; }, 0);
+    const toInsert = rows.map(row => { maxSerial++; return { user_id: user.id, serial: String(maxSerial).padStart(3, "0"), ...row, currency: defaultCurrency || "KWD" }; });
+    for (let i = 0; i < toInsert.length; i += 50) { await supabase.from("invoices").insert(toInsert.slice(i, i + 50)); }
+    setShowImport(false);
+    setExportDone(true);
+    setTimeout(() => setExportDone(false), 3000);
+  };
+
+  const downloadFile = (filename: string, content: string, mime: string) => {
+    const blob = new Blob([content], { type: mime });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+  };
+
+  const escapeCsv = (v: unknown) => {
+    const s = String(v ?? "");
+    if (/[",\n\r]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
+    return s;
+  };
+
+  const handleExportCsv = async () => {
+    setExportBusy("csv");
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data: invs } = await supabase.from("invoices").select("*").eq("user_id", user.id).order("date", { ascending: false });
+      const headers = ["Serial", "Date", "Client", "Project", "Description", "Amount", "Discount", "TaxRate", "TaxAmount", "Total", "Currency", "Status", "Category", "Notes"];
+      const lines = [headers.join(",")];
+      for (const r of (invs || [])) {
+        lines.push([r.serial, r.date, r.client, r.project, r.description, r.amount, r.discount || 0, r.tax_rate || 0, r.tax_amount || 0, r.total || r.amount, r.currency, r.status, r.category || "", r.notes || ""].map(escapeCsv).join(","));
+      }
+      // Prepend UTF-8 BOM so Excel opens Arabic correctly
+      const csv = "\ufeff" + lines.join("\n");
+      const ts = new Date().toISOString().split("T")[0];
+      downloadFile(`invoicaty-invoices-${ts}.csv`, csv, "text/csv;charset=utf-8");
+      setExportDone(true);
+      setTimeout(() => setExportDone(false), 3000);
+    } finally {
+      setExportBusy(null);
+    }
+  };
+
+  const handleBackup = async () => {
+    setExportBusy("backup");
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const [inv, quo, prof] = await Promise.all([
+        supabase.from("invoices").select("*").eq("user_id", user.id),
+        supabase.from("quotations").select("*").eq("user_id", user.id),
+        supabase.from("profiles").select("*").eq("id", user.id).single(),
+      ]);
+      const backup = {
+        app: "Invoicaty",
+        version: 1,
+        exported_at: new Date().toISOString(),
+        user_id: user.id,
+        profile: prof.data || null,
+        invoices: inv.data || [],
+        quotations: quo.data || [],
+      };
+      const ts = new Date().toISOString().replace(/[:.]/g, "-").split("T")[0];
+      downloadFile(`invoicaty-backup-${ts}.json`, JSON.stringify(backup, null, 2), "application/json");
+      setExportDone(true);
+      setTimeout(() => setExportDone(false), 3000);
+    } finally {
+      setExportBusy(null);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -176,6 +261,10 @@ export default function SettingsPage() {
           <button onClick={() => setTab("invoice")}
             className={`flex-1 min-w-max py-3 px-4 rounded-xl text-sm font-bold transition-all ${tab === "invoice" ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20" : "glass text-slate-400 hover:text-white"}`}>
             🎨 {t("settings.invoiceTab")}
+          </button>
+          <button onClick={() => setTab("data")}
+            className={`flex-1 min-w-max py-3 px-4 rounded-xl text-sm font-bold transition-all ${tab === "data" ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20" : "glass text-slate-400 hover:text-white"}`}>
+            💾 {t("settings.dataTab")}
           </button>
         </div>
 
@@ -354,7 +443,86 @@ export default function SettingsPage() {
             </div>
           </div>
         )}
+
+        {tab === "data" && (
+          <div className="space-y-5 fade-in">
+            {/* Header */}
+            <div className="glass rounded-2xl p-5">
+              <h3 className="text-sm font-bold text-white mb-1 flex items-center gap-2">
+                <span className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center text-sm">💾</span>
+                {t("data.title")}
+              </h3>
+              <p className="text-xs text-slate-400 mt-1 ms-10">{t("data.subtitle")}</p>
+            </div>
+
+            {/* Import */}
+            <div className="glass rounded-2xl p-5">
+              <div className="flex items-start justify-between gap-3 mb-3">
+                <div className="flex items-start gap-3">
+                  <span className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500/25 to-blue-600/15 border border-blue-500/30 flex items-center justify-center text-lg shrink-0">📥</span>
+                  <div>
+                    <h4 className="text-sm font-bold text-white">{t("data.importTitle")}</h4>
+                    <p className="text-[11px] text-slate-400 mt-0.5">{t("data.importDesc")}</p>
+                  </div>
+                </div>
+              </div>
+              <button onClick={() => setShowImport(true)} className="w-full bg-blue-600/90 hover:bg-blue-500 text-white font-bold py-3 rounded-xl text-sm transition-all shadow-lg shadow-blue-500/20 active:scale-[.99]">
+                📥 {t("data.importBtn")}
+              </button>
+            </div>
+
+            {/* Export CSV */}
+            <div className="glass rounded-2xl p-5">
+              <div className="flex items-start justify-between gap-3 mb-3">
+                <div className="flex items-start gap-3">
+                  <span className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500/25 to-emerald-600/15 border border-emerald-500/30 flex items-center justify-center text-lg shrink-0">📊</span>
+                  <div>
+                    <h4 className="text-sm font-bold text-white">{t("data.exportTitle")}</h4>
+                    <p className="text-[11px] text-slate-400 mt-0.5">{t("data.exportDesc")}</p>
+                  </div>
+                </div>
+              </div>
+              <button onClick={handleExportCsv} disabled={exportBusy !== null} className="w-full bg-emerald-600/90 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl text-sm transition-all shadow-lg shadow-emerald-500/20 active:scale-[.99] disabled:opacity-50">
+                {exportBusy === "csv" ? `⏳ ${t("data.exporting")}` : `📊 ${t("data.exportBtn")}`}
+              </button>
+            </div>
+
+            {/* Full Backup */}
+            <div className="glass rounded-2xl p-5">
+              <div className="flex items-start justify-between gap-3 mb-3">
+                <div className="flex items-start gap-3">
+                  <span className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/25 to-purple-600/15 border border-purple-500/30 flex items-center justify-center text-lg shrink-0">💾</span>
+                  <div>
+                    <h4 className="text-sm font-bold text-white">{t("data.backupTitle")}</h4>
+                    <p className="text-[11px] text-slate-400 mt-0.5">{t("data.backupDesc")}</p>
+                  </div>
+                </div>
+              </div>
+              <button onClick={handleBackup} disabled={exportBusy !== null} className="w-full bg-purple-600/90 hover:bg-purple-500 text-white font-bold py-3 rounded-xl text-sm transition-all shadow-lg shadow-purple-500/20 active:scale-[.99] disabled:opacity-50">
+                {exportBusy === "backup" ? `⏳ ${t("data.exporting")}` : `💾 ${t("data.backupBtn")}`}
+              </button>
+              {exportDone && <p className="text-center text-emerald-400 text-[11px] font-bold mt-2">{t("data.exported")}</p>}
+            </div>
+
+            {/* Support block */}
+            <div className="glass rounded-2xl p-5 border border-blue-500/20">
+              <div className="flex items-start gap-3 mb-3">
+                <span className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500/25 to-cyan-600/15 border border-blue-500/30 flex items-center justify-center text-lg shrink-0">🛟</span>
+                <div>
+                  <h4 className="text-sm font-bold text-white">{t("support.supportTitle")}</h4>
+                  <p className="text-[11px] text-slate-400 mt-0.5">{t("support.supportDesc")}</p>
+                </div>
+              </div>
+              <a href={SUPPORT_LINKS.email} className="w-full bg-slate-800/60 hover:bg-blue-600/20 text-white hover:text-blue-300 border border-slate-700/50 hover:border-blue-500/40 font-bold py-3 rounded-xl text-sm transition-all active:scale-[.99] inline-flex items-center justify-center gap-2">
+                📧 {t("support.emailUs")} — <span className="font-mono text-[11px] opacity-80">support@invoicaty.com</span>
+              </a>
+            </div>
+          </div>
+        )}
       </main>
+
+      {showImport && <ImportModal onImport={handleImport} onClose={() => setShowImport(false)} />}
+      <AppFooter compact />
     </div>
   );
 }

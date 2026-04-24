@@ -8,7 +8,10 @@
     "admin": "لوحة الإدارة",
     "import": "استيراد",
     "newInvoice": "فاتورة جديدة",
-    "new": "جديدة",
+    "newQuotation": "عرض سعر جديد",
+    "new": "جديد",
+    "create": "إنشاء",
+    "createNew": "إنشاء جديد",
     "back": "رجوع"
   },
   "home": {
@@ -125,6 +128,7 @@
     "profileTab": "الملف الشخصي",
     "invoiceTab": "قالب الفاتورة",
     "regionTab": "المنطقة واللغة",
+    "dataTab": "البيانات",
     "personalInfo": "المعلومات الشخصية",
     "bankInfo": "البيانات البنكية",
     "bankInfoNote": "(تظهر في الفاتورة)",
@@ -207,6 +211,8 @@
     "rejected": "مرفوض",
     "expired": "منتهي",
     "convertToInvoice": "تحويل لفاتورة",
+    "convertShort": "فاتورة",
+    "print": "طباعة PDF",
     "converted": "تم التحويل ✅",
     "convertConfirm": "تحويل عرض السعر #{{serial}} إلى فاتورة؟",
     "convertNote": "سيتم إنشاء فاتورة جديدة بنفس التفاصيل.",
@@ -223,5 +229,39 @@
     "no": "لا",
     "ok": "حسناً",
     "close": "إغلاق"
+  },
+  "items": {
+    "title": "بنود الفاتورة",
+    "item": "بند",
+    "items": "بنود",
+    "itemNum": "بند",
+    "description": "وصف البند / الخدمة",
+    "quantity": "الكمية",
+    "unitPrice": "السعر",
+    "lineTotal": "إجمالي البند",
+    "addItem": "إضافة بند آخر",
+    "remove": "حذف"
+  },
+  "support": {
+    "contactDeveloper": "تواصل مع المطور",
+    "contactSupport": "تواصل مع الدعم",
+    "supportTitle": "تحتاج مساعدة؟",
+    "supportDesc": "تواصل مع المطور للحصول على الدعم الفني",
+    "emailUs": "راسلنا على البريد"
+  },
+  "data": {
+    "title": "إدارة البيانات",
+    "subtitle": "استيراد وتصدير ونسخ احتياطي لفواتيرك",
+    "importTitle": "استيراد الفواتير",
+    "importDesc": "ارفع ملف CSV أو Excel لاستيراد عدة فواتير دفعة واحدة",
+    "importBtn": "استيراد ملف",
+    "exportTitle": "تصدير الفواتير",
+    "exportDesc": "تحميل جميع فواتيرك كملف CSV",
+    "exportBtn": "تصدير CSV",
+    "backupTitle": "نسخة احتياطية شاملة",
+    "backupDesc": "تحميل نسخة احتياطية (JSON) لجميع بياناتك (الفواتير والعروض والملف الشخصي)",
+    "backupBtn": "تحميل النسخة",
+    "exporting": "جارٍ التصدير…",
+    "exported": "تم التصدير ✅"
   }
 }
