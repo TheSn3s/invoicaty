@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase";
+import { trackSignup } from "@/lib/gtag";
 import { useI18n } from "@/lib/i18n";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import Link from "next/link";
@@ -38,6 +39,8 @@ export default function RegisterPage() {
       setError(error.message === "User already registered" ? t("auth.alreadyRegistered") : error.message);
       setLoading(false);
     } else {
+      // 📊 Google Ads: track successful signup as conversion
+      trackSignup();
       setLoading(false);
       setSuccess(true);
     }

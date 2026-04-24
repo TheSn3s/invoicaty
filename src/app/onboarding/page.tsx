@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase";
+import { trackFirstInvoice } from "@/lib/gtag";
 import { useI18n } from "@/lib/i18n";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import type { Country, Currency, BusinessType } from "@/lib/types";
@@ -172,6 +173,8 @@ export default function OnboardingPage() {
         setSaving(false);
         return;
       }
+      // 📊 Google Ads: track completed onboarding as a high-intent conversion
+      trackFirstInvoice();
       router.push("/dashboard");
     } catch (e) {
       setError(`Error: ${e instanceof Error ? e.message : String(e)}`);
