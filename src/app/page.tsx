@@ -34,15 +34,15 @@ export default function Home() {
       </header>
 
       <main className="relative z-10 flex-1 flex flex-col items-center justify-center px-5 text-center pb-20">
-        <div className="fade-in max-w-lg">
-          <h1 className="text-3xl md:text-5xl font-black text-white mb-4 leading-tight">
+        <div className="fade-in max-w-2xl">
+          <h1 className="text-3xl md:text-5xl font-black text-white mb-4 leading-[1.35]">
             {t("home.title")}
             <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
               {t("home.subtitle")}
             </span>
           </h1>
-          <p className="text-slate-400 text-base md:text-lg mb-8 leading-relaxed max-w-md mx-auto">
+          <p className="text-slate-400 text-base md:text-lg mb-8 leading-relaxed max-w-xl mx-auto">
             {t("home.desc")}
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
