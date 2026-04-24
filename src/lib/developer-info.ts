@@ -4,7 +4,7 @@
 // ============================================
 
 export const DEVELOPER_INFO = {
-  name_en: "Abdullah Alsane'oosi",
+  name_en: "Abdullah AlSanousi",
   name_ar: "عبدالله السنعوسي",
   supportEmail: "support@invoicaty.com",
 } as const;
