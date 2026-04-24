@@ -230,7 +230,7 @@ export default function DashboardPage() {
           </div>
         )}
 
-        <InvoiceTable invoices={filtered} onEdit={(inv) => { setEditInvoice(inv); setShowModal(true); }} onDelete={(inv) => setDeleteInvoice(inv)} onPrint={(inv) => printInvoice(inv, profile)} currencySymbol={effectiveSymbol} />
+        <InvoiceTable invoices={filtered} onEdit={(inv) => { setEditInvoice(inv); setShowModal(true); }} onDelete={(inv) => setDeleteInvoice(inv)} onPrint={(inv) => printInvoice(inv, profile)} currencySymbol={effectiveSymbol} currencyCode={currencyData?.code || profile?.default_currency || 'KWD'} profile={profile} />
       </main>
 
       <button onClick={() => { setEditInvoice(null); setShowModal(true); }}
