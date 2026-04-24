@@ -1,18 +1,12 @@
 "use client";
 import { useState } from "react";
 import { useI18n } from "@/lib/i18n";
-import ShareMenu from "./ShareMenu";
 
 interface Invoice {
   id: string; serial: string; date: string; client: string;
   project: string; description: string; amount: number;
   currency: string; status: string; category: string;
   discount?: number; tax_rate?: number; tax_amount?: number; total?: number;
-  notes?: string;
-}
-
-interface ProfileLite {
-  full_name?: string; business_name?: string; phone?: string; email?: string;
 }
 
 interface Props {
@@ -21,17 +15,14 @@ interface Props {
   onDelete: (inv: Invoice) => void;
   onPrint: (inv: Invoice) => void;
   currencySymbol?: string;
-  currencyCode?: string;
-  profile?: ProfileLite | null;
 }
 
 const PAGE_SIZE = 20;
 
-export default function InvoiceTable({ invoices, onEdit, onDelete, onPrint, currencySymbol, currencyCode, profile }: Props) {
+export default function InvoiceTable({ invoices, onEdit, onDelete, onPrint, currencySymbol }: Props) {
   const [page, setPage] = useState(0);
   const { t, lang } = useI18n();
   const symbol = currencySymbol || (lang === 'ar' ? 'د.ك' : 'KWD');
-  const curCode = currencyCode || 'KWD';
   const totalPages = Math.ceil(invoices.length / PAGE_SIZE);
   const paged = invoices.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 
@@ -74,19 +65,10 @@ export default function InvoiceTable({ invoices, onEdit, onDelete, onPrint, curr
             </div>
             <div className="flex items-center justify-between">
               <span className="font-inter text-slate-500 text-[11px]">{inv.date}</span>
-              <div className="flex flex-wrap gap-1.5">
-                <ShareMenu
-                  doc={{ type: "invoice", serial: inv.serial, client: inv.client, project: inv.project, date: inv.date, amount: inv.amount, total: inv.total, currency: curCode, notes: inv.notes }}
-                  profile={profile || null}
-                  onPrintPdf={() => onPrint(inv)}
-                  align={lang === 'ar' ? 'left' : 'right'}
-                />
-                <button onClick={() => onEdit(inv)} className="bg-blue-500/15 hover:bg-blue-500/25 text-blue-300 border border-blue-500/30 p-2 rounded-lg transition-all active:scale-95" title={t("invoice.edit")}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                </button>
-                <button onClick={() => onDelete(inv)} className="bg-red-500/15 hover:bg-red-500/25 text-red-300 border border-red-500/30 p-2 rounded-lg transition-all active:scale-95" title={t("invoice.delete")}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                </button>
+              <div className="flex gap-1.5">
+                <button onClick={() => onPrint(inv)} className="bg-slate-700/50 hover:bg-slate-600/50 p-2 rounded-lg text-sm transition-all active:scale-95">📄</button>
+                <button onClick={() => onEdit(inv)} className="bg-blue-500/10 hover:bg-blue-500/20 p-2 rounded-lg text-sm transition-all active:scale-95">✏️</button>
+                <button onClick={() => onDelete(inv)} className="bg-red-500/10 hover:bg-red-500/20 p-2 rounded-lg text-sm transition-all active:scale-95">🗑️</button>
               </div>
             </div>
           </div>
@@ -127,19 +109,10 @@ export default function InvoiceTable({ invoices, onEdit, onDelete, onPrint, curr
                   </span>
                 </td>
                 <td className="p-4">
-                  <div className="flex items-center gap-1.5 md:opacity-70 group-hover:opacity-100 transition-opacity">
-                    <ShareMenu
-                      doc={{ type: "invoice", serial: inv.serial, client: inv.client, project: inv.project, date: inv.date, amount: inv.amount, total: inv.total, currency: curCode, notes: inv.notes }}
-                      profile={profile || null}
-                      onPrintPdf={() => onPrint(inv)}
-                      align={lang === 'ar' ? 'left' : 'right'}
-                    />
-                    <button onClick={() => onEdit(inv)} className="bg-blue-500/15 hover:bg-blue-500/25 text-blue-300 border border-blue-500/30 p-2 rounded-lg transition-all" title={t("invoice.edit")}>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                    </button>
-                    <button onClick={() => onDelete(inv)} className="bg-red-500/15 hover:bg-red-500/25 text-red-300 border border-red-500/30 p-2 rounded-lg transition-all" title={t("invoice.delete")}>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                    </button>
+                  <div className="flex items-center gap-1.5 md:opacity-60 group-hover:opacity-100 transition-opacity">
+                    <button onClick={() => onPrint(inv)} className="bg-slate-500/10 hover:bg-slate-500/20 text-slate-300 p-2 rounded-lg transition-all" title={t("invoice.print")}>📄</button>
+                    <button onClick={() => onEdit(inv)} className="bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 p-2 rounded-lg transition-all" title={t("invoice.edit")}>✏️</button>
+                    <button onClick={() => onDelete(inv)} className="bg-red-500/10 hover:bg-red-500/20 text-red-400 p-2 rounded-lg transition-all" title={t("invoice.delete")}>🗑️</button>
                   </div>
                 </td>
               </tr>

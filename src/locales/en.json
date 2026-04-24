@@ -225,15 +225,5 @@
     "no": "No",
     "ok": "OK",
     "close": "Close"
-  },
-  "share": {
-    "title": "Share",
-    "shareVia": "Share via",
-    "whatsapp": "WhatsApp",
-    "email": "Email",
-    "copyText": "Copy text",
-    "copied": "Copied!",
-    "more": "More options…",
-    "printPdf": "Print / Save PDF"
   }
 }

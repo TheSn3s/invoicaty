@@ -6,7 +6,6 @@ import { useI18n } from "@/lib/i18n";
 import { getCurrencyLabel } from "@/lib/currency";
 import type { Currency } from "@/lib/types";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
-import ShareMenu from "@/components/ShareMenu";
 import { printQuotation } from "@/lib/print-invoice";
 import Link from "next/link";
 
@@ -197,23 +196,14 @@ export default function QuotationsPage() {
                     {q.valid_until && <span className="text-slate-600 text-[10px]">→ {q.valid_until}</span>}
                   </div>
                   <div className="flex flex-wrap gap-1.5">
-                    <ShareMenu
-                      doc={{
-                        type: "quotation",
-                        serial: q.serial,
-                        client: q.client,
-                        project: q.project,
-                        date: q.date,
-                        amount: q.amount,
-                        total: q.total,
-                        currency: currencyData?.code || profile?.default_currency || 'KWD',
-                        valid_until: q.valid_until,
-                        notes: q.notes,
-                      }}
-                      profile={profile}
-                      onPrintPdf={() => printQuotation({ ...q, currency: currencyData?.code || profile?.default_currency || 'KWD' }, profile)}
-                      align={lang === 'ar' ? 'left' : 'right'}
-                    />
+                    <button
+                      onClick={() => printQuotation({ ...q, currency: currencyData?.code || profile?.default_currency || 'KWD' }, profile)}
+                      className="bg-purple-500/15 hover:bg-purple-500/25 text-purple-300 border border-purple-500/30 px-3 py-2 rounded-lg text-[11px] font-bold transition-all active:scale-95 flex items-center gap-1.5"
+                      title={t("quotation.print")}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                      <span>{t("quotation.print")}</span>
+                    </button>
                     {q.status !== "Accepted" && !q.converted_invoice_id && (
                       <button
                         onClick={() => setConvertQuotation(q)}
