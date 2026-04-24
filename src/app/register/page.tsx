@@ -15,6 +15,8 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [resending, setResending] = useState(false);
+  const [resent, setResent] = useState(false);
   const router = useRouter();
   const supabase = createClient();
   const { t } = useI18n();
@@ -46,6 +48,24 @@ export default function RegisterPage() {
     }
   };
 
+  const handleResend = async () => {
+    setResending(true);
+    setResent(false);
+    setError("");
+    const { error: resendErr } = await supabase.auth.resend({
+      type: "signup",
+      email,
+      options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+    });
+    setResending(false);
+    if (resendErr) {
+      setError(resendErr.message);
+    } else {
+      setResent(true);
+      setTimeout(() => setResent(false), 5000);
+    }
+  };
+
   if (success) {
     return (
       <div className="min-h-screen flex items-center justify-center px-5">
@@ -61,6 +81,16 @@ export default function RegisterPage() {
             <a href="https://mail.google.com" target="_blank" rel="noreferrer" className="block w-full bg-white text-slate-900 py-3.5 rounded-xl text-sm font-bold transition-all hover:bg-slate-200">
               {t("auth.openGmail")}
             </a>
+            <button
+              onClick={handleResend}
+              disabled={resending}
+              className="block w-full bg-blue-600/90 hover:bg-blue-500 text-white py-3.5 rounded-xl text-sm font-bold transition-all disabled:opacity-60">
+              {resending ? "⏳ …" : resent ? "✅ تم الإرسال / Resent!" : "📨 إعادة إرسال الإيميل / Resend Email"}
+            </button>
+            {error && <p className="text-xs text-red-400 mt-2">{error}</p>}
+            <p className="text-[11px] text-slate-500 px-2 leading-relaxed mt-2">
+              💡 لم يصلك الإيميل؟ تحقّق من مجلد <b>Spam / Junk</b> أو <b>Promotions</b>
+            </p>
             <Link href="/login" className="block w-full bg-slate-800 text-slate-300 py-3.5 rounded-xl text-sm font-bold transition-all hover:bg-slate-700">
               {t("auth.backToLogin")}
             </Link>
