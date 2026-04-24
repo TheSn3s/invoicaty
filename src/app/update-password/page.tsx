@@ -58,10 +58,26 @@ export default function UpdatePasswordPage() {
     setLoading(true);
     setError("");
 
-    const { error } = await supabase.auth.updateUser({ password });
+    // Safety: make sure we still have a valid session before attempting the update
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      setError(t("auth.sessionExpired"));
+      setLoading(false);
+      return;
+    }
 
-    if (error) {
-      setError(t("common.error"));
+    const { error: updErr } = await supabase.auth.updateUser({ password });
+
+    if (updErr) {
+      // Surface the real Supabase error so the user (and we) can debug
+      const msg = updErr.message || "";
+      if (/same.*password|new password should be different/i.test(msg)) {
+        setError(t("auth.samePassword"));
+      } else if (/session|jwt|expired|not authenticated/i.test(msg)) {
+        setError(t("auth.sessionExpired"));
+      } else {
+        setError(msg || t("common.error"));
+      }
       setLoading(false);
     } else {
       setSuccess(true);
