@@ -17,12 +17,38 @@ export default function UpdatePasswordPage() {
   const { t } = useI18n();
 
   useEffect(() => {
-    supabase.auth.onAuthStateChange((event) => {
-      if (event === "PASSWORD_RECOVERY") {
+    // 1) Check if a session already exists (user just came from /auth/callback with
+    //    a valid recovery code that was exchanged server-side). If yes — we're ready.
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
         setReady(true);
       }
     });
-  }, [supabase]);
+
+    // 2) Also listen for the PASSWORD_RECOVERY event (fires when Supabase recognises
+    //    the recovery flow — e.g. when using the old token-hash fragment flow).
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "PASSWORD_RECOVERY" || (event === "SIGNED_IN" && session)) {
+        setReady(true);
+      }
+    });
+
+    // 3) Safety net: if after 5s we still have no session AND no event fired,
+    //    the link is invalid/expired. Show a helpful error instead of spinning forever.
+    const timeout = setTimeout(() => {
+      setReady((r) => {
+        if (!r) {
+          setError(t("auth.invalidResetLink"));
+        }
+        return r;
+      });
+    }, 5000);
+
+    return () => {
+      sub.subscription.unsubscribe();
+      clearTimeout(timeout);
+    };
+  }, [supabase, t]);
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -92,6 +118,14 @@ export default function UpdatePasswordPage() {
               {loading ? t("auth.updateLoading") : t("auth.updateBtn")}
             </button>
           </form>
+        ) : error ? (
+          <div className="text-center py-4">
+            <div className="text-4xl mb-3">⚠️</div>
+            <p className="text-red-400 text-sm mb-4">{error}</p>
+            <a href="/reset-password" className="inline-block bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-bold py-2.5 px-5 rounded-xl transition-all">
+              {t("auth.requestNewLink")}
+            </a>
+          </div>
         ) : (
           <div className="text-center py-4">
             <div className="w-8 h-8 border-3 border-green-500 border-t-transparent rounded-full animate-spin mx-auto" />

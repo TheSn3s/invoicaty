@@ -65,6 +65,8 @@
     "updatePasswordTitle": "Update Password",
     "newPassword": "New Password",
     "updateBtn": "Update Password",
+    "invalidResetLink": "This reset link is invalid or has expired.",
+    "requestNewLink": "Request a new link",
     "updateLoading": "Updating...",
     "updateSuccess": "Password updated successfully!"
   },

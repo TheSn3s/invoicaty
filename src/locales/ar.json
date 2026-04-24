@@ -65,6 +65,8 @@
     "updatePasswordTitle": "تحديث كلمة المرور",
     "newPassword": "كلمة المرور الجديدة",
     "updateBtn": "تحديث كلمة المرور",
+    "invalidResetLink": "الرابط غير صالح أو انتهت صلاحيته. أعد طلب رابط جديد.",
+    "requestNewLink": "طلب رابط جديد",
     "updateLoading": "جاري التحديث...",
     "updateSuccess": "تم تحديث كلمة المرور بنجاح!"
   },
