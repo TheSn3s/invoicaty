@@ -8,7 +8,10 @@
     "admin": "Admin Panel",
     "import": "Import",
     "newInvoice": "New Invoice",
+    "newQuotation": "New Quotation",
     "new": "New",
+    "create": "Create",
+    "createNew": "Create new",
     "back": "Back"
   },
   "home": {

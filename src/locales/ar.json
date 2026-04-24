@@ -8,7 +8,10 @@
     "admin": "لوحة الإدارة",
     "import": "استيراد",
     "newInvoice": "فاتورة جديدة",
-    "new": "جديدة",
+    "newQuotation": "عرض سعر جديد",
+    "new": "جديد",
+    "create": "إنشاء",
+    "createNew": "إنشاء جديد",
     "back": "رجوع"
   },
   "home": {

@@ -11,6 +11,7 @@ import DeleteModal from "@/components/DeleteModal";
 import ImportModal from "@/components/ImportModal";
 import StatsCards from "@/components/StatsCards";
 import InvoiceTable from "@/components/InvoiceTable";
+import CreateMenu from "@/components/CreateMenu";
 import { printInvoice } from "@/lib/print-invoice";
 import Link from "next/link";
 
@@ -46,6 +47,17 @@ export default function DashboardPage() {
   const [editInvoice, setEditInvoice] = useState<Invoice | null>(null);
   const [deleteInvoice, setDeleteInvoice] = useState<Invoice | null>(null);
   const router = useRouter();
+
+  // Auto-open invoice modal when arriving via ?new=1 (from CreateMenu)
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("new") === "1") {
+      setEditInvoice(null);
+      setShowModal(true);
+      router.replace("/dashboard", { scroll: false });
+    }
+  }, [router]);
   const supabase = createClient();
   const { t, lang } = useI18n();
 
@@ -180,10 +192,11 @@ export default function DashboardPage() {
             <button onClick={() => setShowImport(true)} className="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-700/50 transition-all text-sm" title={t("nav.import")}>📥</button>
             <Link href="/quotations" className="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-700/50 transition-all text-sm" title={t("quotation.title")}>📋</Link>
             <Link href="/settings" className="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-700/50 transition-all text-sm" title={t("nav.settings")}>⚙️</Link>
-            <button onClick={() => { setEditInvoice(null); setShowModal(true); }}
-              className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-lg shadow-blue-500/20">
-              <span>+</span> <span className="hidden sm:inline">{t("nav.newInvoice")}</span><span className="sm:hidden">{t("nav.new")}</span>
-            </button>
+            <CreateMenu
+              onNewInvoice={() => { setEditInvoice(null); setShowModal(true); }}
+              onNewQuotation={() => router.push("/quotations?new=1")}
+              align={lang === 'ar' ? 'left' : 'right'}
+            />
             <button onClick={handleLogout} className="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-700/50 transition-all text-sm" title={t("nav.logout")}>⬅️</button>
           </div>
         </div>
@@ -235,8 +248,12 @@ export default function DashboardPage() {
         <InvoiceTable invoices={filtered} onEdit={(inv) => { setEditInvoice(inv); setShowModal(true); }} onDelete={(inv) => setDeleteInvoice(inv)} onPrint={(inv) => printInvoice(inv, profile)} currencySymbol={effectiveSymbol} />
       </main>
 
-      <button onClick={() => { setEditInvoice(null); setShowModal(true); }}
-        className="md:hidden fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl shadow-2xl shadow-blue-500/30 flex items-center justify-center text-white text-2xl z-20 active:scale-95 transition-transform safe-bottom">+</button>
+      <CreateMenu
+        variant="fab"
+        onNewInvoice={() => { setEditInvoice(null); setShowModal(true); }}
+        onNewQuotation={() => router.push("/quotations?new=1")}
+        align={lang === 'ar' ? 'right' : 'left'}
+      />
 
       {showModal && <InvoiceModal invoice={editInvoice} onSave={handleSave} onClose={() => { setShowModal(false); setEditInvoice(null); }} currencySymbol={effectiveSymbol} defaultTaxRate={profile?.tax_rate || 0} />}
       {deleteInvoice && <DeleteModal serial={deleteInvoice.serial} onConfirm={handleDelete} onClose={() => setDeleteInvoice(null)} />}

@@ -6,6 +6,7 @@ import { useI18n } from "@/lib/i18n";
 import { getCurrencyLabel } from "@/lib/currency";
 import type { Currency } from "@/lib/types";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import CreateMenu from "@/components/CreateMenu";
 import LineItemsEditor, { LineItem, makeEmptyItem, calcSubtotal } from "@/components/LineItemsEditor";
 import { printQuotation } from "@/lib/print-invoice";
 import Link from "next/link";
@@ -42,6 +43,17 @@ export default function QuotationsPage() {
   const supabase = createClient();
   const { t, lang } = useI18n();
   const effectiveSymbol = getCurrencyLabel(currencyData, lang);
+
+  // Auto-open quotation modal when arriving via ?new=1 (from CreateMenu)
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("new") === "1") {
+      setEditQuotation(null);
+      setShowModal(true);
+      router.replace("/quotations", { scroll: false });
+    }
+  }, [router]);
 
   const loadData = useCallback(async () => {
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -142,10 +154,11 @@ export default function QuotationsPage() {
           <div className="flex items-center gap-1.5">
             <LanguageSwitcher />
             <Link href="/dashboard" className="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-700/50 transition-all text-sm" title={t("nav.dashboard")}>🏠</Link>
-            <button onClick={() => { setEditQuotation(null); setShowModal(true); }}
-              className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-lg shadow-blue-500/20">
-              <span>+</span> <span className="hidden sm:inline">{t("quotation.new")}</span><span className="sm:hidden">{t("nav.new")}</span>
-            </button>
+            <CreateMenu
+              onNewInvoice={() => router.push("/dashboard?new=1")}
+              onNewQuotation={() => { setEditQuotation(null); setShowModal(true); }}
+              align={lang === 'ar' ? 'left' : 'right'}
+            />
           </div>
         </div>
       </header>
@@ -240,8 +253,12 @@ export default function QuotationsPage() {
         )}
       </main>
 
-      <button onClick={() => { setEditQuotation(null); setShowModal(true); }}
-        className="md:hidden fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl shadow-2xl shadow-blue-500/30 flex items-center justify-center text-white text-2xl z-20 active:scale-95 transition-transform safe-bottom">+</button>
+      <CreateMenu
+        variant="fab"
+        onNewInvoice={() => router.push("/dashboard?new=1")}
+        onNewQuotation={() => { setEditQuotation(null); setShowModal(true); }}
+        align={lang === 'ar' ? 'right' : 'left'}
+      />
 
       {/* Quotation Modal */}
       {showModal && <QuotationModal quotation={editQuotation} onSave={handleSave} onClose={() => { setShowModal(false); setEditQuotation(null); }} currencySymbol={effectiveSymbol} defaultTaxRate={profile?.tax_rate || 0} />}
