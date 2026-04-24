@@ -190,7 +190,6 @@ export default function DashboardPage() {
             {profile?.role === 'admin' && (
               <Link href="/admin" className="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-700/50 transition-all text-sm" title={t("nav.admin")}>🛡</Link>
             )}
-            <button onClick={() => setShowImport(true)} className="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-700/50 transition-all text-sm" title={t("nav.import")}>📥</button>
             <Link href="/quotations" className="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-700/50 transition-all text-sm" title={t("quotation.title")}>📋</Link>
             <Link href="/settings" className="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-700/50 transition-all text-sm" title={t("nav.settings")}>⚙️</Link>
             <CreateMenu
