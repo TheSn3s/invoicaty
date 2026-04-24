@@ -1,209 +1,41 @@
-interface LineItem {
-  description: string;
-  quantity: number;
-  unit_price: number;
+import type { PrintableDoc, Profile, DocType, TemplateId, LineItem } from "./print-templates/types";
+import { renderModern } from "./print-templates/modern";
+import { renderClassic } from "./print-templates/classic";
+import { renderMinimal } from "./print-templates/minimal";
+
+// Re-export types for consumers that imported from here previously
+export type { PrintableDoc, Profile, LineItem, TemplateId, DocType };
+
+function resolveTemplate(profile: Profile | null): TemplateId {
+  const t = profile?.invoice_template;
+  if (t === "classic" || t === "minimal" || t === "modern") return t;
+  return "modern";
 }
 
-interface PrintableDoc {
-  serial: string; date: string; client: string; project: string;
-  description: string; amount: number; discount?: number; currency: string;
-  tax_rate?: number; tax_amount?: number; total?: number; notes?: string;
-  valid_until?: string | null;
-  items?: LineItem[] | null;
+export function buildInvoiceHtml(
+  doc: PrintableDoc,
+  profile: Profile | null,
+  type: DocType,
+  templateOverride?: TemplateId,
+): string {
+  const template = templateOverride || resolveTemplate(profile);
+  switch (template) {
+    case "classic": return renderClassic(doc, profile, type);
+    case "minimal": return renderMinimal(doc, profile, type);
+    case "modern":
+    default:        return renderModern(doc, profile, type);
+  }
 }
 
-interface Profile {
-  full_name: string; business_name: string; phone: string; email: string;
-  bank_name: string; bank_account: string; bank_iban: string; bank_holder: string;
-  brand_color: string; logo_url?: string;
-}
-
-type DocType = 'invoice' | 'quotation';
-
-function buildHtml(doc: PrintableDoc, profile: Profile | null, type: DocType) {
-  // Build effective line items (fallback to legacy single-line if none)
-  const rawItems: LineItem[] = Array.isArray(doc.items) && doc.items.length > 0
-    ? doc.items
-    : [{
-        description: doc.project + (doc.description ? ` — ${doc.description}` : ''),
-        quantity: 1,
-        unit_price: Number(doc.amount) || 0,
-      }];
-
-  const itemsSubtotal = rawItems.reduce((s, it) => s + (Number(it.quantity) || 0) * (Number(it.unit_price) || 0), 0);
-  const amt = itemsSubtotal > 0 ? itemsSubtotal : (Number(doc.amount) || 0);
-  const disc = Number(doc.discount) || 0;
-  const taxRate = Number(doc.tax_rate) || 0;
-  const taxableBase = Math.max(amt - disc, 0);
-  const taxAmount = Number(doc.tax_amount) || +(taxableBase * (taxRate / 100)).toFixed(3);
-  const total = Number(doc.total) || +(taxableBase + taxAmount).toFixed(3);
-  const cur = doc.currency || 'KWD';
-  const fmt = (n: number) => `${cur} ${n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 3 })}`;
-  const name = profile?.full_name || profile?.business_name || 'Your Name';
-  const color = profile?.brand_color || '#f04444';
-  const phone = profile?.phone || '';
-  const email = profile?.email || '';
-  const bankHolder = profile?.bank_holder || name;
-  const bankName = profile?.bank_name || '—';
-  const bankAccount = profile?.bank_account || '—';
-  const bankIban = profile?.bank_iban || '—';
-  const notes = doc.notes || '';
-  const logoUrl = profile?.logo_url || '';
-
-  // Build dynamic line-items HTML
-  const escapeHtml = (s: string) => String(s || '')
-    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-
-  const rowsHtml = rawItems.map((it, idx) => {
-    const q = Number(it.quantity) || 0;
-    const p = Number(it.unit_price) || 0;
-    const lineTotal = q * p;
-    return `<tr>
-<td>${idx + 1}</td>
-<td>${q}</td>
-<td style="padding-right:2rem"><div class="pn">${escapeHtml(it.description)}</div></td>
-<td>${fmt(lineTotal)}</td>
-</tr>`;
-  }).join('');
-
-  // Optional project brief (shown above items if present and different from a single-item desc)
-  const briefHtml = (doc.description && doc.project)
-    ? `<div class="brief"><b>${escapeHtml(doc.project)}</b> — ${escapeHtml(doc.description)}</div>`
-    : (doc.project ? `<div class="brief"><b>${escapeHtml(doc.project)}</b></div>` : '');
-  const isQuotation = type === 'quotation';
-  const docLabel = isQuotation ? 'Quotation' : 'Invoice';
-  const showTax = taxRate > 0;
-  const showDiscount = disc > 0;
-
-  // Totals
-  let totalsHtml = `<div class="totr"><span>Subtotal</span><span>${fmt(amt)}</span></div>`;
-  if (showDiscount) totalsHtml += `<div class="totr"><span>Discount</span><span>- ${fmt(disc)}</span></div>`;
-  if (showTax) totalsHtml += `<div class="totr"><span>Tax (${taxRate}%)</span><span>${fmt(taxAmount)}</span></div>`;
-  totalsHtml += `<div class="tott"><span>Total</span><span>${fmt(total)}</span></div>`;
-
-  const logoHtml = logoUrl
-    ? `<img src="${logoUrl}" alt="Logo" style="max-height:50px;max-width:180px;margin-bottom:0.3rem;border-radius:4px" /><br>`
-    : '';
-
-  const notesHtml = notes
-    ? `<div class="notes"><div class="notes-t">Notes</div><div class="notes-b">${notes}</div></div>`
-    : '';
-
-  // Validity line for quotations
-  const validityHtml = isQuotation && doc.valid_until
-    ? `<div class="validity">Valid Until: <b>${doc.valid_until}</b></div>`
-    : '';
-
-  // Bank details only for invoices
-  const bankHtml = !isQuotation ? `<div class="bank"><div class="bt">Banking Details:</div>
-<div><b>Account Holder:</b> ${bankHolder}</div>
-<div><b>Bank Name:</b> ${bankName}</div>
-<div><b>Account Number:</b> ${bankAccount}</div>
-<div><b>IBAN:</b> ${bankIban}</div>
-</div>` : '';
-
-  return `<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>${docLabel} #${doc.serial}</title>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Montserrat',sans-serif;background:#f9fafb;color:#000;display:flex;justify-content:center;padding:1rem}
-.inv{width:800px;background:#fff;box-shadow:0 10px 40px rgba(0,0,0,.1);border:1px solid #e5e7eb}
-.hdr{background:${color};color:#fff;padding:1.25rem;text-align:center}
-.hdr h1{font-size:1.6rem;font-weight:900;margin-bottom:.1rem}
-.hdr p{font-size:.65rem;font-weight:700;opacity:.9}
-.cnt{padding:1.5rem 2.5rem}
-.bar{display:flex;justify-content:space-between;border-bottom:2px solid ${color};padding-bottom:.25rem;margin-bottom:1.25rem;font-weight:700;font-size:.7rem;text-transform:uppercase;color:#1e293b}
-.ttl{color:${color};font-size:1.1rem;font-weight:900;margin-bottom:.4rem}
-.cli{font-weight:700;font-size:.875rem;color:#1e293b;margin-bottom:.5rem}
-.validity{font-size:.7rem;color:#64748b;margin-bottom:1.25rem;font-weight:700}
-.brief{font-size:.75rem;color:#334155;background:#f8fafc;padding:.5rem .75rem;border-radius:.375rem;border:1px solid #f1f5f9;margin-bottom:1rem;line-height:1.6}
-table{width:100%;border-collapse:collapse;margin-bottom:1.25rem;text-align:left}
-thead tr{border-bottom:2px solid ${color}}
-th{font-size:.6rem;font-weight:900;text-transform:uppercase;letter-spacing:.1em;color:#334155;padding:.35rem 0}
-th:last-child{text-align:right}
-td{padding:.75rem 0;font-size:.75rem;vertical-align:top;color:#334155}
-td:first-child,td:nth-child(2){text-align:center;width:3rem}
-td:last-child{text-align:right;font-weight:900;font-size:.875rem;white-space:nowrap;color:#1e293b}
-.pn{font-weight:700;font-size:.875rem;color:#1e293b;margin-bottom:.15rem}
-.pd{font-size:.625rem;line-height:1.5;color:#334155}
-tbody tr{border-bottom:1px solid #f1f5f9}
-.tots{display:flex;justify-content:flex-end;margin-bottom:1.25rem}
-.totb{width:14rem;font-size:.7rem;font-weight:700}
-.totr{display:flex;justify-content:space-between;color:#334155;margin-bottom:.35rem}
-.tott{display:flex;justify-content:space-between;border-top:2px solid #000;padding-top:.35rem;font-size:.875rem;font-weight:900;color:#1e293b}
-.notes{font-size:.65rem;color:#334155;background:#f8fafc;padding:.6rem .8rem;border-radius:.375rem;border:1px solid #f1f5f9;margin-bottom:1rem;line-height:1.7}
-.notes-t{font-weight:900;font-size:.65rem;color:#0f172a;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.3rem}
-.notes-b{white-space:pre-wrap}
-.bank{font-size:.625rem;color:#1e293b;background:#f8fafc;padding:.6rem .8rem;border-radius:.375rem;border:1px solid #f1f5f9;display:inline-block;margin-bottom:1rem;line-height:1.7}
-.bank b{font-weight:900;color:#334155}
-.bank .bt{font-weight:900;font-size:.65rem;color:#0f172a;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.3rem}
-.reg{font-size:.75rem;margin-bottom:.75rem}
-.reg p:first-child{color:#334155;font-weight:700;margin-bottom:.15rem}
-.reg .nm{font-weight:900;font-size:.875rem;color:#1e293b}
-.ftr{padding:.75rem 2.5rem;display:flex;justify-content:space-between;color:${color};font-weight:900;font-size:.55rem;text-transform:uppercase;letter-spacing:.15em;border-top:1px solid #e5e7eb}
-.pbtn{position:fixed;bottom:2rem;right:2rem;background:${color};color:#fff;border:none;padding:1rem 2rem;border-radius:50px;font-weight:900;font-size:.875rem;cursor:pointer;box-shadow:0 10px 30px rgba(0,0,0,.2);display:flex;align-items:center;gap:.75rem;font-family:'Montserrat',sans-serif;transition:transform .2s}
-.pbtn:hover{transform:scale(1.05)}
-@media print{
-@page{size:A4;margin:8mm}
-body{padding:0;background:#fff!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important}
-.inv{box-shadow:none;border:none;width:100%}
-.hdr{background:${color}!important;color:#fff!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
-.pbtn{display:none}
-.bar{border-bottom-color:${color}!important}
-thead tr{border-bottom-color:${color}!important}
-.ttl{color:${color}!important}
-.ftr{color:${color}!important}
-.bank{background:#f8fafc!important;-webkit-print-color-adjust:exact!important}
-.notes{background:#f8fafc!important;-webkit-print-color-adjust:exact!important}
-.tott{border-top:2px solid #000!important}
-}
-@media(max-width:900px){
-body{padding:.5rem}
-.inv{width:100%}
-.cnt{padding:1rem 1.5rem}
-.ftr{padding:.75rem 1.5rem;flex-wrap:wrap;gap:.5rem;justify-content:center}
-}
-</style>
-</head>
-<body>
-<div class="inv">
-<div class="hdr">${logoHtml}<h1>${name}</h1><p>${profile?.business_name || ''}</p></div>
-<div class="cnt">
-<div class="bar"><div>${doc.date}</div><div>${docLabel} #${doc.serial}</div><div>${doc.client}</div></div>
-<div class="ttl">${docLabel} #${doc.serial}</div>
-<div class="cli">${doc.client}</div>
-${validityHtml}
-${briefHtml}
-<table><thead><tr><th>ID</th><th>QTY</th><th>DESCRIPTION</th><th>COST</th></tr></thead>
-<tbody>${rowsHtml}</tbody></table>
-<div class="tots"><div class="totb">
-${totalsHtml}
-</div></div>
-${notesHtml}
-${bankHtml}
-<div class="reg"><p>Regards,</p><p class="nm">${name}</p></div>
-</div>
-<div class="ftr">
-${phone ? `<div>${phone}</div>` : ''}
-${email ? `<div>${email}</div>` : ''}
-</div>
-</div>
-<button class="pbtn" onclick="window.print()">🖨️ SAVE AS PDF</button>
-</body></html>`;
-}
-
-export function printInvoice(inv: PrintableDoc, profile: Profile | null) {
-  const html = buildHtml(inv, profile, 'invoice');
+function openPrintWindow(html: string) {
   const w = window.open('', '_blank');
   if (w) { w.document.write(html); w.document.close(); }
 }
 
-export function printQuotation(q: PrintableDoc, profile: Profile | null) {
-  const html = buildHtml(q, profile, 'quotation');
-  const w = window.open('', '_blank');
-  if (w) { w.document.write(html); w.document.close(); }
+export function printInvoice(inv: PrintableDoc, profile: Profile | null, templateOverride?: TemplateId) {
+  openPrintWindow(buildInvoiceHtml(inv, profile, 'invoice', templateOverride));
+}
+
+export function printQuotation(q: PrintableDoc, profile: Profile | null, templateOverride?: TemplateId) {
+  openPrintWindow(buildInvoiceHtml(q, profile, 'quotation', templateOverride));
 }
