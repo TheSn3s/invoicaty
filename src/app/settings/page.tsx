@@ -47,7 +47,7 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
-  const [tab, setTab] = useState<"profile" | "region" | "invoice" | "data">("profile");
+  const [tab, setTab] = useState<"profile" | "security" | "region" | "invoice" | "data">("profile");
   const [showImport, setShowImport] = useState(false);
   const [exportBusy, setExportBusy] = useState<null | "csv" | "backup">(null);
   const [exportDone, setExportDone] = useState(false);
@@ -310,6 +310,10 @@ export default function SettingsPage() {
             className={`flex-1 min-w-max py-3 px-4 rounded-xl text-sm font-bold transition-all ${tab === "profile" ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20" : "glass text-slate-400 hover:text-white"}`}>
             👤 {t("settings.profileTab")}
           </button>
+          <button onClick={() => setTab("security")}
+            className={`flex-1 min-w-max py-3 px-4 rounded-xl text-sm font-bold transition-all ${tab === "security" ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20" : "glass text-slate-400 hover:text-white"}`}>
+            🔐 {t("settings.security")}
+          </button>
           <button onClick={() => setTab("region")}
             className={`flex-1 min-w-max py-3 px-4 rounded-xl text-sm font-bold transition-all ${tab === "region" ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20" : "glass text-slate-400 hover:text-white"}`}>
             🌍 {t("settings.regionTab")}
@@ -388,7 +392,11 @@ export default function SettingsPage() {
                 </div>
               </div>
             </div>
+          </div>
+        )}
 
+        {tab === "security" && (
+          <div className="space-y-6 fade-in">
             {/* Change Password Card */}
             <div className="glass rounded-2xl p-5">
               <h3 className="text-sm font-bold text-white mb-1 flex items-center gap-2">
