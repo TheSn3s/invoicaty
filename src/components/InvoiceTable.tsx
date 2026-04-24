@@ -7,6 +7,8 @@ interface Invoice {
   project: string; description: string; amount: number;
   currency: string; status: string; category: string;
   discount?: number; tax_rate?: number; tax_amount?: number; total?: number;
+  notes?: string;
+  items?: Array<{ description: string; quantity: number; unit_price: number }> | null;
 }
 
 interface Props {

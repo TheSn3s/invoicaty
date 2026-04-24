@@ -100,7 +100,8 @@ export default function QuotationsPage() {
       date: new Date().toISOString().split("T")[0], client: q.client, project: q.project,
       description: q.description, amount: q.amount, discount: q.discount,
       tax_rate: q.tax_rate, tax_amount: q.tax_amount, total: q.total,
-      notes: q.notes, status: "Not Paid", category: ""
+      notes: q.notes, status: "Not Paid", category: "",
+      items: q.items || null
     }).select("id").single();
     if (newInv) {
       await supabase.from("quotations").update({ status: "Accepted", converted_invoice_id: newInv.id }).eq("id", q.id);

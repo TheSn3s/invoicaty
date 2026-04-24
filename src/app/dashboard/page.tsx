@@ -21,6 +21,7 @@ interface Invoice {
   project: string; description: string; amount: number;
   discount?: number; currency: string; status: string; category: string;
   tax_rate?: number; tax_amount?: number; total?: number; notes?: string;
+  items?: Array<{ description: string; quantity: number; unit_price: number }> | null;
 }
 
 interface Profile {
