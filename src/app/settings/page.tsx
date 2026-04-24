@@ -305,26 +305,31 @@ export default function SettingsPage() {
 
       <main className="max-w-2xl mx-auto px-4 md:px-8 pt-5">
         {/* Tabs */}
-        <div className="flex gap-2 mb-6 overflow-x-auto">
+        <div className="flex gap-1 sm:gap-1.5 mb-6">
           <button onClick={() => setTab("profile")}
-            className={`flex-1 min-w-max py-3 px-4 rounded-xl text-sm font-bold transition-all ${tab === "profile" ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20" : "glass text-slate-400 hover:text-white"}`}>
-            👤 {t("settings.profileTab")}
+            className={`flex-1 min-w-0 py-2.5 px-2 sm:px-3 rounded-xl text-[12px] sm:text-sm font-bold transition-all flex items-center justify-center gap-1 whitespace-nowrap ${tab === "profile" ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20" : "glass text-slate-400 hover:text-white"}`}>
+            <span>👤</span>
+            <span className={`${tab === "profile" ? "inline" : "hidden"} sm:inline truncate`}>{t("settings.profileTab")}</span>
           </button>
           <button onClick={() => setTab("security")}
-            className={`flex-1 min-w-max py-3 px-4 rounded-xl text-sm font-bold transition-all ${tab === "security" ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20" : "glass text-slate-400 hover:text-white"}`}>
-            🔐 {t("settings.security")}
+            className={`flex-1 min-w-0 py-2.5 px-2 sm:px-3 rounded-xl text-[12px] sm:text-sm font-bold transition-all flex items-center justify-center gap-1 whitespace-nowrap ${tab === "security" ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20" : "glass text-slate-400 hover:text-white"}`}>
+            <span>🔐</span>
+            <span className={`${tab === "security" ? "inline" : "hidden"} sm:inline truncate`}>{t("settings.security")}</span>
           </button>
           <button onClick={() => setTab("region")}
-            className={`flex-1 min-w-max py-3 px-4 rounded-xl text-sm font-bold transition-all ${tab === "region" ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20" : "glass text-slate-400 hover:text-white"}`}>
-            🌍 {t("settings.regionTab")}
+            className={`flex-1 min-w-0 py-2.5 px-2 sm:px-3 rounded-xl text-[12px] sm:text-sm font-bold transition-all flex items-center justify-center gap-1 whitespace-nowrap ${tab === "region" ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20" : "glass text-slate-400 hover:text-white"}`}>
+            <span>🌍</span>
+            <span className={`${tab === "region" ? "inline" : "hidden"} sm:inline truncate`}>{t("settings.regionTab")}</span>
           </button>
           <button onClick={() => setTab("invoice")}
-            className={`flex-1 min-w-max py-3 px-4 rounded-xl text-sm font-bold transition-all ${tab === "invoice" ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20" : "glass text-slate-400 hover:text-white"}`}>
-            🎨 {t("settings.invoiceTab")}
+            className={`flex-1 min-w-0 py-2.5 px-2 sm:px-3 rounded-xl text-[12px] sm:text-sm font-bold transition-all flex items-center justify-center gap-1 whitespace-nowrap ${tab === "invoice" ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20" : "glass text-slate-400 hover:text-white"}`}>
+            <span>🎨</span>
+            <span className={`${tab === "invoice" ? "inline" : "hidden"} sm:inline truncate`}>{t("settings.invoiceTab")}</span>
           </button>
           <button onClick={() => setTab("data")}
-            className={`flex-1 min-w-max py-3 px-4 rounded-xl text-sm font-bold transition-all ${tab === "data" ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20" : "glass text-slate-400 hover:text-white"}`}>
-            💾 {t("settings.dataTab")}
+            className={`flex-1 min-w-0 py-2.5 px-2 sm:px-3 rounded-xl text-[12px] sm:text-sm font-bold transition-all flex items-center justify-center gap-1 whitespace-nowrap ${tab === "data" ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20" : "glass text-slate-400 hover:text-white"}`}>
+            <span>💾</span>
+            <span className={`${tab === "data" ? "inline" : "hidden"} sm:inline truncate`}>{t("settings.dataTab")}</span>
           </button>
         </div>
 
