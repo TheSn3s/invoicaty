@@ -157,9 +157,26 @@ export default function AdminPage() {
     if (!deleteUser) return;
     setSaving(true);
 
-    // Delete user's invoices first, then profile
-    await supabase.from("invoices").delete().eq("user_id", deleteUser.id);
-    await supabase.from("profiles").delete().eq("id", deleteUser.id);
+    try {
+      // Deep delete: يحذف من Supabase Auth + Database + Resend دفعة واحدة
+      const res = await fetch("/api/admin/delete-user", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: deleteUser.id,
+          email: deleteUser.email,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        alert(`فشل الحذف: ${data.error || "خطأ غير معروف"}`);
+      } else {
+        console.log("Delete results:", data.results);
+      }
+    } catch (err: any) {
+      alert(`خطأ في الاتصال: ${err.message}`);
+    }
 
     setSaving(false);
     setDeleteUser(null);
