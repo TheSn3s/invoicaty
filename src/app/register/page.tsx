@@ -28,24 +28,46 @@ export default function RegisterPage() {
     setLoading(true);
     setError("");
 
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: { full_name: name },
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
       }
     });
 
     if (error) {
       setError(error.message === "User already registered" ? t("auth.alreadyRegistered") : error.message);
       setLoading(false);
-    } else {
-      // 📊 Google Ads: track successful signup as conversion
-      trackSignup();
-      setLoading(false);
-      setSuccess(true);
+      return;
     }
+
+    // 📊 Google Ads: track successful signup as conversion
+    trackSignup();
+
+    // إذا رجعت الجلسة مباشرة (autoconfirm مفعّل في Supabase) → توجيه للداش بورد
+    if (data.session) {
+      router.push("/dashboard");
+      router.refresh();
+      return;
+    }
+
+    // fallback: إذا لسبب ما لم ترجع جلسة (مثل بقاء confirmation مفعلاً) جرّب تسجيل دخول مباشر
+    const { data: signInData, error: signInErr } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (signInData?.session) {
+      router.push("/dashboard");
+      router.refresh();
+      return;
+    }
+
+    // حالة أخيرة: لا تزال متطلبات التحقق مفعلة — أظهر رسالة التفعيل
+    if (signInErr) console.warn("Auto sign-in failed:", signInErr.message);
+    setLoading(false);
+    setSuccess(true);
   };
 
   const handleResend = async () => {
