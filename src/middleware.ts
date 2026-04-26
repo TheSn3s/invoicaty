@@ -40,7 +40,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // If not logged in and visiting protected pages → redirect to login
-  if (!user && (path.startsWith('/dashboard') || path.startsWith('/admin') || path.startsWith('/settings') || path.startsWith('/onboarding') || path.startsWith('/quotations'))) {
+  if (!user && (path.startsWith('/dashboard') || path.startsWith('/admin') || path.startsWith('/settings') || path.startsWith('/onboarding') || path.startsWith('/quotations') || path.startsWith('/trash'))) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
@@ -48,5 +48,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/', '/login', '/register', '/dashboard/:path*', '/admin/:path*', '/settings/:path*', '/onboarding/:path*', '/update-password', '/quotations/:path*'],
+  matcher: ['/', '/login', '/register', '/dashboard/:path*', '/admin/:path*', '/settings/:path*', '/onboarding/:path*', '/update-password', '/quotations/:path*', '/trash/:path*'],
 }
