@@ -216,6 +216,7 @@ export default function InvoiceModal({ invoice, onSave, onClose, currencySymbol,
               className="w-full bg-slate-800/50 border border-slate-600/30 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-blue-500/40 outline-none">
               <option value="Paid">{t("dashboard.paid")}</option>
               <option value="Not Paid">{t("dashboard.notPaid")}</option>
+              <option value="Cancelled">{lang === 'ar' ? 'ملغاة' : 'Cancelled'}</option>
             </select>
           </div>
 

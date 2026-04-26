@@ -25,6 +25,7 @@ interface Invoice {
   discount?: number; currency: string; status: string; category: string;
   tax_rate?: number; tax_amount?: number; total?: number; notes?: string;
   items?: Array<{ description: string; quantity: number; unit_price: number }> | null;
+  deleted_at?: string | null;
 }
 
 interface Profile {
@@ -137,7 +138,8 @@ export default function DashboardPage() {
 
   const handleDelete = async () => {
     if (!deleteInvoice) return;
-    await supabase.from("invoices").delete().eq("id", deleteInvoice.id);
+    // Soft delete: mark as Deleted instead of removing from DB
+    await supabase.from("invoices").update({ status: "Deleted", deleted_at: new Date().toISOString() }).eq("id", deleteInvoice.id);
     setDeleteInvoice(null); loadData();
   };
 
@@ -153,8 +155,10 @@ export default function DashboardPage() {
   const handleLogout = async () => { await supabase.auth.signOut(); router.push("/"); };
 
   const filtered = invoices.filter(inv => {
+    // Hide soft-deleted invoices from main dashboard
+    if (inv.status === "Deleted") return false;
     const matchSearch = !search || inv.client.toLowerCase().includes(search.toLowerCase()) || inv.project.toLowerCase().includes(search.toLowerCase()) || inv.serial.includes(search);
-    const matchStatus = statusFilter === "all" || (statusFilter === "Paid" && inv.status === "Paid") || (statusFilter === "Not Paid" && inv.status === "Not Paid");
+    const matchStatus = statusFilter === "all" || inv.status === statusFilter;
     const matchDateFrom = !dateFrom || inv.date >= dateFrom;
     const matchDateTo = !dateTo || inv.date <= dateTo;
     return matchSearch && matchStatus && matchDateFrom && matchDateTo;
@@ -163,9 +167,9 @@ export default function DashboardPage() {
   const now = new Date();
   // Use invoice total (incl. tax) if available, else fallback to amount - discount
   const effectiveTotal = (i: Invoice) => Number(i.total) || (Number(i.amount) - (Number(i.discount) || 0));
-  const totalIncome = invoices.reduce((s, i) => s + (i.status !== "Canceled" ? effectiveTotal(i) : 0), 0);
-  const monthIncome = invoices.filter(i => { const d = new Date(i.date); return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth() && i.status !== "Canceled"; }).reduce((s, i) => s + effectiveTotal(i), 0);
-  const yearIncome = invoices.filter(i => new Date(i.date).getFullYear() === now.getFullYear() && i.status !== "Canceled").reduce((s, i) => s + effectiveTotal(i), 0);
+  const totalIncome = invoices.reduce((s, i) => s + (i.status !== "Cancelled" && i.status !== "Deleted" ? effectiveTotal(i) : 0), 0);
+  const monthIncome = invoices.filter(i => { const d = new Date(i.date); return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth() && i.status !== "Cancelled" && i.status !== "Deleted"; }).reduce((s, i) => s + effectiveTotal(i), 0);
+  const yearIncome = invoices.filter(i => new Date(i.date).getFullYear() === now.getFullYear() && i.status !== "Cancelled" && i.status !== "Deleted").reduce((s, i) => s + effectiveTotal(i), 0);
   const outstanding = invoices.filter(i => i.status === "Not Paid");
   const outstandingTotal = outstanding.reduce((s, i) => s + effectiveTotal(i), 0);
 
@@ -266,6 +270,7 @@ export default function DashboardPage() {
             <option value="all">{t("dashboard.allStatuses")}</option>
             <option value="Paid">{t("dashboard.paid")}</option>
             <option value="Not Paid">{t("dashboard.notPaid")}</option>
+            <option value="Cancelled">{lang === 'ar' ? 'ملغاة' : 'Cancelled'}</option>
           </select>
           <button onClick={() => setShowDateFilter(!showDateFilter)}
             className={`flex items-center gap-1.5 px-4 py-3 rounded-xl text-xs font-bold transition-all border ${dateFrom || dateTo ? "bg-blue-500/15 border-blue-500/30 text-blue-400" : "bg-slate-800/50 border-slate-700/50 text-slate-400 hover:bg-slate-700/50"}`}>

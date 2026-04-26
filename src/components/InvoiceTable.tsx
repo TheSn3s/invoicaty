@@ -29,9 +29,17 @@ export default function InvoiceTable({ invoices, onEdit, onDelete, onPrint, onMa
   const totalPages = Math.ceil(invoices.length / PAGE_SIZE);
   const paged = invoices.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 
-  const statusLabel = (s: string) => s === "Not Paid"
-    ? `🚩 ${t("invoice.notPaid")}`
-    : `✅ ${t("invoice.paid")}`;
+  const statusLabel = (s: string) => {
+    if (s === "Not Paid") return `🚩 ${t("invoice.notPaid")}`;
+    if (s === "Cancelled") return `❌ ${lang === 'ar' ? 'ملغاة' : 'Cancelled'}`;
+    return `✅ ${t("invoice.paid")}`;
+  };
+
+  const statusStyle = (s: string) => {
+    if (s === "Not Paid") return "bg-red-500/15 text-red-400 border border-red-500/20";
+    if (s === "Cancelled") return "bg-slate-500/15 text-slate-400 border border-slate-500/20 line-through";
+    return "bg-green-500/15 text-green-400 border border-green-500/20";
+  };
 
   if (invoices.length === 0) {
     return (
@@ -52,11 +60,7 @@ export default function InvoiceTable({ invoices, onEdit, onDelete, onPrint, onMa
             <div className="flex items-start justify-between mb-2">
               <div className="flex items-center gap-2">
                 <span className="font-inter text-blue-400 font-bold text-xs bg-blue-500/10 border border-blue-500/20 px-2 py-1 rounded-lg">#{inv.serial}</span>
-                <span className={`text-[10px] font-bold px-2 py-1 rounded-full ${
-                  inv.status === "Not Paid"
-                    ? "bg-red-500/15 text-red-400 border border-red-500/20"
-                    : "bg-green-500/15 text-green-400 border border-green-500/20"
-                }`}>
+                <span className={`text-[10px] font-bold px-2 py-1 rounded-full ${statusStyle(inv.status)}`}>
                   {statusLabel(inv.status)}
                 </span>
               </div>
@@ -73,7 +77,9 @@ export default function InvoiceTable({ invoices, onEdit, onDelete, onPrint, onMa
                   <button onClick={() => onMarkPaid(inv)} className="bg-green-500/10 hover:bg-green-500/20 p-2 rounded-lg text-sm transition-all active:scale-95" title={t("invoice.markPaid")}>💰</button>
                 )}
                 <button onClick={() => onPrint(inv)} className="bg-slate-700/50 hover:bg-slate-600/50 p-2 rounded-lg text-sm transition-all active:scale-95">📄</button>
-                <button onClick={() => onEdit(inv)} className="bg-blue-500/10 hover:bg-blue-500/20 p-2 rounded-lg text-sm transition-all active:scale-95">✏️</button>
+                {inv.status !== "Cancelled" && (
+                  <button onClick={() => onEdit(inv)} className="bg-blue-500/10 hover:bg-blue-500/20 p-2 rounded-lg text-sm transition-all active:scale-95">✏️</button>
+                )}
                 <button onClick={() => onDelete(inv)} className="bg-red-500/10 hover:bg-red-500/20 p-2 rounded-lg text-sm transition-all active:scale-95">🗑️</button>
               </div>
             </div>
@@ -106,11 +112,7 @@ export default function InvoiceTable({ invoices, onEdit, onDelete, onPrint, onMa
                 <td className="p-4 text-slate-300 text-xs max-w-[200px] truncate">{inv.project}</td>
                 <td className="p-4 font-inter font-bold text-white text-sm">{Number(inv.total || inv.amount).toLocaleString()} {symbol}</td>
                 <td className="p-4">
-                  <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold ${
-                    inv.status === "Not Paid"
-                      ? "bg-red-500/15 text-red-400 border border-red-500/20"
-                      : "bg-green-500/15 text-green-400 border border-green-500/20"
-                  }`}>
+                  <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold ${statusStyle(inv.status)}`}>
                     {statusLabel(inv.status)}
                   </span>
                 </td>
@@ -120,6 +122,9 @@ export default function InvoiceTable({ invoices, onEdit, onDelete, onPrint, onMa
                       <button onClick={() => onMarkPaid(inv)} className="bg-green-500/10 hover:bg-green-500/20 text-green-400 p-2 rounded-lg transition-all" title={t("invoice.markPaid")}>💰</button>
                     )}
                     <button onClick={() => onPrint(inv)} className="bg-slate-500/10 hover:bg-slate-500/20 text-slate-300 p-2 rounded-lg transition-all" title={t("invoice.print")}>📄</button>
+                    {inv.status !== "Cancelled" && (
+                      <button onClick={() => onEdit(inv)} className="bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 p-2 rounded-lg transition-all" title={t("invoice.edit")}>✏️</button>
+                    )}
                     <button onClick={() => onEdit(inv)} className="bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 p-2 rounded-lg transition-all" title={t("invoice.edit")}>✏️</button>
                     <button onClick={() => onDelete(inv)} className="bg-red-500/10 hover:bg-red-500/20 text-red-400 p-2 rounded-lg transition-all" title={t("invoice.delete")}>🗑️</button>
                   </div>
