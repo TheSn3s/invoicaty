@@ -188,7 +188,7 @@ export async function GET(request: NextRequest) {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            from: 'Invoicaty <hello@invoicaty.com>',
+            from: 'Invoicaty <support@invoicaty.com>',
             to: [profile.email],
             subject,
             html,
