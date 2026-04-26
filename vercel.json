@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/activation-email",
+      "schedule": "0 * * * *"
+    }
+  ]
+}
