@@ -2,7 +2,7 @@
   "crons": [
     {
       "path": "/api/cron/activation-email",
-      "schedule": "0 * * * *"
+      "schedule": "0 5 * * *"
     }
   ]
 }
