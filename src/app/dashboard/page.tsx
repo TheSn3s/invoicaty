@@ -119,6 +119,7 @@ export default function DashboardPage() {
       notes: data.notes || "",
       status: data.status, category: data.category,
       items: (data as { items?: unknown[] }).items || null,
+      currency: profile?.default_currency || 'KWD',
     };
 
     if (editInvoice) {
@@ -144,7 +145,7 @@ export default function DashboardPage() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
     let maxSerial = invoices.reduce((max, inv) => { const n = parseInt(inv.serial); return !isNaN(n) && n > max ? n : max; }, 0);
-    const toInsert = rows.map(row => { maxSerial++; return { user_id: user.id, serial: String(maxSerial).padStart(3, "0"), ...row, currency: "KWD" }; });
+    const toInsert = rows.map(row => { maxSerial++; return { user_id: user.id, serial: String(maxSerial).padStart(3, "0"), ...row, currency: profile?.default_currency || 'KWD' }; });
     for (let i = 0; i < toInsert.length; i += 50) { await supabase.from("invoices").insert(toInsert.slice(i, i + 50)); }
     setShowImport(false); loadData();
   };

@@ -57,7 +57,7 @@ export function computeTotals(doc: PrintableDoc): ComputedTotals {
   const taxableBase = Math.max(subtotal - discount, 0);
   const taxAmount = Number(doc.tax_amount) || +(taxableBase * (taxRate / 100)).toFixed(3);
   const total = Number(doc.total) || +(taxableBase + taxAmount).toFixed(3);
-  const currency = doc.currency || 'KWD';
+  const currency = doc.currency || 'USD';
 
   const fmt = (n: number) =>
     `${currency} ${n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 3 })}`;
