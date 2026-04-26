@@ -181,6 +181,8 @@ tbody tr:last-child td{border-bottom:none}
       </div>
     </section>
 
+    ${doc.description ? `<div style="margin-bottom:16px;padding:12px 16px;border-left:3px solid ${color};background:#f8fafc;"><div style="font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#94a3b8;margin-bottom:4px;">Scope of Work</div><div style="font-size:11px;color:#475569;line-height:1.7;white-space:pre-wrap;">${escapeHtml(doc.description)}</div></div>` : ''}
+
     <table>
       <thead>
         <tr>

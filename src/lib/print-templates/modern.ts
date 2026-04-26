@@ -28,7 +28,7 @@ export function renderModern(doc: PrintableDoc, profile: Profile | null, type: D
 
   const logoBlock = logoUrl
     ? `<img src="${logoUrl}" alt="${escapeHtml(displayLine1)}" class="logo" />`
-    : `<div class="logo-fallback" style="background:${color}">${escapeHtml(displayLine1.charAt(0).toUpperCase())}</div>`;
+    : '';
 
   const businessLine = displayLine2
     ? `<div class="biz-name">${escapeHtml(displayLine1)}</div>
@@ -188,6 +188,8 @@ tbody tr:last-child td{border-bottom:none}
         ${doc.project ? `<div class="meta-row"><span class="meta-lbl">Project</span><span class="meta-val">${escapeHtml(doc.project)}</span></div>` : ''}
       </div>
     </section>
+
+    ${doc.description ? `<div class="card" style="margin-bottom:24px;"><div class="card-t">Scope of Work</div><div class="card-b">${escapeHtml(doc.description)}</div></div>` : ''}
 
     <table>
       <thead>

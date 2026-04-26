@@ -130,9 +130,9 @@ export default function InvoiceModal({ invoice, onSave, onClose, currencySymbol,
                 className="w-full bg-slate-800/50 border border-slate-600/30 rounded-xl px-3 py-3 text-sm text-white focus:ring-2 focus:ring-blue-500/40 outline-none" />
             </div>
             <div>
-              <label className="block text-[11px] font-bold text-slate-400 mb-1.5">{t("invoice.category")}</label>
+              <label className="block text-[11px] font-bold text-slate-400 mb-1.5">{t("invoice.category")} <span className="text-slate-600 font-normal">({lang === "ar" ? "لا يظهر للعميل" : "not visible to client"})</span></label>
               <input type="text" value={category} onChange={e => setCategory(e.target.value)}
-                placeholder={t("invoice.category")}
+                placeholder={lang === "ar" ? "تصوير، مونتاج، تصميم..." : "Photography, editing, design..."}
                 className="w-full bg-slate-800/50 border border-slate-600/30 rounded-xl px-3 py-3 text-sm text-white placeholder:text-slate-500 focus:ring-2 focus:ring-blue-500/40 outline-none" />
             </div>
           </div>

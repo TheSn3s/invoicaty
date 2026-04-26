@@ -14,7 +14,7 @@ interface Props {
 }
 
 export function makeEmptyItem(): LineItem {
-  return { description: "", quantity: 1, unit_price: 0 };
+  return { description: "", quantity: 1, unit_price: "" as unknown as number };
 }
 
 export function calcSubtotal(items: LineItem[]): number {
@@ -101,7 +101,7 @@ export default function LineItemsEditor({ items, onChange, currencySymbol }: Pro
                   <label className="block text-[10px] font-bold text-slate-500 mb-1">{t("items.unitPrice") || (lang === "ar" ? "السعر" : "Price")} ({currencySymbol})</label>
                   <input
                     type="number"
-                    value={it.unit_price}
+                    value={it.unit_price === 0 && !it.description ? "" : it.unit_price || ""}
                     onChange={(e) => updateItem(idx, { unit_price: Math.max(0, parseFloat(e.target.value) || 0) })}
                     min="0"
                     step="0.5"

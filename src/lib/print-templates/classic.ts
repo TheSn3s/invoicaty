@@ -175,6 +175,8 @@ tbody td{padding:16px 8px;font-size:15px;color:var(--ink-2);border-bottom:1px so
       </div>
     </section>
 
+    ${doc.description ? `<div style="margin-bottom:20px;padding:14px 18px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;"><div style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#94a3b8;margin-bottom:6px;">Scope of Work</div><div style="font-size:12px;color:#475569;line-height:1.7;white-space:pre-wrap;">${escapeHtml(doc.description)}</div></div>` : ''}
+
     <table>
       <thead>
         <tr>
