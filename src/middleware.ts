@@ -33,32 +33,10 @@ export async function middleware(request: NextRequest) {
     return response
   }
 
-  // If logged in and visiting login/register/landing → check onboarding first
+  // If logged in and visiting login/register/landing → go straight to dashboard
+  // (Onboarding is optional — user can set up currency/logo from Settings later)
   if (user && (path === '/' || path === '/login' || path === '/register')) {
-    // Check if onboarding is completed
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('onboarding_completed')
-      .eq('id', user.id)
-      .single()
-
-    if (profile && !profile.onboarding_completed) {
-      return NextResponse.redirect(new URL('/onboarding', request.url))
-    }
     return NextResponse.redirect(new URL('/dashboard', request.url))
-  }
-
-  // If logged in, on a protected page, but NOT onboarded → redirect to onboarding
-  if (user && !path.startsWith('/onboarding') && (path.startsWith('/dashboard') || path.startsWith('/admin') || path.startsWith('/settings') || path.startsWith('/quotations'))) {
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('onboarding_completed')
-      .eq('id', user.id)
-      .single()
-
-    if (profile && !profile.onboarding_completed) {
-      return NextResponse.redirect(new URL('/onboarding', request.url))
-    }
   }
 
   // If not logged in and visiting protected pages → redirect to login

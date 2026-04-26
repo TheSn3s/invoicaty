@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
 import { createClient } from "@/lib/supabase";
+import { trackFirstInvoice } from "@/lib/gtag";
 import { useRouter } from "next/navigation";
 import { useI18n } from "@/lib/i18n";
 import { getCurrencyLabel } from "@/lib/currency";
@@ -30,7 +31,7 @@ interface Profile {
   full_name: string; business_name: string; phone: string; email: string;
   bank_name: string; bank_account: string; bank_iban: string; bank_holder: string;
   brand_color: string; role?: string; default_currency?: string;
-  tax_rate?: number; logo_url?: string;
+  tax_rate?: number; logo_url?: string; onboarding_completed?: boolean;
 }
 
 export default function DashboardPage() {
@@ -124,7 +125,11 @@ export default function DashboardPage() {
       await supabase.from("invoices").update(payload).eq("id", editInvoice.id);
     } else {
       const maxSerial = invoices.reduce((max, inv) => { const n = parseInt(inv.serial); return !isNaN(n) && n > max ? n : max; }, 0);
-      await supabase.from("invoices").insert({ user_id: user.id, serial: String(maxSerial + 1).padStart(3, "0"), ...payload });
+      const { error: insertErr } = await supabase.from("invoices").insert({ user_id: user.id, serial: String(maxSerial + 1).padStart(3, "0"), ...payload });
+      // 📊 Google Ads: fire FIRST INVOICE conversion — only when this is the user's very first invoice
+      if (!insertErr && invoices.length === 0) {
+        trackFirstInvoice();
+      }
     }
     setShowModal(false); setEditInvoice(null); loadData();
   };
@@ -203,6 +208,50 @@ export default function DashboardPage() {
       </header>
 
       <main className="max-w-6xl mx-auto px-4 md:px-8 pt-5">
+        {invoices.length === 0 ? (
+          /* ===== EMPTY STATE — First-time user, no invoices yet ===== */
+          <div className="fade-in mt-8">
+            <div className="glass rounded-3xl p-8 md:p-12 text-center max-w-lg mx-auto border border-slate-700/30">
+              <div className="text-7xl mb-6">🧾</div>
+              <h2 className="text-2xl md:text-3xl font-black text-white mb-3">
+                {lang === 'ar' ? 'أنشئ أول فاتورة خلال ٦٠ ثانية' : 'Create your first invoice in 60 seconds'}
+              </h2>
+              <p className="text-slate-400 text-sm md:text-base mb-8 leading-relaxed">
+                {lang === 'ar'
+                  ? 'لا تحتاج أي إعداد مسبق. اضغط الزر وابدأ فوراً — أدخل اسم العميل والمبلغ وأرسل الفاتورة كـ PDF احترافي.'
+                  : 'No setup needed. Click the button and start right away — enter client name, amount, and send a professional PDF invoice.'}
+              </p>
+              <button
+                onClick={() => { setEditInvoice(null); setShowModal(true); }}
+                className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white font-bold py-4 px-10 rounded-2xl text-lg shadow-lg shadow-green-500/20 transition-all hover:scale-[1.02] active:scale-[0.98]">
+                {lang === 'ar' ? '+ أنشئ فاتورة الآن' : '+ Create Invoice Now'}
+              </button>
+              <div className="mt-8 grid grid-cols-3 gap-4">
+                <div className="text-center">
+                  <div className="text-2xl mb-1">⚡</div>
+                  <p className="text-slate-500 text-[11px]">{lang === 'ar' ? 'سريع — أقل من دقيقة' : 'Fast — under 1 minute'}</p>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl mb-1">📄</div>
+                  <p className="text-slate-500 text-[11px]">{lang === 'ar' ? 'تصدير PDF احترافي' : 'Professional PDF export'}</p>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl mb-1">💰</div>
+                  <p className="text-slate-500 text-[11px]">{lang === 'ar' ? 'تتبع المدفوعات تلقائياً' : 'Auto payment tracking'}</p>
+                </div>
+              </div>
+            </div>
+            {!profile?.onboarding_completed && (
+              <div className="text-center mt-6">
+                <Link href="/onboarding" className="text-slate-500 hover:text-slate-300 text-xs underline transition-all">
+                  {lang === 'ar' ? '⚙️ إعداد العملة والشعار وبيانات العمل' : '⚙️ Set up currency, logo & business info'}
+                </Link>
+              </div>
+            )}
+          </div>
+        ) : (
+          /* ===== NORMAL STATE — User has invoices ===== */
+          <>
         <StatsCards total={totalIncome} month={monthIncome} year={yearIncome} outstanding={outstandingTotal} outstandingCount={outstanding.length} currencySymbol={effectiveSymbol} />
 
         <div className="mt-6 flex flex-col sm:flex-row gap-3">
@@ -251,6 +300,8 @@ export default function DashboardPage() {
             setInvoices(prev => prev.map(i => i.id === inv.id ? { ...i, status: "Paid" } : i));
           }
         }} currencySymbol={effectiveSymbol} />
+          </>
+        )}
       </main>
 
       <CreateMenu
