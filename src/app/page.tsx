@@ -65,197 +65,61 @@ export default function Home() {
   const faqs = landing.faq.items as { q: string; a: string }[];
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#06111f] text-slate-100">
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(58,130,246,0.18),_transparent_35%),radial-gradient(circle_at_80%_20%,_rgba(14,165,233,0.16),_transparent_28%),radial-gradient(circle_at_50%_100%,_rgba(168,85,247,0.14),_transparent_30%)]" />
-        <div className="absolute inset-0 opacity-[0.08] bg-[linear-gradient(rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.08)_1px,transparent_1px)] bg-[size:72px_72px]" />
+    <div className="min-h-screen flex flex-col">
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/3 right-1/4 w-96 h-96 bg-purple-500/8 rounded-full blur-3xl" />
       </div>
 
-      <header className="sticky top-0 z-30 border-b border-white/8 bg-slate-950/60 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 md:px-8">
-          <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 shadow-[0_0_40px_rgba(59,130,246,0.12)]">
-              <img src="/logo-dark.png" alt="Invoicaty" className="h-7 w-auto" />
-            </div>
-            <div>
-              <div className="text-base font-semibold tracking-[0.18em] text-white">INVOICATY</div>
-              <div className="text-[11px] uppercase tracking-[0.24em] text-slate-400">{t("landing.brandTagline")}</div>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 md:gap-3">
-            <LanguageSwitcher className="rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-slate-200 hover:bg-white/10" />
-            <Link href="/login" className="hidden rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold text-slate-200 transition hover:bg-white/10 sm:inline-flex">
-              {t("nav.login")}
-            </Link>
-            <Link href="/register" className="inline-flex items-center rounded-xl bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-500 px-4 py-2.5 text-sm font-bold text-slate-950 shadow-[0_16px_40px_rgba(59,130,246,0.28)] transition hover:scale-[1.02]">
-              {t("landing.hero.primaryCta")}
-            </Link>
-          </div>
+      <header className="relative z-10 flex items-center justify-between px-5 py-4 md:px-12 md:py-6">
+        <div className="flex items-center gap-2">
+          <img src="/logo-dark.png" alt="Invoicaty" className="h-9 w-auto" />
+          <span className="text-lg font-bold text-white">Invoicaty</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <LanguageSwitcher />
+          <Link href="/login" className="bg-white/10 hover:bg-white/15 text-white px-5 py-2.5 rounded-xl text-sm font-bold transition-all border border-white/10">
+            {t("nav.login")}
+          </Link>
         </div>
       </header>
 
-      <main className="relative z-10">
-        <section className="mx-auto grid max-w-7xl gap-10 px-5 pb-16 pt-10 md:grid-cols-[1.02fr_0.98fr] md:px-8 md:pb-20 md:pt-16">
-          <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/20 bg-cyan-400/10 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-cyan-200">
-              <span className="h-2 w-2 rounded-full bg-cyan-300" />
-              {t("landing.hero.eyebrow")}
-            </div>
-
-            <h1 className="mt-6 max-w-3xl text-4xl font-black leading-[1.02] tracking-tight text-white sm:text-5xl md:text-6xl">
+      <main className="relative z-10 flex-1">
+        <section className="px-5 pt-6 pb-12 text-center md:px-8 md:pt-10 md:pb-16">
+          <div className="fade-in max-w-2xl mx-auto">
+            <h1 className="text-3xl md:text-5xl font-black text-white mb-4 leading-[1.2]">
               {t("landing.hero.titlePrefix")}
               <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-400 to-purple-400">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
                 {t("landing.hero.titleHighlight")}
               </span>
             </h1>
-
-            <p className="mt-5 max-w-xl text-base leading-7 text-slate-300 sm:text-lg">
+            <p className="text-slate-400 text-base md:text-lg mb-8 leading-relaxed max-w-xl mx-auto">
               {t("landing.hero.desc")}
             </p>
-
-            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-              <Link href="/register" className="inline-flex items-center justify-center rounded-2xl bg-white px-6 py-4 text-lg font-black text-slate-950 transition hover:bg-slate-200 sm:text-base">
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Link href="/register" className="bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 rounded-2xl font-bold text-base shadow-xl shadow-blue-500/20 transition-all">
                 {t("landing.hero.mobileCta")}
               </Link>
-              <a href="#features" className="inline-flex items-center justify-center rounded-2xl border border-white/12 bg-white/5 px-6 py-4 text-base font-bold text-white transition hover:bg-white/10">
-                {t("landing.hero.secondaryCta")}
-              </a>
+              <Link href="/login" className="glass hover:bg-white/10 text-white px-8 py-4 rounded-2xl font-bold text-base transition-all">
+                {t("home.hasAccount")}
+              </Link>
             </div>
-
             <p className="mt-4 text-sm font-semibold text-cyan-200">{t("landing.hero.ctaNote")}</p>
-            <p className="mt-4 text-sm text-slate-400">{t("landing.hero.supporting")}</p>
           </div>
 
-          <div className="relative">
-            <div className="absolute -inset-3 rounded-[2rem] bg-gradient-to-br from-cyan-400/20 via-blue-500/10 to-purple-500/20 blur-2xl" />
-            <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(15,23,42,0.92),rgba(10,15,28,0.96))] p-4 shadow-[0_30px_80px_rgba(2,8,23,0.6)]">
-              <div className="rounded-[1.5rem] border border-white/8 bg-slate-950/80 p-4">
-                <div className="flex items-center justify-between rounded-2xl border border-white/6 bg-white/[0.03] px-4 py-3">
-                  <div>
-                    <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Invoicaty</div>
-                    <div className="mt-1 text-lg font-bold text-white">{t("landing.mockup.dashboardTitle")}</div>
-                  </div>
-                  <div className="rounded-xl border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-xs font-semibold text-emerald-300">
-                    {t("landing.mockup.paidBadge")}
-                  </div>
-                </div>
-
-                <div className="mt-4 grid gap-4 lg:grid-cols-[1.15fr_0.85fr]">
-                  <div className="space-y-4">
-                    <div className="rounded-2xl border border-white/8 bg-white/[0.03] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <div className="text-xs uppercase tracking-[0.18em] text-slate-500">{t("landing.mockup.invoiceLabel")}</div>
-                          <div className="mt-1 text-base font-bold text-white">#1042</div>
-                        </div>
-                        <div className="rounded-lg border border-cyan-400/20 bg-cyan-400/10 px-2.5 py-1 text-xs font-semibold text-cyan-200">
-                          {t("landing.mockup.invoiceStatus")}
-                        </div>
-                      </div>
-
-                      <div className="mt-5 space-y-3">
-                        <div className="grid gap-3 rounded-2xl border border-white/6 bg-slate-900/70 p-3 sm:grid-cols-2">
-                          <div>
-                            <div className="text-[10px] uppercase tracking-[0.18em] text-slate-500">{t("landing.mockup.client")}</div>
-                            <div className="mt-1 text-sm font-semibold text-white">Sn3s Studio</div>
-                          </div>
-                          <div>
-                            <div className="text-[10px] uppercase tracking-[0.18em] text-slate-500">{t("landing.mockup.project")}</div>
-                            <div className="mt-1 text-sm font-semibold text-white">Travel Campaign</div>
-                          </div>
-                        </div>
-                        <div className="grid gap-2 pt-1">
-                          <div className="rounded-xl border border-white/6 bg-slate-900/80 px-3 py-3">
-                            <div className="flex items-center justify-between text-xs text-slate-400">
-                              <span>Motion graphics package</span>
-                              <span>1,200.000</span>
-                            </div>
-                          </div>
-                          <div className="rounded-xl border border-white/6 bg-slate-900/80 px-3 py-3">
-                            <div className="flex items-center justify-between text-xs text-slate-400">
-                              <span>Video editing</span>
-                              <span>800.000</span>
-                            </div>
-                          </div>
-                          <div className="rounded-xl border border-white/6 bg-slate-900/80 px-3 py-3">
-                            <div className="flex items-center justify-between text-xs text-slate-400">
-                              <span>Social media cutdowns</span>
-                              <span>400.000</span>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="h-px bg-white/8" />
-                        <div className="grid gap-2 rounded-2xl border border-white/6 bg-white/[0.03] p-3">
-                          <div className="flex items-center justify-between text-sm text-slate-300">
-                            <span>{t("landing.mockup.subtotal")}</span>
-                            <span className="font-semibold text-white">2,400.000 KWD</span>
-                          </div>
-                          <div className="flex items-center justify-between text-sm text-slate-300">
-                            <span>{t("landing.mockup.tax")}</span>
-                            <span className="font-semibold text-white">0%</span>
-                          </div>
-                          <div className="flex items-center justify-between rounded-xl bg-cyan-400/[0.08] px-3 py-3 text-sm text-slate-200">
-                            <span>{t("landing.mockup.total")}</span>
-                            <span className="text-lg font-black text-white">2,400.000 KWD</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="rounded-2xl border border-white/8 bg-white/[0.03] p-4">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <div className="text-xs uppercase tracking-[0.18em] text-slate-500">{t("landing.mockup.chartLabel")}</div>
-                          <div className="mt-1 text-base font-bold text-white">{t("landing.mockup.chartTitle")}</div>
-                        </div>
-                        <div className="text-xs font-semibold text-emerald-300">+18%</div>
-                      </div>
-                      <div className="mt-5 flex h-28 items-end gap-2">
-                        {[28, 44, 35, 60, 52, 78, 68].map((height, index) => (
-                          <div key={index} className="flex-1 rounded-t-2xl bg-gradient-to-t from-cyan-500/25 via-blue-500/45 to-cyan-300/80" style={{ height: `${height}%` }} />
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-4">
-                    <div className="rounded-2xl border border-white/8 bg-white/[0.03] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
-                      <div className="text-xs uppercase tracking-[0.18em] text-slate-500">{t("landing.mockup.quotationLabel")}</div>
-                      <div className="mt-2 flex items-center justify-between">
-                        <div className="text-base font-bold text-white">#Q-208</div>
-                        <div className="rounded-lg border border-amber-300/20 bg-amber-300/10 px-2.5 py-1 text-xs font-semibold text-amber-200">
-                          {t("landing.mockup.quotationStatus")}
-                        </div>
-                      </div>
-                      <p className="mt-3 text-sm leading-6 text-slate-300">{t("landing.mockup.quotationDesc")}</p>
-                      <div className="mt-4 space-y-2">
-                        <div className="rounded-xl border border-white/6 bg-slate-900/80 px-3 py-3 text-xs text-slate-400">Brand film concept — 1,000.000 KWD</div>
-                        <div className="rounded-xl border border-white/6 bg-slate-900/80 px-3 py-3 text-xs text-slate-400">Production plan — 600.000 KWD</div>
-                      </div>
-                      <div className="mt-4 flex items-center justify-between rounded-xl border border-dashed border-cyan-400/20 bg-cyan-400/6 px-3 py-3 text-sm font-semibold text-cyan-200">
-                        <span>{t("landing.mockup.convertAction")}</span>
-                        <span className="rounded-full bg-cyan-300/15 px-2 py-1 text-[10px] uppercase tracking-[0.18em] text-cyan-100">1 click</span>
-                      </div>
-                    </div>
-
-                    <div className="rounded-2xl border border-white/8 bg-white/[0.03] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
-                      <div className="text-xs uppercase tracking-[0.18em] text-slate-500">{t("landing.mockup.settingsLabel")}</div>
-                      <div className="mt-4 space-y-3">
-                        {[t("landing.mockup.country"), t("landing.mockup.currency"), t("landing.mockup.language"), t("landing.mockup.taxRate")].map((item, index) => (
-                          <div key={index} className="flex items-center justify-between rounded-xl border border-white/6 bg-slate-900/80 px-3 py-3 text-sm text-slate-300">
-                            <span className="h-2 w-2 rounded-full bg-cyan-300/80" />
-                            <span className="flex-1 px-3">{item}</span>
-                            <span className="text-[10px] uppercase tracking-[0.18em] text-slate-500">Active</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-16 w-full max-w-3xl mx-auto fade-in">
+            {[
+              { icon: "⚡", title: t("home.features.0.title"), desc: t("home.features.0.desc") },
+              { icon: "📄", title: t("quotation.title"), desc: t("landing.features.items.2.shortDesc") },
+              { icon: "🌍", title: t("landing.features.items.3.title"), desc: t("landing.features.items.3.shortDesc") },
+            ].map((f, i) => (
+              <div key={i} className="glass rounded-2xl p-5 text-center">
+                <div className="text-2xl mb-2">{f.icon}</div>
+                <div className="font-bold text-white text-sm mb-1">{f.title}</div>
+                <div className="text-slate-400 text-xs">{f.desc}</div>
               </div>
-            </div>
+            ))}
           </div>
         </section>
 
@@ -271,8 +135,8 @@ export default function Home() {
         </section>
 
         <section id="features" className="mx-auto max-w-7xl px-5 py-20 md:px-8">
-          <div className="max-w-2xl">
-            <div className="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-200/80">{t("landing.features.eyebrow")}</div>
+          <div className="max-w-2xl mx-auto text-center">
+            <div className={`text-xs font-semibold text-cyan-200/80 ${isArabic ? "tracking-normal" : "uppercase tracking-[0.24em]"}`}>{t("landing.features.eyebrow")}</div>
             <h2 className="mt-4 text-3xl font-black text-white md:text-5xl">{t("landing.features.title")}</h2>
             <p className="mt-4 text-base leading-7 text-slate-300">{t("landing.features.shortDesc")}</p>
           </div>
@@ -290,10 +154,10 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="mx-auto max-w-7xl px-5 py-2 md:px-8">
+        <section className="mx-auto max-w-7xl px-5 py-4 md:px-8">
           <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
             <div>
-              <div className="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-200/80">{t("landing.workflow.eyebrow")}</div>
+              <div className={`text-xs font-semibold text-cyan-200/80 ${isArabic ? "tracking-normal" : "uppercase tracking-[0.24em]"}`}>{t("landing.workflow.eyebrow")}</div>
               <h2 className="mt-4 text-3xl font-black text-white md:text-5xl">{t("landing.workflow.title")}</h2>
               <p className="mt-4 max-w-xl text-base leading-7 text-slate-300">{t("landing.workflow.shortDesc")}</p>
             </div>
@@ -347,7 +211,7 @@ export default function Home() {
             </div>
 
             <div className={`order-1 ${isArabic ? "lg:order-2" : "lg:order-1"}`}>
-              <div className="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-200/80">{t("landing.output.eyebrow")}</div>
+              <div className={`text-xs font-semibold text-cyan-200/80 ${isArabic ? "tracking-normal" : "uppercase tracking-[0.24em]"}`}>{t("landing.output.eyebrow")}</div>
               <h2 className="mt-4 text-3xl font-black text-white md:text-5xl">{t("landing.output.title")}</h2>
               <p className="mt-4 max-w-xl text-base leading-7 text-slate-300">{t("landing.output.shortDesc")}</p>
               <div className="mt-7 grid gap-3 sm:grid-cols-2">
@@ -363,7 +227,7 @@ export default function Home() {
 
         <section className="mx-auto max-w-5xl px-5 py-8 md:px-8">
           <div className="text-center">
-            <div className="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-200/80">{t("landing.faq.eyebrow")}</div>
+            <div className={`text-xs font-semibold text-cyan-200/80 ${isArabic ? "tracking-normal" : "uppercase tracking-[0.24em]"}`}>{t("landing.faq.eyebrow")}</div>
             <h2 className="mt-4 text-3xl font-black text-white md:text-5xl">{t("landing.faq.title")}</h2>
           </div>
 
@@ -383,11 +247,11 @@ export default function Home() {
         <section className="mx-auto max-w-7xl px-5 pb-10 md:px-8">
           <div className="overflow-hidden rounded-[2.25rem] border border-cyan-300/20 bg-[linear-gradient(135deg,rgba(255,255,255,0.06),rgba(8,145,178,0.16),rgba(59,130,246,0.18))] p-8 text-center md:p-12">
             <div className="mx-auto max-w-3xl">
-              <div className="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-100/80">{t("landing.finalCta.eyebrow")}</div>
+              <div className={`text-xs font-semibold text-cyan-100/80 ${isArabic ? "tracking-normal" : "uppercase tracking-[0.24em]"}`}>{t("landing.finalCta.eyebrow")}</div>
               <h2 className="mt-4 text-3xl font-black text-white md:text-5xl">{t("landing.finalCta.title")}</h2>
               <p className="mt-5 text-base leading-8 text-slate-100/85">{t("landing.finalCta.desc")}</p>
               <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-                <Link href="/register" className="inline-flex items-center justify-center rounded-2xl bg-white px-6 py-4 text-base font-bold text-slate-950 transition hover:bg-slate-200">
+                <Link href="/register" className="inline-flex items-center justify-center rounded-2xl bg-blue-600 px-6 py-4 text-base font-bold text-white shadow-[0_18px_40px_rgba(37,99,235,0.35)] transition hover:bg-blue-500">
                   {t("landing.finalCta.primary")}
                 </Link>
                 <Link href="/login" className="inline-flex items-center justify-center rounded-2xl border border-white/15 bg-white/5 px-6 py-4 text-base font-bold text-white transition hover:bg-white/10">
