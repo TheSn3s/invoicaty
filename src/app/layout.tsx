@@ -17,6 +17,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://invoicaty.com"),
   title: "Invoicaty — Professional Invoices & Quotations for Freelancers and Small Businesses",
   description: "Create professional invoices and quotations in minutes with Invoicaty. Support for countries, currencies, taxes, Arabic & English, and print-ready PDF documents.",
   keywords: [
@@ -43,11 +44,20 @@ export const metadata: Metadata = {
     locale: "en_US",
     alternateLocale: ["ar_KW"],
     type: "website",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Invoicaty — فواتير وعروض أسعار احترافية",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Invoicaty — Professional Invoices & Quotations",
     description: "Invoices, quotations, currencies, taxes, Arabic & English — all in one clean workflow.",
+    images: ["/og-image.png"],
   },
   alternates: {
     canonical: "https://invoicaty.com",
