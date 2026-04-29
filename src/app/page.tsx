@@ -74,7 +74,7 @@ export default function Home() {
       <header className="relative z-10 flex items-center justify-between px-5 py-4 md:px-12 md:py-6">
         <div className="flex items-center gap-2">
           <img src="/logo-dark.png" alt="Invoicaty" className="h-9 w-auto" />
-          <span className="text-lg font-bold text-white">Invoicaty</span>
+          <span className="text-lg font-bold text-white">{isArabic ? "انفويساتي" : "Invoicaty"}</span>
         </div>
         <div className="flex items-center gap-2">
           <LanguageSwitcher />
@@ -87,10 +87,9 @@ export default function Home() {
       <main className="relative z-10 flex-1">
         <section className="px-5 pt-6 pb-12 text-center md:px-8 md:pt-10 md:pb-16">
           <div className="fade-in max-w-2xl mx-auto">
-            <h1 className="text-3xl md:text-5xl font-black text-white mb-4 leading-[1.2]">
-              {t("landing.hero.titlePrefix")}
-              <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
+            <h1 className="text-3xl md:text-5xl font-black text-white mb-4 leading-[1.25] md:leading-[1.15]">
+              <span className="block">{t("landing.hero.titlePrefix")}</span>
+              <span className="mt-2 block text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
                 {t("landing.hero.titleHighlight")}
               </span>
             </h1>
@@ -183,29 +182,75 @@ export default function Home() {
             <div className={`order-2 ${isArabic ? "lg:order-1" : "lg:order-2"}`}>
               <div className="rounded-[2rem] border border-white/10 bg-white/[0.035] p-5 sm:p-6">
                 <div className="grid gap-4 sm:grid-cols-2">
-                  {["modern", "classic", "minimal"].map((template, index) => (
-                    <div key={template} className={`${index === 2 ? "sm:col-span-2" : ""} rounded-[1.5rem] border border-white/10 bg-slate-950/70 p-4`}>
-                      <div className="flex items-center justify-between">
-                        <div className="text-sm font-bold text-white">{t(`landing.output.templates.${template}.title`)}</div>
-                        <div className="text-[10px] uppercase tracking-[0.2em] text-slate-500">PDF</div>
-                      </div>
-                      <div className="mt-4 rounded-2xl border border-white/6 bg-white/[0.03] p-3">
-                        <div className="h-2 rounded-full bg-white/10" />
-                        <div className="mt-2 h-2 w-4/5 rounded-full bg-white/10" />
-                        <div className="mt-3 rounded-xl border border-white/6 bg-slate-900/80 p-3">
-                          <div className="flex items-center justify-between text-[10px] text-slate-500">
-                            <span>INVOICE</span>
-                            <span>#1042</span>
-                          </div>
-                          <div className="mt-3 h-12 rounded-xl bg-white/[0.04]" />
-                          <div className="mt-3 flex gap-2">
-                            <div className="h-2 flex-1 rounded-full bg-white/10" />
-                            <div className="h-2 w-1/4 rounded-full bg-cyan-300/40" />
-                          </div>
+                  <div className="rounded-[1.5rem] border border-cyan-300/20 bg-slate-950/80 p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="text-sm font-bold text-white">{t("landing.output.templates.modern.title")}</div>
+                      <div className="text-[10px] uppercase tracking-[0.2em] text-cyan-300/80">PDF</div>
+                    </div>
+                    <div className="mt-4 rounded-2xl border border-cyan-300/10 bg-white p-3 text-slate-900">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <div className="text-[11px] font-semibold text-cyan-600">INVOICE</div>
+                          <div className="mt-1 text-lg font-black">#1042</div>
                         </div>
+                        <div className="h-10 w-10 rounded-xl bg-cyan-500/15" />
+                      </div>
+                      <div className="mt-4 grid grid-cols-[1fr_auto] gap-2 text-[10px]">
+                        <span className="text-slate-500">Sn3s Studio</span>
+                        <span className="font-semibold">2,400.000 KWD</span>
+                        <span className="text-slate-500">Travel Campaign</span>
+                        <span className="text-cyan-600">0%</span>
+                      </div>
+                      <div className="mt-4 h-1 w-full rounded-full bg-slate-100" />
+                    </div>
+                  </div>
+
+                  <div className="rounded-[1.5rem] border border-amber-200/20 bg-[#16110d] p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="text-sm font-bold text-white">{t("landing.output.templates.classic.title")}</div>
+                      <div className="text-[10px] uppercase tracking-[0.2em] text-amber-200/70">PDF</div>
+                    </div>
+                    <div className="mt-4 border border-amber-100/30 bg-[#fffaf2] px-4 py-5 text-slate-900">
+                      <div className="border-y border-slate-300 py-3 text-center">
+                        <div className="text-[10px] uppercase tracking-[0.35em] text-slate-500">Invoice</div>
+                        <div className="mt-2 text-xl font-serif font-semibold">№ #1042</div>
+                      </div>
+                      <div className="mt-4 space-y-2 text-[10px]">
+                        <div className="flex justify-between"><span className="text-slate-500">Client</span><span>Sn3s Studio</span></div>
+                        <div className="flex justify-between"><span className="text-slate-500">Project</span><span>Travel Campaign</span></div>
+                        <div className="flex justify-between border-t border-slate-200 pt-2 font-semibold"><span>Total</span><span>2,400.000 KWD</span></div>
                       </div>
                     </div>
-                  ))}
+                  </div>
+
+                  <div className="rounded-[1.5rem] border border-white/10 bg-slate-950/70 p-4 sm:col-span-2">
+                    <div className="flex items-center justify-between">
+                      <div className="text-sm font-bold text-white">{t("landing.output.templates.minimal.title")}</div>
+                      <div className="text-[10px] uppercase tracking-[0.2em] text-slate-500">PDF</div>
+                    </div>
+                    <div className="mt-4 border border-white/10 bg-white px-4 py-4 text-slate-900">
+                      <div className="flex items-start justify-between text-[10px] uppercase tracking-[0.18em] text-slate-500">
+                        <span>Invoice</span>
+                        <span>2026</span>
+                      </div>
+                      <div className="mt-3 text-2xl font-black">#1042</div>
+                      <div className="mt-4 grid gap-2 text-[10px] sm:grid-cols-2">
+                        <div>
+                          <div className="text-slate-500">From</div>
+                          <div className="mt-1 font-semibold text-slate-900">Invoicaty</div>
+                        </div>
+                        <div>
+                          <div className="text-slate-500">Billed to</div>
+                          <div className="mt-1 font-semibold text-slate-900">Sn3s Studio</div>
+                        </div>
+                      </div>
+                      <div className="mt-4 space-y-2 text-[10px]">
+                        <div className="flex justify-between"><span>Motion graphics package</span><span>1,000.000 KWD</span></div>
+                        <div className="flex justify-between"><span>Video editing</span><span>800.000 KWD</span></div>
+                        <div className="flex justify-between"><span>Social media cutdowns</span><span>600.000 KWD</span></div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

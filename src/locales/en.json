@@ -28,13 +28,13 @@
     "footer": "Invoicaty © {{year}} — All rights reserved"
   },
   "landing": {
-    "brandTagline": "Smart invoicing workflow",
+    "brandTagline": "Invoicaty — smart invoicing workflow",
     "hero": {
       "eyebrow": "Smart invoicing for real business",
       "title": "Create professional invoices and quotations in minutes",
       "titlePrefix": "Create professional",
       "titleHighlight": "invoices and quotations",
-      "desc": "Invoicaty helps freelancers and small businesses create invoices and quotations with support for global countries, currencies, taxes, and a full Arabic-English experience.",
+      "desc": "Invoicaty helps freelancers and small businesses create invoices and quotations with support for 83 countries, 155 currencies, tax configuration, and a full Arabic-English experience.",
       "primaryCta": "Start Free",
       "mobileCta": "Register Now — Free",
       "secondaryCta": "Explore Features",
@@ -74,7 +74,7 @@
     },
     "features": {
       "eyebrow": "Core capabilities",
-      "title": "Built for real invoicing workflows",
+      "title": "Send your invoice professionally in one minute",
       "desc": "These are not filler features. They solve the practical steps independent businesses go through every day.",
       "shortDesc": "A focused invoicing workflow with the features most businesses actually need.",
       "items": [
@@ -94,9 +94,9 @@
           "shortDesc": "Turn approved quotations into invoices without redoing the work."
         },
         {
-          "title": "Support countries, currencies, and taxes",
-          "desc": "Adapt your setup to your country, default currency, and tax requirements.",
-          "shortDesc": "Set up country, currency, and tax preferences for your business."
+          "title": "83 countries, 155 currencies, and tax support",
+          "desc": "Adapt your setup to your country, default currency, and tax requirements with built-in support for 83 countries and 155 currencies.",
+          "shortDesc": "Choose from 83 countries, 155 currencies, and configure taxes for your business."
         },
         {
           "title": "Arabic and English experience",
@@ -111,7 +111,7 @@
       ]
     },
     "workflow": {
-      "eyebrow": "Document flow",
+      "eyebrow": "Workflow steps",
       "title": "From quotation to invoice with less back-and-forth",
       "desc": "Invoicaty helps you handle the full path from proposal to payment in one smoother workflow.",
       "shortDesc": "Create the quotation, convert it to an invoice, then track what happens next.",
@@ -208,7 +208,7 @@
         },
         {
           "q": "Is it suitable for different countries?",
-          "a": "Yes. Invoicaty is built with country, currency, and regional flexibility in mind."
+          "a": "Yes. Invoicaty includes support for 83 countries and 155 currencies, so you can choose the country that fits your business, set a default currency, and configure tax rates for more accurate invoices and quotations across local and international work."
         },
         {
           "q": "Does it support Arabic and English?",
