@@ -27,6 +27,228 @@
     ],
     "footer": "Invoicaty © {{year}} — All rights reserved"
   },
+  "landing": {
+    "brandTagline": "Invoicaty — smart invoicing workflow",
+    "hero": {
+      "eyebrow": "Smart invoicing for real business",
+      "title": "Create professional invoices and quotations in minutes",
+      "titlePrefix": "Create professional",
+      "titleHighlight": "invoices and quotations",
+      "desc": "Invoicaty helps freelancers and small businesses create invoices and quotations with support for 197 countries, 155 currencies, tax configuration, and a full Arabic-English experience.",
+      "primaryCta": "Start Free",
+      "mobileCta": "Register Now — Free",
+      "secondaryCta": "Explore Features",
+      "ctaNote": "Free sign-up. No complicated setup.",
+      "supporting": "Built for freelancers, creators, consultants, and small businesses"
+    },
+    "trust": {
+      "items": [
+        "Professional invoices and quotations",
+        "Arabic and English interface",
+        "Global currency and tax support",
+        "Print-ready templates and PDF output"
+      ]
+    },
+    "problem": {
+      "eyebrow": "The common pain",
+      "title": "Manual invoicing slows serious work down",
+      "points": [
+        "Business details get repeated over and over across scattered files.",
+        "Creating quotations and invoices manually takes time you should spend on clients.",
+        "Tracking paid, unpaid, and cancelled documents becomes messy very quickly.",
+        "Documents often look inconsistent, which weakens your professional impression."
+      ]
+    },
+    "solution": {
+      "eyebrow": "The cleaner workflow",
+      "title": "Invoicaty keeps your document flow organized",
+      "desc": "From your first quotation to your final invoice, Invoicaty gives you one polished place to create, convert, print, share, and track business documents without unnecessary friction.",
+      "tags": [
+        "Invoices",
+        "Quotations",
+        "Quotation → Invoice conversion",
+        "Status tracking",
+        "Currencies and taxes",
+        "Print and PDF"
+      ]
+    },
+    "features": {
+      "eyebrow": "Core capabilities",
+      "title": "Send your invoice professionally in one minute",
+      "desc": "These are not filler features. They solve the practical steps independent businesses go through every day.",
+      "shortDesc": "A focused invoicing workflow with the features most businesses actually need.",
+      "items": [
+        {
+          "title": "Create invoices quickly",
+          "desc": "Generate polished invoices in minutes with the details your clients expect.",
+          "shortDesc": "Build clean invoices fast with the details clients expect."
+        },
+        {
+          "title": "Create professional quotations",
+          "desc": "Prepare clear quotations before approval with the same structured workflow.",
+          "shortDesc": "Send structured quotations before moving to invoicing."
+        },
+        {
+          "title": "Convert quotations into invoices",
+          "desc": "Once a quotation is accepted, turn it into an invoice without starting over.",
+          "shortDesc": "Turn approved quotations into invoices without redoing the work."
+        },
+        {
+          "title": "197 countries, 155 currencies, and tax support",
+          "desc": "Adapt your setup to your country, default currency, and tax requirements with built-in support for 197 countries and 155 currencies.",
+          "shortDesc": "Choose from 197 countries, 155 currencies, and configure taxes for your business."
+        },
+        {
+          "title": "Arabic and English experience",
+          "desc": "Use the platform in both Arabic and English with a bilingual product flow.",
+          "shortDesc": "Switch between Arabic and English with a bilingual product flow."
+        },
+        {
+          "title": "Templates, printing, and PDF-ready output",
+          "desc": "Present your invoices and quotations in a clean format that is easy to print and share.",
+          "shortDesc": "Use polished templates that are ready to print and share as PDFs."
+        }
+      ]
+    },
+    "workflow": {
+      "eyebrow": "Workflow steps",
+      "title": "From quotation to invoice with less back-and-forth",
+      "desc": "Invoicaty helps you handle the full path from proposal to payment in one smoother workflow.",
+      "shortDesc": "Create the quotation, convert it to an invoice, then track what happens next.",
+      "steps": [
+        {
+          "title": "Create a quotation",
+          "desc": "Prepare a professional quotation with clear pricing, project details, and structure.",
+          "shortDesc": "Start with a clear, client-ready quotation."
+        },
+        {
+          "title": "Share and update it easily",
+          "desc": "Make changes quickly and keep the client-facing document tidy and professional.",
+          "shortDesc": "Update the document quickly while keeping it polished."
+        },
+        {
+          "title": "Convert it into an invoice",
+          "desc": "After approval, generate the invoice directly from the quotation details.",
+          "shortDesc": "Move from quotation to invoice without starting over."
+        },
+        {
+          "title": "Track payment and document status",
+          "desc": "Stay on top of paid, unpaid, cancelled, and archived records without confusion.",
+          "shortDesc": "See what is paid, pending, cancelled, or archived at a glance."
+        }
+      ]
+    },
+    "global": {
+      "eyebrow": "Global flexibility",
+      "title": "Built for your business wherever you work",
+      "desc": "Whether you serve clients locally or internationally, Invoicaty helps you configure the business details that matter for your workflow.",
+      "items": [
+        "Country-specific setup",
+        "Default currency selection",
+        "Tax rate configuration",
+        "Arabic or English interface",
+        "Business identity and branding",
+        "Ready for local and international clients"
+      ]
+    },
+    "output": {
+      "eyebrow": "Professional output",
+      "title": "Send documents that reflect the quality of your work",
+      "desc": "Your quotation or invoice should not look like an afterthought. Invoicaty helps you produce cleaner client-facing documents with better structure, branding, and presentation.",
+      "shortDesc": "Make every quotation and invoice look clean, branded, and client-ready.",
+      "points": [
+        "Multiple invoice template styles",
+        "Print-friendly layout",
+        "Client-ready PDF output",
+        "Brand color, logo, and business details"
+      ],
+      "templates": {
+        "modern": {
+          "title": "Modern template",
+          "desc": "Clean structure with a sharp branded accent and strong readability."
+        },
+        "classic": {
+          "title": "Classic template",
+          "desc": "A more formal presentation for businesses that prefer a timeless look."
+        },
+        "minimal": {
+          "title": "Minimal template",
+          "desc": "Simple and focused, ideal when clarity matters more than decoration."
+        }
+      }
+    },
+    "audience": {
+      "eyebrow": "Who it is for",
+      "title": "Made for service-based work",
+      "desc": "If your business depends on sending quotations or invoices to clients, Invoicaty is designed for the way you actually work.",
+      "items": [
+        "Freelancers",
+        "Content creators",
+        "Designers and creatives",
+        "Consultants and service providers",
+        "Small agencies",
+        "Small and growing businesses"
+      ]
+    },
+    "faq": {
+      "eyebrow": "Frequently asked questions",
+      "title": "Everything people usually ask before signing up",
+      "items": [
+        {
+          "q": "Can I create quotations?",
+          "a": "Yes. Invoicaty includes quotation creation so you can prepare professional offers before issuing invoices."
+        },
+        {
+          "q": "Can I convert a quotation into an invoice?",
+          "a": "Yes. Once the quotation is approved, you can convert it into an invoice instead of rebuilding the document from scratch."
+        },
+        {
+          "q": "Does it support currencies and taxes?",
+          "a": "Yes. You can configure default currencies and tax settings to match your business needs."
+        },
+        {
+          "q": "Is it suitable for different countries?",
+          "a": "Yes. Invoicaty includes support for 197 countries and 155 currencies, so you can choose the country that fits your business, set a default currency, and configure tax rates for more accurate invoices and quotations across local and international work."
+        },
+        {
+          "q": "Does it support Arabic and English?",
+          "a": "Yes. The platform supports both Arabic and English for a bilingual product experience."
+        },
+        {
+          "q": "Can I print and share documents easily?",
+          "a": "Yes. Invoices and quotations are designed to be print-friendly and easy to share as polished documents."
+        }
+      ]
+    },
+    "finalCta": {
+      "eyebrow": "Start smarter",
+      "title": "Create invoices and quotations with a workflow that feels more professional",
+      "desc": "Save time, stay organized, and present your business with documents that look clear, polished, and client-ready.",
+      "primary": "Start Free Now"
+    },
+    "mockup": {
+      "dashboardTitle": "Business Overview",
+      "paidBadge": "Live workflow",
+      "invoiceLabel": "Invoice",
+      "invoiceStatus": "Ready to send",
+      "quotationLabel": "Quotation",
+      "quotationStatus": "Approved",
+      "quotationDesc": "Create your offer, adjust it quickly, then convert it into an invoice once the client confirms.",
+      "convertAction": "Convert quotation → invoice",
+      "settingsLabel": "Region & language settings",
+      "country": "Country: Kuwait",
+      "currency": "Currency: KWD",
+      "language": "Language: Arabic / English",
+      "taxRate": "Tax rate: configurable",
+      "chartLabel": "Revenue",
+      "chartTitle": "This month overview",
+      "client": "Client",
+      "project": "Project",
+      "subtotal": "Subtotal",
+      "tax": "Tax",
+      "total": "Total"
+    }
+  },
   "auth": {
     "loginTitle": "Login",
     "loginSubtitle": "Enter your account to continue",
