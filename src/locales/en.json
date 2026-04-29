@@ -34,7 +34,7 @@
       "title": "Create professional invoices and quotations in minutes",
       "titlePrefix": "Create professional",
       "titleHighlight": "invoices and quotations",
-      "desc": "Invoicaty helps freelancers and small businesses create invoices and quotations with support for 83 countries, 155 currencies, tax configuration, and a full Arabic-English experience.",
+      "desc": "Invoicaty helps freelancers and small businesses create invoices and quotations with support for 197 countries, 155 currencies, tax configuration, and a full Arabic-English experience.",
       "primaryCta": "Start Free",
       "mobileCta": "Register Now — Free",
       "secondaryCta": "Explore Features",
@@ -94,9 +94,9 @@
           "shortDesc": "Turn approved quotations into invoices without redoing the work."
         },
         {
-          "title": "83 countries, 155 currencies, and tax support",
-          "desc": "Adapt your setup to your country, default currency, and tax requirements with built-in support for 83 countries and 155 currencies.",
-          "shortDesc": "Choose from 83 countries, 155 currencies, and configure taxes for your business."
+          "title": "197 countries, 155 currencies, and tax support",
+          "desc": "Adapt your setup to your country, default currency, and tax requirements with built-in support for 197 countries and 155 currencies.",
+          "shortDesc": "Choose from 197 countries, 155 currencies, and configure taxes for your business."
         },
         {
           "title": "Arabic and English experience",
@@ -208,7 +208,7 @@
         },
         {
           "q": "Is it suitable for different countries?",
-          "a": "Yes. Invoicaty includes support for 83 countries and 155 currencies, so you can choose the country that fits your business, set a default currency, and configure tax rates for more accurate invoices and quotations across local and international work."
+          "a": "Yes. Invoicaty includes support for 197 countries and 155 currencies, so you can choose the country that fits your business, set a default currency, and configure tax rates for more accurate invoices and quotations across local and international work."
         },
         {
           "q": "Does it support Arabic and English?",
