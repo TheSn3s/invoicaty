@@ -32,9 +32,13 @@
     "hero": {
       "eyebrow": "Smart invoicing for real business",
       "title": "Create professional invoices and quotations in minutes",
+      "titlePrefix": "Create professional",
+      "titleHighlight": "invoices and quotations",
       "desc": "Invoicaty helps freelancers and small businesses create invoices and quotations with support for global countries, currencies, taxes, and a full Arabic-English experience.",
       "primaryCta": "Start Free",
+      "mobileCta": "Register Now — Free",
       "secondaryCta": "Explore Features",
+      "ctaNote": "Free sign-up. No complicated setup.",
       "supporting": "Built for freelancers, creators, consultants, and small businesses"
     },
     "trust": {
@@ -72,30 +76,37 @@
       "eyebrow": "Core capabilities",
       "title": "Built for real invoicing workflows",
       "desc": "These are not filler features. They solve the practical steps independent businesses go through every day.",
+      "shortDesc": "A focused invoicing workflow with the features most businesses actually need.",
       "items": [
         {
           "title": "Create invoices quickly",
-          "desc": "Generate polished invoices in minutes with the details your clients expect."
+          "desc": "Generate polished invoices in minutes with the details your clients expect.",
+          "shortDesc": "Build clean invoices fast with the details clients expect."
         },
         {
           "title": "Create professional quotations",
-          "desc": "Prepare clear quotations before approval with the same structured workflow."
+          "desc": "Prepare clear quotations before approval with the same structured workflow.",
+          "shortDesc": "Send structured quotations before moving to invoicing."
         },
         {
           "title": "Convert quotations into invoices",
-          "desc": "Once a quotation is accepted, turn it into an invoice without starting over."
+          "desc": "Once a quotation is accepted, turn it into an invoice without starting over.",
+          "shortDesc": "Turn approved quotations into invoices without redoing the work."
         },
         {
           "title": "Support countries, currencies, and taxes",
-          "desc": "Adapt your setup to your country, default currency, and tax requirements."
+          "desc": "Adapt your setup to your country, default currency, and tax requirements.",
+          "shortDesc": "Set up country, currency, and tax preferences for your business."
         },
         {
           "title": "Arabic and English experience",
-          "desc": "Use the platform in both Arabic and English with a bilingual product flow."
+          "desc": "Use the platform in both Arabic and English with a bilingual product flow.",
+          "shortDesc": "Switch between Arabic and English with a bilingual product flow."
         },
         {
           "title": "Templates, printing, and PDF-ready output",
-          "desc": "Present your invoices and quotations in a clean format that is easy to print and share."
+          "desc": "Present your invoices and quotations in a clean format that is easy to print and share.",
+          "shortDesc": "Use polished templates that are ready to print and share as PDFs."
         }
       ]
     },
@@ -103,22 +114,27 @@
       "eyebrow": "Document flow",
       "title": "From quotation to invoice with less back-and-forth",
       "desc": "Invoicaty helps you handle the full path from proposal to payment in one smoother workflow.",
+      "shortDesc": "Create the quotation, convert it to an invoice, then track what happens next.",
       "steps": [
         {
           "title": "Create a quotation",
-          "desc": "Prepare a professional quotation with clear pricing, project details, and structure."
+          "desc": "Prepare a professional quotation with clear pricing, project details, and structure.",
+          "shortDesc": "Start with a clear, client-ready quotation."
         },
         {
           "title": "Share and update it easily",
-          "desc": "Make changes quickly and keep the client-facing document tidy and professional."
+          "desc": "Make changes quickly and keep the client-facing document tidy and professional.",
+          "shortDesc": "Update the document quickly while keeping it polished."
         },
         {
           "title": "Convert it into an invoice",
-          "desc": "After approval, generate the invoice directly from the quotation details."
+          "desc": "After approval, generate the invoice directly from the quotation details.",
+          "shortDesc": "Move from quotation to invoice without starting over."
         },
         {
           "title": "Track payment and document status",
-          "desc": "Stay on top of paid, unpaid, cancelled, and archived records without confusion."
+          "desc": "Stay on top of paid, unpaid, cancelled, and archived records without confusion.",
+          "shortDesc": "See what is paid, pending, cancelled, or archived at a glance."
         }
       ]
     },
@@ -139,6 +155,7 @@
       "eyebrow": "Professional output",
       "title": "Send documents that reflect the quality of your work",
       "desc": "Your quotation or invoice should not look like an afterthought. Invoicaty helps you produce cleaner client-facing documents with better structure, branding, and presentation.",
+      "shortDesc": "Make every quotation and invoice look clean, branded, and client-ready.",
       "points": [
         "Multiple invoice template styles",
         "Print-friendly layout",
@@ -223,6 +240,8 @@
       "currency": "Currency: KWD",
       "language": "Language: Arabic / English",
       "taxRate": "Tax rate: configurable",
+      "chartLabel": "Revenue",
+      "chartTitle": "This month overview",
       "client": "Client",
       "project": "Project",
       "subtotal": "Subtotal",
