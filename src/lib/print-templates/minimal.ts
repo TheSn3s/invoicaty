@@ -8,16 +8,21 @@ import type { PrintableDoc, Profile, DocType } from "./types";
  */
 export function renderMinimal(doc: PrintableDoc, profile: Profile | null, type: DocType): string {
   const ctx = buildContext(doc, profile, type);
+  const isRtlText = (value: string) => /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/.test(value || '');
+  const textAttrs = (value: string) => isRtlText(value)
+    ? ' dir="rtl" style="direction:rtl;text-align:right;"'
+    : ' dir="ltr" style="direction:ltr;text-align:left;"';
   const { totals, color, name, businessName, displayLine1, displayLine2, phone, email, logoUrl, notes,
           bankHolder, bankName, bankAccount, bankIban, isQuotation, docLabel } = ctx;
   const { fmt } = totals;
 
   const rowsHtml = totals.items.map((it) => {
+    const descAttrs = textAttrs(it.description);
     const q = Number(it.quantity) || 0;
     const p = Number(it.unit_price) || 0;
     const lineTotal = q * p;
     return `<tr>
-  <td class="c-desc">${escapeHtml(it.description)}</td>
+  <td class="c-desc"${descAttrs}>${escapeHtml(it.description)}</td>
   <td class="c-qty">${q}</td>
   <td class="c-price">${fmt(p)}</td>
   <td class="c-total">${fmt(lineTotal)}</td>
@@ -33,7 +38,7 @@ export function renderMinimal(doc: PrintableDoc, profile: Profile | null, type: 
   if (totals.showTax) totalsHtml += `<div class="tot-row"><span>Tax (${totals.taxRate}%)</span><span>${fmt(totals.taxAmount)}</span></div>`;
 
   const notesHtml = notes
-    ? `<section class="section"><div class="section-t">Notes</div><div class="notes-b">${escapeHtml(notes)}</div></section>`
+    ? `<section class="section"><div class="section-t">Notes</div><div class="notes-b"${textAttrs(notes)}>${escapeHtml(notes)}</div></section>`
     : '';
 
   const validityHtml = isQuotation && doc.valid_until
@@ -181,7 +186,7 @@ tbody tr:last-child td{border-bottom:none}
       </div>
     </section>
 
-    ${doc.description ? `<div style="margin-bottom:16px;padding:12px 16px;border-left:3px solid ${color};background:#f8fafc;"><div style="font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#94a3b8;margin-bottom:4px;">Scope of Work</div><div style="font-size:11px;color:#475569;line-height:1.7;white-space:pre-wrap;">${escapeHtml(doc.description)}</div></div>` : ''}
+    ${doc.description ? `<div style="margin-bottom:16px;padding:12px 16px;border-left:3px solid ${color};background:#f8fafc;"><div style="font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#94a3b8;margin-bottom:4px;">Scope of Work</div><div dir="${isRtlText(doc.description) ? 'rtl' : 'ltr'}" style="direction:${isRtlText(doc.description) ? 'rtl' : 'ltr'};text-align:${isRtlText(doc.description) ? 'right' : 'left'};font-size:11px;color:#475569;line-height:1.7;white-space:pre-wrap;">${escapeHtml(doc.description)}</div></div>` : ''}
 
     <table>
       <thead>

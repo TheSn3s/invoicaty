@@ -9,17 +9,22 @@ import type { PrintableDoc, Profile, DocType } from "./types";
  */
 export function renderModern(doc: PrintableDoc, profile: Profile | null, type: DocType): string {
   const ctx = buildContext(doc, profile, type);
+  const isRtlText = (value: string) => /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/.test(value || '');
+  const textAttrs = (value: string) => isRtlText(value)
+    ? ' dir="rtl" style="direction:rtl;text-align:right;"'
+    : ' dir="ltr" style="direction:ltr;text-align:left;"';
   const { totals, color, name, businessName, displayLine1, displayLine2, phone, email, logoUrl, notes,
           bankHolder, bankName, bankAccount, bankIban, isQuotation, docLabel } = ctx;
   const { fmt } = totals;
 
   const rowsHtml = totals.items.map((it, idx) => {
+    const descAttrs = textAttrs(it.description);
     const q = Number(it.quantity) || 0;
     const p = Number(it.unit_price) || 0;
     const lineTotal = q * p;
     return `<tr>
   <td class="c-num">${idx + 1}</td>
-  <td class="c-desc">${escapeHtml(it.description)}</td>
+  <td class="c-desc"${descAttrs}>${escapeHtml(it.description)}</td>
   <td class="c-qty">${q}</td>
   <td class="c-price">${fmt(p)}</td>
   <td class="c-total">${fmt(lineTotal)}</td>
@@ -45,7 +50,7 @@ export function renderModern(doc: PrintableDoc, profile: Profile | null, type: D
   if (totals.showTax) totalsHtml += `<div class="tot-row"><span>Tax (${totals.taxRate}%)</span><span>${fmt(totals.taxAmount)}</span></div>`;
 
   const notesHtml = notes
-    ? `<div class="card notes-card"><div class="card-t">Notes</div><div class="card-b">${escapeHtml(notes)}</div></div>`
+    ? `<div class="card notes-card"><div class="card-t">Notes</div><div class="card-b"${textAttrs(notes)}>${escapeHtml(notes)}</div></div>`
     : '';
 
   const validityHtml = isQuotation && doc.valid_until
@@ -246,7 +251,7 @@ tbody tr:last-child td{border-bottom:none}
 
     <div class="section-rule"></div>
 
-    ${doc.description ? `<div class="card scope-card"><div class="card-t">Scope of Work</div><div class="card-b">${escapeHtml(doc.description)}</div></div>` : ''}
+    ${doc.description ? `<div class="card scope-card"><div class="card-t">Scope of Work</div><div class="card-b"${textAttrs(doc.description)}>${escapeHtml(doc.description)}</div></div>` : ''}
 
     <table>
       <thead>
