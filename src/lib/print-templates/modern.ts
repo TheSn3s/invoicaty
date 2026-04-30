@@ -81,43 +81,48 @@ body{padding:24px;display:flex;justify-content:center}
 .doc-inner::before{content:"";position:absolute;inset:0 auto 0 0;width:4px;background:var(--c);border-radius:0}
 
 /* Header */
-.hdr{display:grid;grid-template-columns:1fr auto;gap:32px;align-items:flex-start;margin-bottom:36px}
-.brand{display:flex;align-items:center;gap:16px}
-.logo{max-height:64px;max-width:200px;object-fit:contain;border-radius:4px}
+.hdr{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:28px;align-items:start;margin-bottom:22px;padding-bottom:18px;border-bottom:1px solid var(--line)}
+.brand-wrap{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;min-width:0}
+.brand{display:flex;align-items:center;gap:18px;min-width:0;flex:1}
+.logo{max-height:64px;max-width:200px;object-fit:contain;border-radius:4px;flex-shrink:0}
 .logo-fallback{width:56px;height:56px;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:22px;font-weight:800;font-family:inherit}
+.biz-meta{min-width:0;padding-top:4px}
 .biz-name{font-size:18px;font-weight:800;color:var(--ink);line-height:1.2}
 .biz-person{font-size:12px;color:var(--ink-3);margin-top:2px;font-weight:500}
+.invoice-side{text-align:right;min-width:140px}
+.doc-type{font-size:11px;font-weight:700;letter-spacing:.18em;color:var(--c);text-transform:uppercase;margin-bottom:2px}
+.doc-serial{font-size:34px;font-weight:800;color:var(--ink);line-height:1}
+.info-strip{display:grid;grid-template-columns:minmax(260px,.72fr) minmax(0,1.28fr);gap:18px;align-items:stretch;margin-bottom:18px}
+.info-block{min-width:0;background:#fff;border:1px solid #edf1f6;border-radius:16px;padding:18px 22px;box-shadow:0 2px 10px rgba(15,23,42,.03)}
+.info-lbl{font-size:10px;font-weight:700;letter-spacing:.18em;color:var(--ink-3);text-transform:uppercase;margin-bottom:10px}
+.info-client{font-size:17px;font-weight:800;color:var(--ink);line-height:1.3;word-break:break-word}
+.meta-inline{display:grid;grid-template-columns:106px minmax(0,1fr);gap:6px 22px;align-items:start}
+.meta-lbl{color:var(--ink-2);font-weight:600;font-size:11px;line-height:1.2}
+.meta-val{color:var(--ink);font-weight:700;font-size:12px;line-height:1.35;word-break:break-word}
+.section-rule{height:1px;background:var(--line);margin-bottom:22px}
 
-.doc-title{text-align:right}
-.doc-type{font-size:11px;font-weight:700;letter-spacing:.18em;color:var(--c);text-transform:uppercase;margin-bottom:6px}
-.doc-serial{font-size:28px;font-weight:800;color:var(--ink);line-height:1}
-
-/* Meta + Bill To grid */
-.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:32px;padding-bottom:20px;border-bottom:1px solid var(--line-2)}
-.info-block{display:flex;flex-direction:column;gap:8px}
-.info-lbl{font-size:10px;font-weight:700;letter-spacing:.15em;color:var(--ink-3);text-transform:uppercase}
-.info-client{font-size:16px;font-weight:700;color:var(--ink)}
-.meta-row{display:flex;justify-content:space-between;font-size:12px}
-.meta-lbl{color:var(--ink-3);font-weight:500}
-.meta-val{color:var(--ink);font-weight:600}
+/* Scope + spacing */
+.scope-card{margin-bottom:24px;background:#f8fafc;border-color:#eef2f7;border-radius:14px;padding:18px 22px}
+.card{padding:16px 20px}
+.card-b{line-height:1.65}
 
 /* Items table */
-table{width:100%;border-collapse:collapse;margin-bottom:28px}
-thead th{text-align:left;font-size:10px;font-weight:700;letter-spacing:.12em;color:var(--ink-3);text-transform:uppercase;padding:12px 8px;border-bottom:2px solid var(--c)}
+table{width:100%;border-collapse:collapse;margin-bottom:20px}
+thead th{text-align:left;font-size:10px;font-weight:700;letter-spacing:.12em;color:var(--ink-3);text-transform:uppercase;padding:10px 8px;border-bottom:2px solid var(--c)}
 thead th.c-qty,thead th.c-price,thead th.c-total{text-align:right}
 thead th.c-num{width:32px;text-align:center}
-tbody td{padding:14px 8px;font-size:13px;color:var(--ink);border-bottom:1px solid var(--line-2);vertical-align:top}
+tbody td{padding:9px 8px;font-size:12.5px;color:var(--ink);border-bottom:1px solid var(--line-2);vertical-align:top}
 tbody tr:last-child td{border-bottom:none}
 .c-num{text-align:center;color:var(--ink-3);font-variant-numeric:tabular-nums;font-weight:600}
-.c-desc{font-weight:500;line-height:1.5}
-.c-qty{text-align:right;font-variant-numeric:tabular-nums;color:var(--ink-2);width:70px}
-.c-price{text-align:right;font-variant-numeric:tabular-nums;color:var(--ink-2);width:110px;white-space:nowrap}
-.c-total{text-align:right;font-variant-numeric:tabular-nums;font-weight:700;color:var(--ink);width:130px;white-space:nowrap}
+.c-desc{font-weight:500;line-height:1.35}
+.c-qty{text-align:right;font-variant-numeric:tabular-nums;color:var(--ink-2);width:64px}
+.c-price{text-align:right;font-variant-numeric:tabular-nums;color:var(--ink-2);width:104px;white-space:nowrap}
+.c-total{text-align:right;font-variant-numeric:tabular-nums;font-weight:700;color:var(--ink);width:120px;white-space:nowrap}
 
 /* Totals */
-.totals-wrap{display:flex;justify-content:flex-end;margin-bottom:32px}
+.totals-wrap{display:flex;justify-content:flex-end;margin-bottom:24px}
 .totals{min-width:280px;font-size:12px}
-.tot-row{display:flex;justify-content:space-between;padding:6px 0;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.tot-row{display:flex;justify-content:space-between;padding:4px 0;color:var(--ink-2);font-variant-numeric:tabular-nums}
 .tot-row span:first-child{color:var(--ink-3)}
 .tot-row span:last-child{font-weight:600;color:var(--ink)}
 .grand{margin-top:8px;padding:14px 18px;background:var(--c);color:#fff;border-radius:6px;display:flex;justify-content:space-between;align-items:center}
@@ -148,6 +153,7 @@ tbody tr:last-child td{border-bottom:none}
   .doc-inner::before{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
   .grand{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
   .card{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  .info-block{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
   @page{size:A4;margin:12mm}
 }
 @media (max-width:900px){
@@ -155,8 +161,11 @@ tbody tr:last-child td{border-bottom:none}
   .doc{width:100%}
   .doc-inner{padding:28px 20px}
   .hdr{grid-template-columns:1fr;gap:16px}
-  .doc-title{text-align:left}
-  .info-grid{grid-template-columns:1fr;gap:16px}
+  .brand-wrap{flex-direction:column;gap:14px}
+  .invoice-side{text-align:left;min-width:0}
+  .info-strip{grid-template-columns:1fr;gap:12px}
+  .meta-inline{grid-template-columns:1fr;gap:8px}
+  .doc-serial{font-size:28px}
   .bank-grid{grid-template-columns:1fr}
   .ftr{padding:14px 20px;flex-direction:column;gap:8px;align-items:flex-start}
 }
@@ -166,30 +175,36 @@ tbody tr:last-child td{border-bottom:none}
 <div class="doc">
   <div class="doc-inner">
     <header class="hdr">
-      <div class="brand">
-        ${logoBlock}
-        <div>${businessLine}</div>
-      </div>
-      <div class="doc-title">
-        <div class="doc-type">${docLabel}</div>
-        <div class="doc-serial">#${escapeHtml(doc.serial)}</div>
+      <div class="brand-wrap">
+        <div class="brand">
+          ${logoBlock}
+          <div class="biz-meta">${businessLine}</div>
+        </div>
+        <div class="invoice-side">
+          <div class="doc-type">${docLabel}</div>
+          <div class="doc-serial">#${escapeHtml(doc.serial)}</div>
+        </div>
       </div>
     </header>
 
-    <section class="info-grid">
+    <section class="info-strip">
       <div class="info-block">
         <div class="info-lbl">Bill to</div>
         <div class="info-client">${escapeHtml(doc.client)}</div>
       </div>
       <div class="info-block">
         <div class="info-lbl">Details</div>
-        <div class="meta-row"><span class="meta-lbl">Date</span><span class="meta-val">${escapeHtml(doc.date)}</span></div>
-        ${validityHtml}
-        ${doc.project ? `<div class="meta-row"><span class="meta-lbl">Project</span><span class="meta-val">${escapeHtml(doc.project)}</span></div>` : ''}
+        <div class="meta-inline">
+          <span class="meta-lbl">Date</span><span class="meta-val">${escapeHtml(doc.date)}</span>
+          ${doc.project ? `<span class="meta-lbl">Project</span><span class="meta-val">${escapeHtml(doc.project)}</span>` : ''}
+          ${isQuotation && doc.valid_until ? `<span class="meta-lbl">Valid until</span><span class="meta-val">${escapeHtml(doc.valid_until)}</span>` : ''}
+        </div>
       </div>
     </section>
 
-    ${doc.description ? `<div class="card" style="margin-bottom:24px;"><div class="card-t">Scope of Work</div><div class="card-b">${escapeHtml(doc.description)}</div></div>` : ''}
+    <div class="section-rule"></div>
+
+    ${doc.description ? `<div class="card scope-card"><div class="card-t">Scope of Work</div><div class="card-b">${escapeHtml(doc.description)}</div></div>` : ''}
 
     <table>
       <thead>

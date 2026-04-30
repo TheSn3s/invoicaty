@@ -92,20 +92,20 @@ body{padding:24px;display:flex;justify-content:center}
 .kv span:first-child{color:var(--ink-3)}
 
 /* Items table */
-table{width:100%;border-collapse:collapse;margin-bottom:32px}
-thead th{text-align:left;font-size:10px;color:var(--ink-3);letter-spacing:.15em;text-transform:uppercase;font-weight:600;padding:12px 8px;border-bottom:1px solid var(--ink)}
+table{width:100%;border-collapse:collapse;margin-bottom:22px}
+thead th{text-align:left;font-size:10px;color:var(--ink-3);letter-spacing:.15em;text-transform:uppercase;font-weight:600;padding:10px 8px;border-bottom:1px solid var(--ink)}
 thead th.c-qty,thead th.c-price,thead th.c-total{text-align:right}
-tbody td{padding:16px 8px;font-size:13px;color:var(--ink);border-bottom:1px solid var(--line-2);vertical-align:top}
+tbody td{padding:10px 8px;font-size:12.5px;color:var(--ink);border-bottom:1px solid var(--line-2);vertical-align:top}
 tbody tr:last-child td{border-bottom:none}
-.c-desc{line-height:1.5;font-weight:500}
-.c-qty{text-align:right;font-variant-numeric:tabular-nums;color:var(--ink-2);width:70px}
-.c-price{text-align:right;font-variant-numeric:tabular-nums;color:var(--ink-2);width:120px;white-space:nowrap}
-.c-total{text-align:right;font-variant-numeric:tabular-nums;font-weight:600;width:130px;white-space:nowrap}
+.c-desc{line-height:1.35;font-weight:500}
+.c-qty{text-align:right;font-variant-numeric:tabular-nums;color:var(--ink-2);width:64px}
+.c-price{text-align:right;font-variant-numeric:tabular-nums;color:var(--ink-2);width:108px;white-space:nowrap}
+.c-total{text-align:right;font-variant-numeric:tabular-nums;font-weight:600;width:118px;white-space:nowrap}
 
 /* Totals */
-.totals-wrap{display:flex;justify-content:flex-end;margin-bottom:64px}
+.totals-wrap{display:flex;justify-content:flex-end;margin-bottom:40px}
 .totals{min-width:300px;font-size:13px}
-.tot-row{display:flex;justify-content:space-between;padding:6px 0;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.tot-row{display:flex;justify-content:space-between;padding:4px 0;color:var(--ink-2);font-variant-numeric:tabular-nums}
 .tot-row span:first-child{color:var(--ink-3)}
 .tot-row span:last-child{font-weight:500;color:var(--ink)}
 .grand{margin-top:10px;padding-top:14px;border-top:1px solid var(--ink);display:flex;justify-content:space-between;align-items:baseline}

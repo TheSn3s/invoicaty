@@ -92,19 +92,19 @@ body{padding:24px;display:flex;justify-content:center}
 .meta-row span:last-child{font-weight:600}
 
 /* Items table */
-table{width:100%;border-collapse:collapse;margin-bottom:28px}
-thead th{text-align:left;font-family:'Playfair Display',serif;font-size:12px;font-weight:700;letter-spacing:.2em;color:var(--ink);text-transform:uppercase;padding:14px 8px;border-top:2px solid var(--line);border-bottom:1px solid var(--line)}
+table{width:100%;border-collapse:collapse;margin-bottom:20px}
+thead th{text-align:left;font-family:'Playfair Display',serif;font-size:11px;font-weight:700;letter-spacing:.2em;color:var(--ink);text-transform:uppercase;padding:10px 8px;border-top:2px solid var(--line);border-bottom:1px solid var(--line)}
 thead th.c-qty,thead th.c-price,thead th.c-total{text-align:right}
-tbody td{padding:16px 8px;font-size:15px;color:var(--ink-2);border-bottom:1px solid var(--line-2);vertical-align:top}
-.c-desc{font-weight:500;line-height:1.5}
-.c-qty{text-align:right;font-variant-numeric:tabular-nums;width:70px}
-.c-price{text-align:right;font-variant-numeric:tabular-nums;width:130px;white-space:nowrap}
-.c-total{text-align:right;font-variant-numeric:tabular-nums;font-weight:700;color:var(--ink);width:140px;white-space:nowrap}
+tbody td{padding:10px 8px;font-size:13.5px;color:var(--ink-2);border-bottom:1px solid var(--line-2);vertical-align:top}
+.c-desc{font-weight:500;line-height:1.35}
+.c-qty{text-align:right;font-variant-numeric:tabular-nums;width:64px}
+.c-price{text-align:right;font-variant-numeric:tabular-nums;width:116px;white-space:nowrap}
+.c-total{text-align:right;font-variant-numeric:tabular-nums;font-weight:700;color:var(--ink);width:126px;white-space:nowrap}
 
 /* Totals */
-.totals-wrap{display:flex;justify-content:flex-end;margin-bottom:40px}
+.totals-wrap{display:flex;justify-content:flex-end;margin-bottom:28px}
 .totals{min-width:320px;font-size:14px}
-.tot-row{display:flex;justify-content:space-between;padding:6px 0;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.tot-row{display:flex;justify-content:space-between;padding:4px 0;color:var(--ink-2);font-variant-numeric:tabular-nums}
 .tot-row span:first-child{font-style:italic;color:var(--ink-3)}
 .tot-row span:last-child{font-weight:600;color:var(--ink)}
 .grand{margin-top:12px;padding:14px 0;border-top:2px solid var(--line);border-bottom:2px solid var(--line);display:flex;justify-content:space-between;align-items:baseline}
