@@ -45,7 +45,7 @@ export function renderModern(doc: PrintableDoc, profile: Profile | null, type: D
   if (totals.showTax) totalsHtml += `<div class="tot-row"><span>Tax (${totals.taxRate}%)</span><span>${fmt(totals.taxAmount)}</span></div>`;
 
   const notesHtml = notes
-    ? `<div class="card"><div class="card-t">Notes</div><div class="card-b">${escapeHtml(notes)}</div></div>`
+    ? `<div class="card notes-card"><div class="card-t">Notes</div><div class="card-b">${escapeHtml(notes)}</div></div>`
     : '';
 
   const validityHtml = isQuotation && doc.valid_until
@@ -150,11 +150,49 @@ tbody tr:last-child td{border-bottom:none}
 @media print{
   body{padding:0;background:#fff!important}
   .doc{width:100%;box-shadow:none;border-radius:0}
+  .doc-inner{padding:30px 34px 24px}
   .doc-inner::before{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
-  .grand{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
-  .card{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
-  .info-block{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
-  @page{size:A4;margin:12mm}
+  .hdr{margin-bottom:14px;padding-bottom:12px;gap:18px}
+  .brand-wrap{gap:16px}
+  .brand{gap:12px}
+  .logo{max-height:48px;max-width:150px}
+  .biz-meta{padding-top:0}
+  .biz-name{font-size:16px}
+  .biz-person{font-size:11px}
+  .invoice-side{min-width:110px}
+  .doc-type{font-size:10px;margin-bottom:1px}
+  .doc-serial{font-size:28px}
+  .info-strip{grid-template-columns:minmax(180px,.78fr) minmax(0,1.22fr);gap:12px;margin-bottom:12px}
+  .info-block{padding:12px 14px;border-radius:12px}
+  .info-lbl{margin-bottom:6px;font-size:9px}
+  .info-client{font-size:15px;line-height:1.2}
+  .meta-inline{grid-template-columns:78px minmax(0,1fr);gap:4px 14px}
+  .meta-lbl{font-size:10px}
+  .meta-val{font-size:11px;line-height:1.25}
+  .section-rule{margin-bottom:14px}
+  .scope-card{margin-bottom:14px;padding:12px 14px;border-radius:12px}
+  .card-t{margin-bottom:6px;font-size:9px}
+  .card-b{font-size:11px;line-height:1.45}
+  table{margin-bottom:14px}
+  thead th{padding:8px 6px;font-size:9px}
+  tbody td{padding:7px 6px;font-size:11.5px}
+  .c-desc{line-height:1.25}
+  .c-qty{width:52px}
+  .c-price{width:88px}
+  .c-total{width:100px}
+  .totals-wrap{margin-bottom:14px}
+  .totals{min-width:240px;font-size:11px}
+  .tot-row{padding:3px 0}
+  .grand{margin-top:6px;padding:10px 12px;border-radius:5px;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  .grand-lbl{font-size:10px}
+  .grand-val{font-size:15px}
+  .card{margin-bottom:10px;padding:12px 14px;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  .notes-card,.bank-card{break-inside:avoid;page-break-inside:avoid}
+  .bank-grid{gap:8px 18px}
+  .bank-lbl{font-size:9px}
+  .bank-grid span:not(.bank-lbl){font-size:11px}
+  .ftr{padding:12px 34px;font-size:9.5px}
+  @page{size:A4;margin:8mm}
 }
 @media (max-width:900px){
   body{padding:8px}
