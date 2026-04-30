@@ -52,8 +52,8 @@ export function renderClassic(doc: PrintableDoc, profile: Profile | null, type: 
   <table class="bank-tbl">
     ${bankHolder ? `<tr><td class="bank-lbl">Account Holder</td><td>${escapeHtml(bankHolder)}</td></tr>` : ''}
     ${bankName ? `<tr><td class="bank-lbl">Bank</td><td>${escapeHtml(bankName)}</td></tr>` : ''}
-    ${bankAccount ? `<tr><td class="bank-lbl">Account No.</td><td class="mono">${escapeHtml(bankAccount)}</td></tr>` : ''}
-    ${bankIban ? `<tr><td class="bank-lbl">IBAN</td><td class="mono">${escapeHtml(bankIban)}</td></tr>` : ''}
+    ${bankAccount ? `<tr><td class="bank-lbl">Account No.</td><td>${escapeHtml(bankAccount)}</td></tr>` : ''}
+    ${bankIban ? `<tr><td class="bank-lbl">IBAN</td><td>${escapeHtml(bankIban)}</td></tr>` : ''}
   </table>
 </div>` : '';
 
@@ -123,7 +123,6 @@ tbody td{padding:10px 8px;font-size:13.5px;color:var(--ink-2);border-bottom:1px 
 .bank-tbl{width:auto;margin:0}
 .bank-tbl td{padding:3px 18px 3px 0;border:none;font-size:12.5px;color:var(--ink-2)}
 .bank-lbl{color:var(--ink-3);font-style:italic;white-space:nowrap}
-.mono{font-family:'SF Mono','Menlo','Consolas',monospace;font-size:12px;letter-spacing:.02em}
 
 /* Signature / Regards */
 .regards{margin-top:22px;text-align:right;font-size:12.5px;color:var(--ink-2)}
