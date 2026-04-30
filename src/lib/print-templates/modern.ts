@@ -162,13 +162,15 @@ tbody tr:last-child td{border-bottom:none}
   .invoice-side{min-width:110px}
   .doc-type{font-size:10px;margin-bottom:1px}
   .doc-serial{font-size:28px}
-  .info-strip{grid-template-columns:minmax(180px,.78fr) minmax(0,1.22fr);gap:12px;margin-bottom:12px}
-  .info-block{padding:12px 14px;border-radius:12px}
-  .info-lbl{margin-bottom:6px;font-size:9px}
-  .info-client{font-size:15px;line-height:1.2}
-  .meta-inline{grid-template-columns:78px minmax(0,1fr);gap:4px 14px}
-  .meta-lbl{font-size:10px}
-  .meta-val{font-size:11px;line-height:1.25}
+  .info-strip{display:table;width:100%;table-layout:fixed;border-spacing:10px 0;margin:0 0 12px}
+  .info-block{display:table-cell;vertical-align:top;padding:10px 12px;border-radius:10px}
+  .info-block:first-child{width:40%}
+  .info-block:last-child{width:60%}
+  .info-lbl{margin-bottom:5px;font-size:8.5px}
+  .info-client{font-size:14px;line-height:1.18}
+  .meta-inline{grid-template-columns:64px minmax(0,1fr);gap:3px 10px}
+  .meta-lbl{font-size:9.5px}
+  .meta-val{font-size:10.5px;line-height:1.2}
   .section-rule{margin-bottom:14px}
   .scope-card{margin-bottom:14px;padding:12px 14px;border-radius:12px}
   .card-t{margin-bottom:6px;font-size:9px}
@@ -186,11 +188,12 @@ tbody tr:last-child td{border-bottom:none}
   .grand{margin-top:6px;padding:10px 12px;border-radius:5px;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
   .grand-lbl{font-size:10px}
   .grand-val{font-size:15px}
-  .card{margin-bottom:10px;padding:12px 14px;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  .card{margin-bottom:8px;padding:10px 12px;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
   .notes-card,.bank-card{break-inside:avoid;page-break-inside:avoid}
-  .bank-grid{gap:8px 18px}
-  .bank-lbl{font-size:9px}
-  .bank-grid span:not(.bank-lbl){font-size:11px}
+  .bank-card{padding:10px 12px}
+  .bank-grid{grid-template-columns:1fr 1fr;gap:6px 14px}
+  .bank-lbl{font-size:8.5px}
+  .bank-grid span:not(.bank-lbl){font-size:10.5px}
   .ftr{padding:12px 34px;font-size:9.5px}
   @page{size:A4;margin:8mm}
 }
