@@ -152,14 +152,14 @@ tbody tr:last-child td{border-bottom:none}
   .doc{width:100%;box-shadow:none;border-radius:0}
   .doc-inner{padding:30px 34px 24px}
   .doc-inner::before{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
-  .hdr{margin-bottom:14px;padding-bottom:12px;gap:18px}
-  .brand-wrap{gap:16px}
+  .hdr{display:block;margin-bottom:14px;padding-bottom:12px}
+  .brand-wrap{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start;gap:16px}
   .brand{gap:12px}
   .logo{max-height:48px;max-width:150px}
   .biz-meta{padding-top:0}
   .biz-name{font-size:16px}
   .biz-person{font-size:11px}
-  .invoice-side{min-width:110px}
+  .invoice-side{min-width:110px;text-align:right;justify-self:end}
   .doc-type{font-size:10px;margin-bottom:1px}
   .doc-serial{font-size:28px}
   .info-strip{display:table;width:100%;table-layout:fixed;border-spacing:10px 0;margin:0 0 12px}
@@ -191,7 +191,8 @@ tbody tr:last-child td{border-bottom:none}
   .card{margin-bottom:8px;padding:10px 12px;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
   .notes-card,.bank-card{break-inside:avoid;page-break-inside:avoid}
   .bank-card{padding:10px 12px}
-  .bank-grid{grid-template-columns:1fr 1fr;gap:6px 14px}
+  .bank-grid{display:grid !important;grid-template-columns:1fr 1fr !important;gap:6px 14px !important}
+  .bank-grid>div{display:flex;flex-direction:column;gap:2px;min-width:0}
   .bank-lbl{font-size:8.5px}
   .bank-grid span:not(.bank-lbl){font-size:10.5px}
   .ftr{padding:12px 34px;font-size:9.5px}
