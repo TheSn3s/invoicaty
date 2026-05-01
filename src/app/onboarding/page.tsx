@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase";
 import { useI18n } from "@/lib/i18n";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import LogoCropper from "@/components/LogoCropper";
 import type { Country, Currency, BusinessType } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -46,8 +47,9 @@ export default function OnboardingPage() {
   const [taxRate, setTaxRate] = useState("0");
 
   // Step 3
-  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [logoFile, setLogoFile] = useState<Blob | null>(null);
   const [logoPreview, setLogoPreview] = useState<string>("");
+  const [cropSrc, setCropSrc] = useState<string>("");
   const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
@@ -86,14 +88,27 @@ export default function OnboardingPage() {
       setError(lang === "ar" ? "يجب أن يكون الملف صورة (PNG, JPG, SVG)" : "File must be an image (PNG, JPG, SVG)");
       return;
     }
-    if (file.size > 2 * 1024 * 1024) {
-      setError(lang === "ar" ? "حجم الملف أكبر من 2 ميجابايت" : "File size exceeds 2MB");
+    if (file.size > 5 * 1024 * 1024) {
+      setError(lang === "ar" ? "حجم الملف أكبر من 5 ميجابايت" : "File size exceeds 5MB");
       return;
     }
-    setLogoFile(file);
+    // Open cropper instead of saving the raw file directly
     const reader = new FileReader();
-    reader.onload = (e) => setLogoPreview(e.target?.result as string || "");
+    reader.onload = (e) => {
+      const result = e.target?.result;
+      if (typeof result === "string") setCropSrc(result);
+    };
+    reader.onerror = () => {
+      setError(lang === "ar" ? "تعذر قراءة الملف" : "Could not read file");
+    };
     reader.readAsDataURL(file);
+  };
+
+  const onCropConfirm = (blob: Blob) => {
+    setLogoFile(blob);
+    const url = URL.createObjectURL(blob);
+    setLogoPreview(url);
+    setCropSrc("");
   };
 
   const [error, setError] = useState<string>("");
@@ -102,11 +117,11 @@ export default function OnboardingPage() {
     if (!logoFile || !userId) return null;
     setUploading(true);
     try {
-      const ext = (logoFile.name.split('.').pop() || "png").toLowerCase();
+      const ext = "png";
       const path = `${userId}/logo-${Date.now()}.${ext}`;
 
       // Race the upload against a 15-second timeout so we never hang forever
-      const uploadPromise = supabase.storage.from("logos").upload(path, logoFile, { upsert: true, contentType: logoFile.type });
+      const uploadPromise = supabase.storage.from("logos").upload(path, logoFile, { upsert: true, contentType: "image/png" });
       const timeoutPromise = new Promise<{ error: Error }>((resolve) => {
         setTimeout(() => resolve({ error: new Error(lang === "ar" ? "انتهت مهلة رفع الشعار (15 ثانية). تحقق من اتصال الإنترنت وحاول مرة أخرى" : "Logo upload timed out (15s). Check your connection and try again") }), 15000);
       });
@@ -363,6 +378,13 @@ export default function OnboardingPage() {
         </div>
         </div>
       </footer>
+      {cropSrc && (
+        <LogoCropper
+          imageSrc={cropSrc}
+          onCancel={() => setCropSrc("")}
+          onConfirm={onCropConfirm}
+        />
+      )}
     </div>
   );
 }

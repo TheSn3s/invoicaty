@@ -9,6 +9,7 @@ import { SUPPORT_LINKS } from "@/lib/developer-info";
 import { buildInvoiceHtml } from "@/lib/print-invoice";
 import type { TemplateId } from "@/lib/print-templates/types";
 import TemplateThumb from "@/components/TemplateThumb";
+import LogoCropper from "@/components/LogoCropper";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import type { Country, Currency, Language, BusinessType } from "@/lib/types";
@@ -83,6 +84,7 @@ export default function SettingsPage() {
   const [logoUrl, setLogoUrl] = useState<string>("");
   const [logoBusy, setLogoBusy] = useState(false);
   const [logoError, setLogoError] = useState<string>("");
+  const [cropSrc, setCropSrc] = useState<string>("");
   const [invoiceTemplate, setInvoiceTemplate] = useState<TemplateId>("modern");
   const [templateSaving, setTemplateSaving] = useState<TemplateId | null>(null);
 
@@ -293,27 +295,42 @@ export default function SettingsPage() {
   };
 
   // ============ Logo Management ============
-  const handleLogoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Step 1: user picks a file → we open the cropper modal (no upload yet).
+  const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     e.target.value = ""; // allow re-selecting the same file
-    if (!file || !profile) return;
+    if (!file) return;
     setLogoError("");
 
     if (!file.type.startsWith("image/")) {
       setLogoError(lang === "ar" ? "يجب أن يكون الملف صورة (PNG, JPG, SVG)" : "File must be an image (PNG, JPG, SVG)");
       return;
     }
-    if (file.size > 2 * 1024 * 1024) {
-      setLogoError(lang === "ar" ? "حجم الملف أكبر من 2 ميجابايت" : "File size exceeds 2MB");
+    if (file.size > 5 * 1024 * 1024) {
+      setLogoError(lang === "ar" ? "حجم الملف أكبر من 5 ميجابايت" : "File size exceeds 5MB");
       return;
     }
 
-    setLogoBusy(true);
-    try {
-      const ext = (file.name.split('.').pop() || "png").toLowerCase();
-      const path = `${profile.id}/logo-${Date.now()}.${ext}`;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result;
+      if (typeof result === "string") setCropSrc(result);
+    };
+    reader.onerror = () => {
+      setLogoError(lang === "ar" ? "تعذر قراءة الملف" : "Could not read file");
+    };
+    reader.readAsDataURL(file);
+  };
 
-      const uploadPromise = supabase.storage.from("logos").upload(path, file, { upsert: true, contentType: file.type });
+  // Step 2: cropper returns a PNG blob → upload it.
+  const handleCroppedUpload = async (blob: Blob) => {
+    if (!profile) return;
+    setLogoBusy(true);
+    setLogoError("");
+    try {
+      const path = `${profile.id}/logo-${Date.now()}.png`;
+
+      const uploadPromise = supabase.storage.from("logos").upload(path, blob, { upsert: true, contentType: "image/png" });
       const timeoutPromise = new Promise<{ error: Error }>((resolve) => {
         setTimeout(() => resolve({ error: new Error(lang === "ar" ? "انتهت مهلة الرفع (15 ثانية)" : "Upload timed out (15s)") }), 15000);
       });
@@ -327,14 +344,13 @@ export default function SettingsPage() {
       const { data: urlData } = supabase.storage.from("logos").getPublicUrl(path);
       const newUrl = urlData.publicUrl;
 
-      // Update profile row
       const { error: updateErr } = await supabase.from("profiles").update({ logo_url: newUrl, updated_at: new Date().toISOString() }).eq("id", profile.id);
       if (updateErr) {
         setLogoError(lang === "ar" ? `فشل حفظ الشعار: ${updateErr.message}` : `Save failed: ${updateErr.message}`);
         return;
       }
 
-      // Try to delete the previous logo file (best-effort, no error if it fails)
+      // Best-effort cleanup of previous logo
       if (logoUrl) {
         try {
           const oldPath = logoUrl.split("/logos/")[1];
@@ -343,6 +359,7 @@ export default function SettingsPage() {
       }
 
       setLogoUrl(newUrl);
+      setCropSrc("");
     } catch (err) {
       setLogoError(lang === "ar" ? `خطأ: ${err instanceof Error ? err.message : String(err)}` : `Error: ${err instanceof Error ? err.message : String(err)}`);
     } finally {
@@ -513,7 +530,7 @@ export default function SettingsPage() {
                 </div>
 
                 <div className="flex-1 space-y-2">
-                  <p className="text-[11px] text-slate-400">{lang === "ar" ? "يظهر في الفواتير وعروض الأسعار المطبوعة. PNG / JPG / SVG — حتى 2 ميجابايت." : "Shown on printed invoices and quotations. PNG / JPG / SVG — max 2MB."}</p>
+                  <p className="text-[11px] text-slate-400">{lang === "ar" ? "يظهر في الفواتير وعروض الأسعار المطبوعة. PNG / JPG / SVG — حتى 5 ميجابايت. بعد الرفع تقدر تصوير وتقص وتدوّر الشعار." : "Shown on printed invoices and quotations. PNG / JPG / SVG — max 5MB. After upload you can zoom, crop and rotate."}</p>
                   <div className="flex flex-wrap gap-2">
                     <label className={`flex-1 min-w-[120px] text-center bg-blue-600/90 hover:bg-blue-500 text-white text-xs font-bold py-2.5 px-3 rounded-xl cursor-pointer transition-all shadow-lg shadow-blue-500/20 ${logoBusy ? "opacity-50 pointer-events-none" : ""}`}>
                       {logoBusy ? `⏳ ${lang === "ar" ? "جارٍ الرفع…" : "Uploading…"}` : (logoUrl ? (lang === "ar" ? "🔄 تغيير الشعار" : "🔄 Change Logo") : (lang === "ar" ? "📤 رفع شعار" : "📤 Upload Logo"))}
@@ -905,6 +922,14 @@ export default function SettingsPage() {
       </main>
 
       {showImport && <ImportModal onImport={handleImport} onClose={() => setShowImport(false)} />}
+      {cropSrc && (
+        <LogoCropper
+          imageSrc={cropSrc}
+          busy={logoBusy}
+          onCancel={() => setCropSrc("")}
+          onConfirm={handleCroppedUpload}
+        />
+      )}
       <AppFooter compact />
     </div>
   );
