@@ -11,8 +11,10 @@ export function renderModern(doc: PrintableDoc, profile: Profile | null, type: D
   const ctx = buildContext(doc, profile, type);
   const isRtlText = (value: string) => /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/.test(value || '');
   const textAttrs = (value: string) => isRtlText(value)
-    ? ' dir="rtl" style="direction:rtl;text-align:right;"'
+    ? ' dir="rtl" class="ar-text" style="direction:rtl;text-align:right;"'
     : ' dir="ltr" style="direction:ltr;text-align:left;"';
+  // Merge .ar-text into an existing class attribute when value is Arabic
+  const withAr = (cls: string, value: string) => isRtlText(value) ? `${cls} ar-text` : cls;
   const { totals, color, name, businessName, displayLine1, displayLine2, phone, email, logoUrl, notes,
           bankHolder, bankName, bankAccount, bankIban, isQuotation, docLabel } = ctx;
   const { fmt } = totals;
@@ -36,9 +38,9 @@ export function renderModern(doc: PrintableDoc, profile: Profile | null, type: D
     : '';
 
   const businessLine = displayLine2
-    ? `<div class="biz-name">${escapeHtml(displayLine1)}</div>
-       <div class="biz-person">${escapeHtml(displayLine2)}</div>`
-    : `<div class="biz-name">${escapeHtml(displayLine1)}</div>`;
+    ? `<div class="${withAr('biz-name', displayLine1)}">${escapeHtml(displayLine1)}</div>
+       <div class="${withAr('biz-person', displayLine2)}">${escapeHtml(displayLine2)}</div>`
+    : `<div class="${withAr('biz-name', displayLine1)}">${escapeHtml(displayLine1)}</div>`;
 
   const contactHtml = [
     phone ? `<div class="contact-line"><span class="contact-lbl">Phone</span><span>${escapeHtml(phone)}</span></div>` : '',
@@ -80,7 +82,7 @@ export function renderModern(doc: PrintableDoc, profile: Profile | null, type: D
 :root{--c:${color};--ink:#0f172a;--ink-2:#334155;--ink-3:#64748b;--line:#e2e8f0;--line-2:#f1f5f9;--bg:#f8fafc}
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:var(--ink);background:#eef2f7;line-height:1.5;-webkit-font-smoothing:antialiased}
-[dir="rtl"],[dir="rtl"] *{font-family:'Tajawal','Inter',sans-serif!important}
+.ar-text,.ar-text *{font-family:'Tajawal','Inter',sans-serif!important}
 body{padding:24px;display:flex;justify-content:center}
 .doc{width:800px;background:#fff;box-shadow:0 20px 60px rgba(15,23,42,.08);border-radius:6px;overflow:hidden}
 .doc-inner{padding:48px 56px 40px;position:relative}
@@ -238,13 +240,13 @@ tbody tr:last-child td{border-bottom:none}
     <section class="info-strip">
       <div class="info-block">
         <div class="info-lbl">Bill to</div>
-        <div class="info-client">${escapeHtml(doc.client)}</div>
+        <div class="${withAr('info-client', doc.client)}">${escapeHtml(doc.client)}</div>
       </div>
       <div class="info-block">
         <div class="info-lbl">Details</div>
         <div class="meta-inline">
           <span class="meta-lbl">Date</span><span class="meta-val">${escapeHtml(doc.date)}</span>
-          ${doc.project ? `<span class="meta-lbl">Project</span><span class="meta-val">${escapeHtml(doc.project)}</span>` : ''}
+          ${doc.project ? `<span class="meta-lbl">Project</span><span class="${withAr('meta-val', doc.project)}">${escapeHtml(doc.project)}</span>` : ''}
           ${isQuotation && doc.valid_until ? `<span class="meta-lbl">Valid until</span><span class="meta-val">${escapeHtml(doc.valid_until)}</span>` : ''}
         </div>
       </div>
