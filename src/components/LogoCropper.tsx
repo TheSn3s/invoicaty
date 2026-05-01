@@ -75,6 +75,9 @@ export default function LogoCropper({ imageSrc, onCancel, onConfirm, busy }: Pro
             cropShape="rect"
             showGrid
             objectFit="contain"
+            minZoom={0.3}
+            maxZoom={4}
+            zoomSpeed={0.5}
             restrictPosition={false}
             onCropChange={setCrop}
             onZoomChange={setZoom}
@@ -93,7 +96,7 @@ export default function LogoCropper({ imageSrc, onCancel, onConfirm, busy }: Pro
               <span className="text-[11px] text-slate-500 tabular-nums">{zoom.toFixed(1)}x</span>
             </div>
             <input
-              type="range" min={1} max={4} step={0.05}
+              type="range" min={0.3} max={4} step={0.05}
               value={zoom}
               onChange={(e) => setZoom(Number(e.target.value))}
               className="w-full accent-blue-500"
@@ -188,7 +191,11 @@ async function getCroppedBlob(
   rctx.rotate(radians);
   rctx.drawImage(image, -image.width / 2, -image.height / 2);
 
-  // Crop the requested area, downscaled to MAX_OUTPUT for storage efficiency
+  // Crop the requested area, downscaled to MAX_OUTPUT for storage efficiency.
+  // When zoom < 1, the requested area can extend beyond the source image
+  // (negative x/y or width/height past the edge). We allow that and let the
+  // surrounding pixels stay transparent so the user can shrink their logo
+  // and keep it fully inside the crop frame.
   const scale = Math.min(1, MAX_OUTPUT / Math.max(area.width, area.height));
   const outW = Math.round(area.width * scale);
   const outH = Math.round(area.height * scale);
@@ -199,7 +206,21 @@ async function getCroppedBlob(
   const octx = out.getContext("2d");
   if (!octx) return null;
   octx.imageSmoothingQuality = "high";
-  octx.drawImage(rotated, area.x, area.y, area.width, area.height, 0, 0, outW, outH);
+
+  // Clip the source rect to the rotated canvas bounds, then map to the
+  // matching destination rect so transparent padding is preserved.
+  const srcX = Math.max(0, area.x);
+  const srcY = Math.max(0, area.y);
+  const srcW = Math.max(0, Math.min(area.x + area.width, bBoxWidth) - srcX);
+  const srcH = Math.max(0, Math.min(area.y + area.height, bBoxHeight) - srcY);
+
+  if (srcW > 0 && srcH > 0) {
+    const dstX = ((srcX - area.x) / area.width) * outW;
+    const dstY = ((srcY - area.y) / area.height) * outH;
+    const dstW = (srcW / area.width) * outW;
+    const dstH = (srcH / area.height) * outH;
+    octx.drawImage(rotated, srcX, srcY, srcW, srcH, dstX, dstY, dstW, dstH);
+  }
 
   return new Promise((resolve) => {
     out.toBlob((b) => resolve(b), "image/png", 0.95);
