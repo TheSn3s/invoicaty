@@ -75,11 +75,12 @@ export function renderModern(doc: PrintableDoc, profile: Profile | null, type: D
 <title>${docLabel} #${escapeHtml(doc.serial)}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root{--c:${color};--ink:#0f172a;--ink-2:#334155;--ink-3:#64748b;--line:#e2e8f0;--line-2:#f1f5f9;--bg:#f8fafc}
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:var(--ink);background:#eef2f7;line-height:1.5;-webkit-font-smoothing:antialiased}
+[dir="rtl"],[dir="rtl"] *{font-family:'Tajawal','Inter',sans-serif!important}
 body{padding:24px;display:flex;justify-content:center}
 .doc{width:800px;background:#fff;box-shadow:0 20px 60px rgba(15,23,42,.08);border-radius:6px;overflow:hidden}
 .doc-inner{padding:48px 56px 40px;position:relative}
