@@ -7,9 +7,14 @@ import { useI18n } from "@/lib/i18n";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import CreateMenu from "@/components/CreateMenu";
 import AppFooter from "@/components/AppFooter";
-import RichTextEditor from "@/components/RichTextEditor";
+import nextDynamic from "next/dynamic";
 import Link from "next/link";
 import { printDraft, sanitizeDraftHtml } from "@/lib/print-draft";
+
+const CKRichTextEditor = nextDynamic(() => import("@/components/CKRichTextEditor"), {
+  ssr: false,
+  loading: () => <div className="border border-slate-300 rounded-2xl overflow-hidden bg-white shadow-inner min-h-[420px] animate-pulse" />,
+});
 
 export const dynamic = "force-dynamic";
 
@@ -272,7 +277,7 @@ function DraftModal({ draft, onSave, onClose }: { draft: Draft | null; onSave: (
           </div>
           <div>
             <label className="block text-[11px] font-bold text-slate-400 mb-2">{t("draft.content")}</label>
-            <RichTextEditor value={contentHtml} onChange={setContentHtml} />
+            <CKRichTextEditor value={contentHtml} onChange={setContentHtml} />
           </div>
           <button type="submit" disabled={saving} className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-500/20 transition-all disabled:opacity-50 text-base mt-2">
             {saving ? t("settings.saving") : `💾 ${t("invoice.save")}`}
