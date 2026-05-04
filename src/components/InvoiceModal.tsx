@@ -127,7 +127,7 @@ export default function InvoiceModal({ invoice, onSave, onClose, currencySymbol,
             <div>
               <label className="block text-[11px] font-bold text-slate-400 mb-1.5">{t("invoice.date")}</label>
               <input type="date" value={date} onChange={e => setDate(e.target.value)} required
-                className="w-full bg-slate-800/50 border border-slate-600/30 rounded-xl px-3 py-3 text-sm text-white focus:ring-2 focus:ring-blue-500/40 outline-none" />
+                className="w-full block bg-slate-800/50 border border-slate-600/30 rounded-xl px-3 py-3 text-sm text-white focus:ring-2 focus:ring-blue-500/40 outline-none" style={{ minWidth: 0, WebkitAppearance: 'none', appearance: 'none' }} />
             </div>
             <div>
               <label className="block text-[11px] font-bold text-slate-400 mb-1.5">{t("invoice.category")} <span className="text-slate-600 font-normal">({lang === "ar" ? "لا يظهر للعميل" : "not visible to client"})</span></label>
