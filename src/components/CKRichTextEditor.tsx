@@ -45,17 +45,38 @@ export default function CKRichTextEditor({ value, onChange }: Props) {
   return (
     <div className="ckeditor-wrapper rounded-2xl overflow-hidden border border-slate-300 bg-white shadow-inner">
       <style jsx global>{`
-        .ckeditor-wrapper .ck.ck-editor__main > .ck-editor__editable {
-          min-height: 420px;
-          background: #ffffff;
-          color: #0f172a;
+        .ckeditor-wrapper .ck.ck-editor {
+          display: flex;
+          flex-direction: column;
         }
         .ckeditor-wrapper .ck.ck-toolbar {
           background: #f8fafc;
           border-color: #e2e8f0;
+          flex-wrap: wrap;
+          row-gap: 8px;
+          direction: ltr;
+        }
+        .ckeditor-wrapper .ck.ck-toolbar .ck-toolbar__items {
+          flex-wrap: wrap !important;
+          align-items: center;
+        }
+        .ckeditor-wrapper .ck.ck-editor__main {
+          display: block;
+        }
+        .ckeditor-wrapper .ck.ck-editor__main > .ck-editor__editable {
+          min-height: 420px;
+          background: #ffffff;
+          color: #0f172a;
+          border-color: #e2e8f0;
+          direction: ${lang === "ar" ? "rtl" : "ltr"};
+          text-align: ${lang === "ar" ? "right" : "left"};
         }
         .ckeditor-wrapper .ck.ck-editor__main > .ck-editor__editable:not(.ck-focused) {
           border-color: #e2e8f0;
+        }
+        .ckeditor-wrapper .ck.ck-dropdown,
+        .ckeditor-wrapper .ck.ck-button {
+          margin-bottom: 0 !important;
         }
       `}</style>
       <CKEditor
