@@ -51,7 +51,7 @@ export default function RichTextEditor({ value, onChange }: Props) {
     content: value || "",
     editorProps: {
       attributes: {
-        class: "prose prose-invert max-w-none min-h-[320px] focus:outline-none px-4 py-4 text-white",
+        class: "prose max-w-none min-h-[320px] focus:outline-none px-4 py-4 text-slate-900",
         dir: lang === "ar" ? "rtl" : "ltr",
       },
     },
@@ -69,8 +69,8 @@ export default function RichTextEditor({ value, onChange }: Props) {
   if (!editor) return null;
 
   return (
-    <div className="border border-slate-700/50 rounded-2xl overflow-hidden bg-slate-900/70">
-      <div className="flex flex-wrap gap-2 p-3 border-b border-slate-700/50 bg-slate-950/50">
+    <div className="border border-slate-300 rounded-2xl overflow-hidden bg-white shadow-inner">
+      <div className="flex flex-wrap gap-2 p-3 border-b border-slate-200 bg-slate-50">
         <ToolButton onClick={() => editor.chain().focus().toggleBold().run()} active={editor.isActive("bold")} label="Bold">B</ToolButton>
         <ToolButton onClick={() => editor.chain().focus().toggleItalic().run()} active={editor.isActive("italic")} label="Italic">I</ToolButton>
         <ToolButton onClick={() => editor.chain().focus().toggleUnderline().run()} active={editor.isActive("underline")} label="Underline">U</ToolButton>
@@ -102,7 +102,9 @@ export default function RichTextEditor({ value, onChange }: Props) {
           className="w-10 h-10 rounded-lg border border-slate-700/60 bg-slate-800/80"
         />
       </div>
-      <EditorContent editor={editor} />
+      <div className="bg-white">
+        <EditorContent editor={editor} />
+      </div>
     </div>
   );
 }
