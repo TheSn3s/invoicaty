@@ -186,34 +186,34 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen pb-24 md:pb-8">
-      <header className="sticky top-0 z-30 glass border-b border-slate-700/50 px-4 py-3 md:px-8 md:py-4">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <img src="/logo-dark.png" alt="Invoicaty" className="h-8 w-auto" />
-            <div>
-              <h1 className="text-sm font-bold text-white leading-tight">Invoicaty</h1>
-              <p className="text-[10px] text-slate-400">{profile?.full_name || profile?.business_name || t("dashboard.welcome")}</p>
+    <div className="min-h-screen pb-24 md:pb-8 overflow-x-hidden">
+      <header className="sticky top-0 z-30 glass border-b border-slate-700/50 px-3 py-3 md:px-8 md:py-4">
+        <div className="max-w-6xl mx-auto flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0 flex-shrink">
+            <img src="/logo-dark.png" alt="Invoicaty" className="h-8 w-auto flex-shrink-0" />
+            <div className="hidden sm:block min-w-0">
+              <h1 className="text-sm font-bold text-white leading-tight truncate">Invoicaty</h1>
+              <p className="text-[10px] text-slate-400 truncate">{profile?.full_name || profile?.business_name || t("dashboard.welcome")}</p>
             </div>
           </div>
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-0.5 md:gap-1.5 flex-shrink-0">
             <LanguageSwitcher />
             {profile?.role === 'admin' && (
-              <Link href="/admin" className="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-700/50 transition-all text-sm" title={t("nav.admin")}>🛡</Link>
+              <Link href="/admin" className="text-slate-400 hover:text-white p-1.5 md:p-2 rounded-lg hover:bg-slate-700/50 transition-all text-sm" title={t("nav.admin")}>🛡</Link>
             )}
-            <Link href="/quotations" className="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-700/50 transition-all text-sm" title={t("quotation.title")}>📋</Link>
-            <Link href="/trash" className="relative text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-700/50 transition-all text-sm" title={lang === 'ar' ? 'سلة المحذوفات' : 'Trash'}>
+            <Link href="/quotations" className="text-slate-400 hover:text-white p-1.5 md:p-2 rounded-lg hover:bg-slate-700/50 transition-all text-sm" title={t("quotation.title")}>📋</Link>
+            <Link href="/trash" className="relative text-slate-400 hover:text-white p-1.5 md:p-2 rounded-lg hover:bg-slate-700/50 transition-all text-sm" title={lang === 'ar' ? 'سلة المحذوفات' : 'Trash'}>
               🗑️
               {deletedCount > 0 && <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">{deletedCount}</span>}
             </Link>
-            <Link href="/settings" className="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-700/50 transition-all text-sm" title={t("nav.settings")}>⚙️</Link>
+            <Link href="/settings" className="text-slate-400 hover:text-white p-1.5 md:p-2 rounded-lg hover:bg-slate-700/50 transition-all text-sm" title={t("nav.settings")}>⚙️</Link>
             <CreateMenu
               onNewInvoice={() => { setEditInvoice(null); setShowModal(true); }}
               onNewQuotation={() => router.push("/quotations?new=1")}
               onNewDraft={() => router.push("/drafts?new=1")}
               align={lang === 'ar' ? 'left' : 'right'}
             />
-            <button onClick={handleLogout} className="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-700/50 transition-all text-sm" title={t("nav.logout")}>⬅️</button>
+            <button onClick={handleLogout} className="text-slate-400 hover:text-white p-1.5 md:p-2 rounded-lg hover:bg-slate-700/50 transition-all text-sm" title={t("nav.logout")}>⬅️</button>
           </div>
         </div>
       </header>
