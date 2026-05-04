@@ -11,6 +11,54 @@ import { Table } from "@tiptap/extension-table";
 import TableRow from "@tiptap/extension-table-row";
 import TableHeader from "@tiptap/extension-table-header";
 import TableCell from "@tiptap/extension-table-cell";
+
+// Extend TableCell & TableHeader to support backgroundColor + borderColor attributes
+const CustomTableCell = TableCell.extend({
+  addAttributes() {
+    return {
+      ...this.parent?.(),
+      backgroundColor: {
+        default: null,
+        parseHTML: (el) => (el as HTMLElement).style.backgroundColor || (el as HTMLElement).getAttribute("data-bg") || null,
+        renderHTML: (attrs) => {
+          if (!attrs.backgroundColor) return {};
+          return { style: `background-color: ${attrs.backgroundColor}` };
+        },
+      },
+      borderColor: {
+        default: null,
+        parseHTML: (el) => (el as HTMLElement).getAttribute("data-border") || null,
+        renderHTML: (attrs) => {
+          if (!attrs.borderColor) return {};
+          return { style: `border-color: ${attrs.borderColor}`, "data-border": attrs.borderColor };
+        },
+      },
+    };
+  },
+});
+const CustomTableHeader = TableHeader.extend({
+  addAttributes() {
+    return {
+      ...this.parent?.(),
+      backgroundColor: {
+        default: null,
+        parseHTML: (el) => (el as HTMLElement).style.backgroundColor || null,
+        renderHTML: (attrs) => {
+          if (!attrs.backgroundColor) return {};
+          return { style: `background-color: ${attrs.backgroundColor}` };
+        },
+      },
+      borderColor: {
+        default: null,
+        parseHTML: (el) => (el as HTMLElement).getAttribute("data-border") || null,
+        renderHTML: (attrs) => {
+          if (!attrs.borderColor) return {};
+          return { style: `border-color: ${attrs.borderColor}`, "data-border": attrs.borderColor };
+        },
+      },
+    };
+  },
+});
 import { useEffect, useState, useRef } from "react";
 import { useI18n } from "@/lib/i18n";
 
@@ -87,8 +135,8 @@ export default function RichTextEditor({ value, onChange }: Props) {
       TextAlign.configure({ types: ["heading", "paragraph"] }),
       Table.configure({ resizable: true, HTMLAttributes: { class: "draft-table" } }),
       TableRow,
-      TableHeader,
-      TableCell,
+      CustomTableHeader,
+      CustomTableCell,
     ],
     content: value || "",
     editorProps: {
@@ -113,19 +161,17 @@ export default function RichTextEditor({ value, onChange }: Props) {
   const inTable = editor.isActive("table");
 
   const setCellBackground = (color: string | null) => {
-    if (color) editor.chain().focus().setCellAttribute("backgroundColor", color).run();
-    else editor.chain().focus().setCellAttribute("backgroundColor", null).run();
+    editor.chain().focus().setCellAttribute("backgroundColor", color).run();
   };
 
   const setCellBorder = (color: string | null) => {
-    const value = color ? `2px solid ${color}` : null;
-    editor.chain().focus().setCellAttribute("style", value ? `border: ${value};` : null).run();
+    editor.chain().focus().setCellAttribute("borderColor", color).run();
   };
 
   return (
     <div className="border border-slate-300 rounded-2xl overflow-hidden bg-white shadow-inner">
       <style jsx global>{`
-        .ProseMirror { min-height: 360px; outline: none; font-size: 15px; line-height: 1.7; }
+        .ProseMirror { min-height: 360px; outline: none; font-size: 15px; line-height: 1.4; }
         .ProseMirror table.draft-table { border-collapse: collapse; width: 100%; margin: 14px 0; table-layout: fixed; display: table !important; visibility: visible !important; }
         .ProseMirror table.draft-table td, .ProseMirror table.draft-table th {
           border: 2px solid #475569;
@@ -153,7 +199,8 @@ export default function RichTextEditor({ value, onChange }: Props) {
           outline: 2px solid #2563eb;
           outline-offset: -2px;
         }
-        .ProseMirror p { margin: 0.4em 0; }
+        .ProseMirror p { margin: 0.15em 0; line-height: 1.4; }
+        .ProseMirror li { line-height: 1.4; margin: 0.1em 0; }
         .ProseMirror h1 { font-size: 1.8em; font-weight: 700; margin: 0.5em 0; }
         .ProseMirror h2 { font-size: 1.4em; font-weight: 700; margin: 0.5em 0; }
         .ProseMirror h3 { font-size: 1.15em; font-weight: 700; margin: 0.4em 0; }
@@ -230,7 +277,7 @@ export default function RichTextEditor({ value, onChange }: Props) {
         <Btn onClick={() => editor.chain().focus().toggleOrderedList().run()} active={editor.isActive("orderedList")} title="Numbered list">1. List</Btn>
 
         <span className="w-px bg-slate-300 mx-1" />
-        <Btn onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()} title="Insert table">▦ Table</Btn>
+        <Btn onClick={() => { if (!inTable) editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run(); }} active={inTable} title={inTable ? "Already inside a table — use Table toolbar below" : "Insert table"}>▦ Table</Btn>
       </div>
 
       {inTable && (

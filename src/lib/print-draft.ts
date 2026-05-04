@@ -93,7 +93,7 @@ export function buildDraftHtml(doc: DraftDoc, profile: DraftProfile | null, lang
       background: #f1f5f9;
       direction: ${dir};
       text-align: ${align};
-      line-height: 1.7;
+      line-height: 1.4;
       font-size: 15px;
     }
     .page {
@@ -147,16 +147,16 @@ export function buildDraftHtml(doc: DraftDoc, profile: DraftProfile | null, lang
     /* Content area */
     .content {
       margin-top: 24px;
-      line-height: 1.8;
+      line-height: 1.4;
       font-size: 15px;
     }
-    .content p { margin: 0.5em 0; }
+    .content p { margin: 0.2em 0; line-height: 1.4; }
     .content h1 { font-size: 1.6em; font-weight: 800; margin: 0.6em 0 0.3em; }
     .content h2 { font-size: 1.3em; font-weight: 700; margin: 0.5em 0 0.3em; }
     .content h3 { font-size: 1.1em; font-weight: 700; margin: 0.4em 0 0.2em; }
     .content ul { list-style: disc; padding-${isRtl ? "right" : "left"}: 1.5em; margin: 0.5em 0; }
     .content ol { list-style: decimal; padding-${isRtl ? "right" : "left"}: 1.5em; margin: 0.5em 0; }
-    .content li { margin: 0.2em 0; }
+    .content li { margin: 0.1em 0; line-height: 1.4; }
     .content strong { font-weight: 700; }
     .content em { font-style: italic; }
     .content u { text-decoration: underline; }
