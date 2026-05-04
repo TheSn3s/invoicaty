@@ -93,7 +93,7 @@ export default function RichTextEditor({ value, onChange }: Props) {
     content: value || "",
     editorProps: {
       attributes: {
-        class: "prose max-w-none min-h-[360px] focus:outline-none px-5 py-4 text-slate-900",
+        class: "max-w-none min-h-[360px] focus:outline-none px-5 py-4 text-slate-900 text-[15px] leading-relaxed",
         dir: lang === "ar" ? "rtl" : "ltr",
       },
     },
@@ -125,10 +125,10 @@ export default function RichTextEditor({ value, onChange }: Props) {
   return (
     <div className="border border-slate-300 rounded-2xl overflow-hidden bg-white shadow-inner">
       <style jsx global>{`
-        .ProseMirror { min-height: 360px; outline: none; }
-        .ProseMirror table.draft-table { border-collapse: collapse; width: 100%; margin: 14px 0; table-layout: fixed; }
+        .ProseMirror { min-height: 360px; outline: none; font-size: 15px; line-height: 1.7; }
+        .ProseMirror table.draft-table { border-collapse: collapse; width: 100%; margin: 14px 0; table-layout: fixed; display: table !important; visibility: visible !important; }
         .ProseMirror table.draft-table td, .ProseMirror table.draft-table th {
-          border: 1px solid #475569;
+          border: 2px solid #475569;
           padding: 8px 10px;
           vertical-align: top;
           min-width: 60px;
@@ -140,8 +140,33 @@ export default function RichTextEditor({ value, onChange }: Props) {
           outline: 2px solid #2563eb;
           outline-offset: -2px;
         }
+        .ProseMirror table { border-collapse: collapse; width: 100%; margin: 14px 0; display: table !important; }
+        .ProseMirror table td, .ProseMirror table th {
+          border: 2px solid #475569;
+          padding: 8px 10px;
+          vertical-align: top;
+          min-width: 60px;
+        }
+        .ProseMirror table th { background: #e2e8f0; font-weight: 700; }
+        .ProseMirror table .selectedCell {
+          background: rgba(37, 99, 235, 0.12);
+          outline: 2px solid #2563eb;
+          outline-offset: -2px;
+        }
         .ProseMirror p { margin: 0.4em 0; }
+        .ProseMirror h1 { font-size: 1.8em; font-weight: 700; margin: 0.5em 0; }
+        .ProseMirror h2 { font-size: 1.4em; font-weight: 700; margin: 0.5em 0; }
+        .ProseMirror h3 { font-size: 1.15em; font-weight: 700; margin: 0.4em 0; }
         .ProseMirror ul, .ProseMirror ol { padding-inline-start: 1.5em; }
+        .ProseMirror ul { list-style: disc; }
+        .ProseMirror ol { list-style: decimal; }
+        .ProseMirror strong { font-weight: 700; }
+        .ProseMirror em { font-style: italic; }
+        .ProseMirror u { text-decoration: underline; }
+        .ProseMirror s { text-decoration: line-through; }
+        .ProseMirror blockquote { border-inline-start: 4px solid #cbd5e1; padding-inline-start: 1em; color: #64748b; }
+        .ProseMirror .tableWrapper { overflow-x: auto; }
+        .ProseMirror .column-resize-handle { background-color: #2563eb; width: 3px; position: absolute; right: -2px; top: 0; bottom: 0; pointer-events: none; }
       `}</style>
 
       <div className="flex flex-wrap gap-1.5 p-3 border-b border-slate-200 bg-slate-50">
