@@ -102,7 +102,7 @@ export default function RichTextEditor({ value, onChange }: Props) {
           className="w-10 h-10 rounded-lg border border-slate-700/60 bg-slate-800/80"
         />
       </div>
-      <div className="bg-white">
+      <div className="bg-white [&_.ProseMirror]:min-h-[320px] [&_.ProseMirror_table]:border-collapse [&_.ProseMirror_table]:w-full [&_.ProseMirror_table]:my-4 [&_.ProseMirror_table]:border [&_.ProseMirror_table]:border-slate-500 [&_.ProseMirror_th]:border [&_.ProseMirror_th]:border-slate-500 [&_.ProseMirror_th]:bg-slate-100 [&_.ProseMirror_th]:px-3 [&_.ProseMirror_th]:py-2 [&_.ProseMirror_td]:border [&_.ProseMirror_td]:border-slate-400 [&_.ProseMirror_td]:px-3 [&_.ProseMirror_td]:py-2">
         <EditorContent editor={editor} />
       </div>
     </div>
