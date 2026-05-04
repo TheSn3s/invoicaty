@@ -165,7 +165,7 @@ export default function DraftsPage() {
                 </div>
                 {d.summary && <div className="text-slate-400 text-xs mb-3 line-clamp-2">{d.summary}</div>}
                 <div className="flex flex-wrap gap-1.5">
-                  <button onClick={() => printDraft(d, profile)} className="bg-purple-500/15 hover:bg-purple-500/25 text-purple-300 border border-purple-500/30 px-3 py-2 rounded-lg text-[11px] font-bold transition-all active:scale-95">📄 {t("draft.print")}</button>
+                  <button onClick={() => printDraft(d, profile, lang)} className="bg-purple-500/15 hover:bg-purple-500/25 text-purple-300 border border-purple-500/30 px-3 py-2 rounded-lg text-[11px] font-bold transition-all active:scale-95">📄 {t("draft.print")}</button>
                   <button onClick={() => { setEditDraft(d); setShowModal(true); }} className="bg-blue-500/15 hover:bg-blue-500/25 text-blue-300 border border-blue-500/30 px-3 py-2 rounded-lg text-[11px] font-bold transition-all active:scale-95">✏️ {t("invoice.edit")}</button>
                   <button onClick={() => handleDelete(d.id)} className="bg-red-500/15 hover:bg-red-500/25 text-red-300 border border-red-500/30 px-3 py-2 rounded-lg text-[11px] font-bold transition-all active:scale-95">🗑 {t("invoice.delete")}</button>
                 </div>
