@@ -168,13 +168,8 @@ export default function RichTextEditor({ value, onChange }: Props) {
   });
 
   const handleInsertTable = () => {
-    if (inTable) return;
-    if (hasAnyTable) {
-      // Move cursor to end and insert after existing content to avoid nesting
-      editor.chain().focus("end").insertContent("<p></p>").insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
-      return;
-    }
-    editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
+    // Always insert as a sibling at end to prevent nesting
+    editor.chain().focus("end").insertContent("<p></p>").insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
   };
 
   const setCellBackground = (color: string | null) => {
@@ -294,12 +289,12 @@ export default function RichTextEditor({ value, onChange }: Props) {
         <Btn onClick={() => editor.chain().focus().toggleOrderedList().run()} active={editor.isActive("orderedList")} title="Numbered list">1. List</Btn>
 
         <span className="w-px bg-slate-300 mx-1" />
-        <Btn onClick={handleInsertTable} active={inTable} title={inTable ? "Already inside a table — use Table toolbar below" : (hasAnyTable ? "Add another table after existing one" : "Insert table")}>▦ Table</Btn>
+        <Btn onClick={handleInsertTable} title="Insert new table at end">▦ + Table</Btn>
       </div>
 
-      {inTable && (
+      {(inTable || hasAnyTable) && (
         <div className="flex flex-wrap gap-1.5 p-3 border-b border-slate-200 bg-blue-50/60">
-          <span className="text-[11px] font-bold text-slate-600 self-center mr-2">Table:</span>
+          <span className="text-[11px] font-bold text-slate-600 self-center mr-2">{inTable ? "Table (active):" : "Table tools (click inside a cell first):"}</span>
           <Btn onClick={() => editor.chain().focus().addColumnBefore().run()} title="Add column before">+ ◀ Col</Btn>
           <Btn onClick={() => editor.chain().focus().addColumnAfter().run()} title="Add column after">Col ▶ +</Btn>
           <Btn onClick={() => editor.chain().focus().deleteColumn().run()} title="Delete column">✕ Col</Btn>
