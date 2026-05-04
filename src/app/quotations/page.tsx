@@ -158,6 +158,7 @@ export default function QuotationsPage() {
             <CreateMenu
               onNewInvoice={() => router.push("/dashboard?new=1")}
               onNewQuotation={() => { setEditQuotation(null); setShowModal(true); }}
+              onNewDraft={() => router.push("/drafts?new=1")}
               align={lang === 'ar' ? 'left' : 'right'}
             />
           </div>
@@ -258,6 +259,7 @@ export default function QuotationsPage() {
         variant="fab"
         onNewInvoice={() => router.push("/dashboard?new=1")}
         onNewQuotation={() => { setEditQuotation(null); setShowModal(true); }}
+        onNewDraft={() => router.push("/drafts?new=1")}
         align={lang === 'ar' ? 'right' : 'left'}
       />
 
