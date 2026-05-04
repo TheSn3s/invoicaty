@@ -160,6 +160,23 @@ export default function RichTextEditor({ value, onChange }: Props) {
 
   const inTable = editor.isActive("table");
 
+  // Detect if document already has any table (cursor may be outside it)
+  let hasAnyTable = false;
+  editor.state.doc.descendants((node) => {
+    if (node.type.name === "table") { hasAnyTable = true; return false; }
+    return true;
+  });
+
+  const handleInsertTable = () => {
+    if (inTable) return;
+    if (hasAnyTable) {
+      // Move cursor to end and insert after existing content to avoid nesting
+      editor.chain().focus("end").insertContent("<p></p>").insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
+      return;
+    }
+    editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
+  };
+
   const setCellBackground = (color: string | null) => {
     editor.chain().focus().setCellAttribute("backgroundColor", color).run();
   };
@@ -277,7 +294,7 @@ export default function RichTextEditor({ value, onChange }: Props) {
         <Btn onClick={() => editor.chain().focus().toggleOrderedList().run()} active={editor.isActive("orderedList")} title="Numbered list">1. List</Btn>
 
         <span className="w-px bg-slate-300 mx-1" />
-        <Btn onClick={() => { if (!inTable) editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run(); }} active={inTable} title={inTable ? "Already inside a table — use Table toolbar below" : "Insert table"}>▦ Table</Btn>
+        <Btn onClick={handleInsertTable} active={inTable} title={inTable ? "Already inside a table — use Table toolbar below" : (hasAnyTable ? "Add another table after existing one" : "Insert table")}>▦ Table</Btn>
       </div>
 
       {inTable && (
