@@ -139,19 +139,6 @@ export default function CreateMenu({ onNewInvoice, onNewQuotation, onNewDraft, v
               <div className="text-[10px] text-slate-400">{lang === "ar" ? "إعداد عرض سعر للعميل" : "Prepare a quote for a client"}</div>
             </div>
           </button>
-
-          <button
-            type="button"
-            role="menuitem"
-            onClick={handleDraft}
-            className="w-full flex items-center gap-3 px-3 py-3 bg-slate-900 hover:bg-emerald-600/20 transition-colors text-start group border-t border-slate-700/60"
-          >
-            <span className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500/30 to-emerald-600/20 border border-emerald-500/40 flex items-center justify-center text-lg group-hover:scale-110 transition-transform">📝</span>
-            <div className="flex-1">
-              <div className="text-sm text-white font-bold">{t("nav.newDraft") || (lang === "ar" ? "مسودة جديدة" : "New Draft")}</div>
-              <div className="text-[10px] text-slate-400">{lang === "ar" ? "إنشاء سكربت أو مسودة للعميل" : "Create a draft or script for your client"}</div>
-            </div>
-          </button>
         </div>
       )}
     </div>
