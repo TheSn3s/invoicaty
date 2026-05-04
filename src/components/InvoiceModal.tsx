@@ -110,7 +110,7 @@ export default function InvoiceModal({ invoice, onSave, onClose, currencySymbol,
 
   return (
     <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm flex items-end md:items-center justify-center z-50" onClick={onClose}>
-      <div className="bg-slate-900 border border-slate-700/50 rounded-t-3xl md:rounded-3xl w-full max-w-md max-h-[90vh] overflow-y-auto slide-up" onClick={e => e.stopPropagation()}>
+      <div className="bg-slate-900 border border-slate-700/50 rounded-t-3xl md:rounded-3xl w-full md:max-w-md max-h-[90vh] overflow-y-auto slide-up mx-auto" onClick={e => e.stopPropagation()}>
         <div className="md:hidden flex justify-center pt-3 pb-1">
           <div className="w-10 h-1 bg-slate-600 rounded-full" />
         </div>

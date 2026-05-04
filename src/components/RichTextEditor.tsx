@@ -290,6 +290,17 @@ export default function RichTextEditor({ value, onChange }: Props) {
 
         <span className="w-px bg-slate-300 mx-1" />
         <Btn onClick={handleInsertTable} title="Insert new table at end">▦ + Table</Btn>
+        {hasAnyTable && !inTable && (
+          <Btn onClick={() => {
+            // Move cursor into first cell of first table
+            let pos = -1;
+            editor.state.doc.descendants((node, p) => {
+              if (pos === -1 && node.type.name === "tableCell") { pos = p + 1; return false; }
+              return true;
+            });
+            if (pos > 0) editor.chain().focus().setTextSelection(pos).run();
+          }} title="Edit existing table (jump cursor inside it)">✎ Edit Table</Btn>
+        )}
       </div>
 
       {(inTable || hasAnyTable) && (
