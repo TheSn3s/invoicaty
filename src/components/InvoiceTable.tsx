@@ -2,6 +2,19 @@
 import { useState } from "react";
 import { useI18n } from "@/lib/i18n";
 
+function PdfIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px]">
+      <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" />
+      <path d="M14 3v5h5" />
+      <path d="M8 15h2a1.5 1.5 0 0 0 0-3H8v6" />
+      <path d="M13 18v-6h1.6a2.4 2.4 0 1 1 0 4.8H13" />
+      <path d="M18 12h-2.5V18" />
+      <path d="M18 15h-2" />
+    </svg>
+  );
+}
+
 interface Invoice {
   id: string; serial: string; date: string; client: string;
   project: string; description: string; amount: number;
@@ -76,7 +89,9 @@ export default function InvoiceTable({ invoices, onEdit, onDelete, onPrint, onMa
                 {inv.status === "Not Paid" && (
                   <button onClick={() => onMarkPaid(inv)} className="bg-green-500/10 hover:bg-green-500/20 p-2 rounded-lg text-sm transition-all active:scale-95" title={t("invoice.markPaid")}>💰</button>
                 )}
-                <button onClick={() => onPrint(inv)} className="bg-slate-700/50 hover:bg-slate-600/50 p-2 rounded-lg text-sm transition-all active:scale-95">📄</button>
+                <button onClick={() => onPrint(inv)} className="bg-red-500/10 hover:bg-red-500/20 text-red-300 p-2 rounded-lg transition-all active:scale-95" title="PDF" aria-label="PDF">
+                  <PdfIcon />
+                </button>
                 {inv.status !== "Cancelled" && (
                   <button onClick={() => onEdit(inv)} className="bg-blue-500/10 hover:bg-blue-500/20 p-2 rounded-lg text-sm transition-all active:scale-95">✏️</button>
                 )}
@@ -121,7 +136,9 @@ export default function InvoiceTable({ invoices, onEdit, onDelete, onPrint, onMa
                     {inv.status === "Not Paid" && (
                       <button onClick={() => onMarkPaid(inv)} className="bg-green-500/10 hover:bg-green-500/20 text-green-400 p-2 rounded-lg transition-all" title={t("invoice.markPaid")}>💰</button>
                     )}
-                    <button onClick={() => onPrint(inv)} className="bg-slate-500/10 hover:bg-slate-500/20 text-slate-300 p-2 rounded-lg transition-all" title={t("invoice.print")}>📄</button>
+                    <button onClick={() => onPrint(inv)} className="bg-red-500/10 hover:bg-red-500/20 text-red-300 p-2 rounded-lg transition-all" title={t("invoice.print")} aria-label={t("invoice.print")}>
+                      <PdfIcon />
+                    </button>
                     {inv.status !== "Cancelled" && (
                       <button onClick={() => onEdit(inv)} className="bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 p-2 rounded-lg transition-all" title={t("invoice.edit")}>✏️</button>
                     )}
