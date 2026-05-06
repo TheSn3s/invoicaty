@@ -8,7 +8,14 @@ import type { PrintableDoc, Profile, DocType } from "./types";
  */
 export function renderMinimal(doc: PrintableDoc, profile: Profile | null, type: DocType): string {
   const ctx = buildContext(doc, profile, type);
-  const isRtlText = (value: string) => /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/.test(value || '');
+  const isRtlText = (value: string) => {
+    const text = String(value || '').trim();
+    for (const ch of text) {
+      if (/[A-Za-z]/.test(ch)) return false;
+      if (/[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/.test(ch)) return true;
+    }
+    return false;
+  };
   const textAttrs = (value: string) => isRtlText(value)
     ? ' dir="rtl" style="direction:rtl;text-align:right;unicode-bidi:plaintext;"'
     : ' dir="ltr" style="direction:ltr;text-align:left;unicode-bidi:plaintext;"';

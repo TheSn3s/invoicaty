@@ -9,11 +9,18 @@ import type { PrintableDoc, Profile, DocType } from "./types";
  */
 export function renderModern(doc: PrintableDoc, profile: Profile | null, type: DocType): string {
   const ctx = buildContext(doc, profile, type);
-  const isRtlText = (value: string) => /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/.test(value || '');
+  const isRtlText = (value: string) => {
+    const text = String(value || '').trim();
+    for (const ch of text) {
+      if (/[A-Za-z]/.test(ch)) return false;
+      if (/[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/.test(ch)) return true;
+    }
+    return false;
+  };
   const textAttrs = (value: string) => isRtlText(value)
     ? ' dir="rtl" class="ar-text" style="direction:rtl;text-align:right;unicode-bidi:plaintext;"'
     : ' dir="ltr" style="direction:ltr;text-align:left;unicode-bidi:plaintext;"';
-  // Merge .ar-text into an existing class attribute when value is Arabic
+  // Merge .ar-text into an existing class attribute when value starts as Arabic
   const withAr = (cls: string, value: string) => isRtlText(value) ? `${cls} ar-text` : cls;
   const { totals, color, name, businessName, displayLine1, displayLine2, phone, email, logoUrl, notes,
           bankHolder, bankName, bankAccount, bankIban, isQuotation, docLabel } = ctx;
