@@ -133,10 +133,17 @@ export function buildContext(
 }
 
 export function printButton(color: string): string {
-  return `<button class="pbtn" onclick="window.print()">🖨️ Save as PDF</button>
+  return `<button class="pbtn" onclick="window.print()" aria-label="Download PDF" title="Download PDF">
+  <span class="pbtn-icon" aria-hidden="true">PDF</span>
+  <span class="pbtn-label">Download PDF</span>
+</button>
 <style>
-.pbtn{position:fixed;bottom:2rem;right:2rem;background:${color};color:#fff;border:none;padding:.9rem 1.6rem;border-radius:999px;font-weight:700;font-size:.875rem;cursor:pointer;box-shadow:0 10px 30px rgba(0,0,0,.25);display:flex;align-items:center;gap:.6rem;font-family:inherit;transition:transform .15s,box-shadow .15s;z-index:999}
-.pbtn:hover{transform:translateY(-2px);box-shadow:0 14px 36px rgba(0,0,0,.3)}
+.pbtn{position:fixed;bottom:2rem;right:2rem;background:${color};color:#fff;border:none;padding:1rem 1.35rem;border-radius:999px;font-weight:800;font-size:.95rem;cursor:pointer;box-shadow:0 12px 32px rgba(0,0,0,.28);display:flex;align-items:center;gap:.75rem;font-family:inherit;transition:transform .15s,box-shadow .15s,opacity .15s;z-index:999}
+.pbtn:hover{transform:translateY(-2px);box-shadow:0 16px 38px rgba(0,0,0,.34)}
+.pbtn:focus-visible{outline:3px solid rgba(255,255,255,.55);outline-offset:3px}
+.pbtn-icon{display:inline-flex;align-items:center;justify-content:center;min-width:2.5rem;height:2.5rem;padding:0 .7rem;border-radius:999px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.28);font-size:.82rem;line-height:1;letter-spacing:.08em;font-weight:900}
+.pbtn-label{white-space:nowrap;letter-spacing:.01em}
+@media (max-width:640px){.pbtn{bottom:1rem;right:1rem;padding:.95rem 1.15rem;font-size:.92rem}.pbtn-icon{min-width:2.35rem;height:2.35rem}}
 @media print{.pbtn{display:none!important}}
 </style>`;
 }
