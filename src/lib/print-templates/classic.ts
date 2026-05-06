@@ -11,8 +11,8 @@ export function renderClassic(doc: PrintableDoc, profile: Profile | null, type: 
   const ctx = buildContext(doc, profile, type);
   const isRtlText = (value: string) => /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/.test(value || '');
   const textAttrs = (value: string) => isRtlText(value)
-    ? ' dir="rtl" style="direction:rtl;text-align:right;"'
-    : ' dir="ltr" style="direction:ltr;text-align:left;"';
+    ? ' dir="rtl" style="direction:rtl;text-align:right;unicode-bidi:plaintext;"'
+    : ' dir="ltr" style="direction:ltr;text-align:left;unicode-bidi:plaintext;"';
   const { totals, color, name, businessName, displayLine1, displayLine2, phone, email, logoUrl, notes,
           bankHolder, bankName, bankAccount, bankIban, isQuotation, docLabel } = ctx;
   const { fmt } = totals;
@@ -119,7 +119,7 @@ tbody td{padding:10px 8px;font-size:13.5px;color:var(--ink-2);border-bottom:1px 
 /* Cards */
 .card{border:1px solid var(--line-2);padding:14px 18px;margin-bottom:12px;background:var(--bg)}
 .card-t{font-family:'Playfair Display',serif;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-3);font-weight:700;margin-bottom:8px}
-.card-b{font-size:12.5px;color:var(--ink-2);line-height:1.6;white-space:pre-wrap;font-style:italic}
+.card-b{font-size:12.5px;color:var(--ink-2);line-height:1.6;white-space:pre-wrap;font-style:italic;unicode-bidi:plaintext}
 .bank-tbl{width:auto;margin:0}
 .bank-tbl td{padding:3px 18px 3px 0;border:none;font-size:12.5px;color:var(--ink-2)}
 .bank-lbl{color:var(--ink-3);font-style:italic;white-space:nowrap}
@@ -215,7 +215,7 @@ tbody td{padding:10px 8px;font-size:13.5px;color:var(--ink-2);border-bottom:1px 
       </div>
     </section>
 
-    ${doc.description ? `<div style="margin-bottom:20px;padding:14px 18px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;"><div style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#94a3b8;margin-bottom:6px;">Scope of Work</div><div dir="${isRtlText(doc.description) ? 'rtl' : 'ltr'}" style="direction:${isRtlText(doc.description) ? 'rtl' : 'ltr'};text-align:${isRtlText(doc.description) ? 'right' : 'left'};font-size:12px;color:#475569;line-height:1.7;white-space:pre-wrap;">${escapeHtml(doc.description)}</div></div>` : ''}
+    ${doc.description ? `<div style="margin-bottom:20px;padding:14px 18px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;"><div style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#94a3b8;margin-bottom:6px;">Scope of Work</div><div dir="${isRtlText(doc.description) ? 'rtl' : 'ltr'}" style="direction:${isRtlText(doc.description) ? 'rtl' : 'ltr'};text-align:${isRtlText(doc.description) ? 'right' : 'left'};unicode-bidi:plaintext;font-size:12px;color:#475569;line-height:1.7;white-space:pre-wrap;">${escapeHtml(doc.description)}</div></div>` : ''}
 
     <table>
       <thead>

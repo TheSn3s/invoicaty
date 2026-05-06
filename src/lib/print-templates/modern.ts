@@ -11,8 +11,8 @@ export function renderModern(doc: PrintableDoc, profile: Profile | null, type: D
   const ctx = buildContext(doc, profile, type);
   const isRtlText = (value: string) => /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/.test(value || '');
   const textAttrs = (value: string) => isRtlText(value)
-    ? ' dir="rtl" class="ar-text" style="direction:rtl;text-align:right;"'
-    : ' dir="ltr" style="direction:ltr;text-align:left;"';
+    ? ' dir="rtl" class="ar-text" style="direction:rtl;text-align:right;unicode-bidi:plaintext;"'
+    : ' dir="ltr" style="direction:ltr;text-align:left;unicode-bidi:plaintext;"';
   // Merge .ar-text into an existing class attribute when value is Arabic
   const withAr = (cls: string, value: string) => isRtlText(value) ? `${cls} ar-text` : cls;
   const { totals, color, name, businessName, displayLine1, displayLine2, phone, email, logoUrl, notes,
@@ -141,6 +141,7 @@ tbody tr:last-child td{border-bottom:none}
 .card{background:var(--bg);border:1px solid var(--line-2);border-radius:8px;padding:16px 20px;margin-bottom:16px}
 .card-t{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-3);font-weight:700;margin-bottom:8px}
 .card-b{font-size:12px;color:var(--ink-2);line-height:1.7;white-space:pre-wrap}
+.mixed-bidi{unicode-bidi:plaintext}
 .bank-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 24px}
 .bank-grid>div{display:flex;flex-direction:column;gap:2px}
 .bank-lbl{font-size:10px;color:var(--ink-3);font-weight:600;letter-spacing:.05em}
@@ -254,7 +255,7 @@ tbody tr:last-child td{border-bottom:none}
 
     <div class="section-rule"></div>
 
-    ${doc.description ? `<div class="card scope-card"><div class="card-t">Scope of Work</div><div class="card-b"${textAttrs(doc.description)}>${escapeHtml(doc.description)}</div></div>` : ''}
+    ${doc.description ? `<div class="card scope-card"><div class="card-t">Scope of Work</div><div class="card-b mixed-bidi"${textAttrs(doc.description)}>${escapeHtml(doc.description)}</div></div>` : ''}
 
     <table>
       <thead>
