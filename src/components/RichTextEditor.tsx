@@ -97,7 +97,7 @@ function ColorDropdown({ colors, current, onPick, children, title }: {
     <div className="relative" ref={ref}>
       <button
         type="button"
-        onClick={() => setOpen((o) => !o)}
+        onMouseDown={(e) => { e.preventDefault(); setOpen((o) => !o); }}
         title={title}
         className="w-8 h-8 rounded-md text-sm flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-all"
       >
@@ -110,7 +110,11 @@ function ColorDropdown({ colors, current, onPick, children, title }: {
               <button
                 key={c}
                 type="button"
-                onClick={() => { onPick(c === "transparent" ? null : c); setOpen(false); }}
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  onPick(c === "transparent" ? null : c);
+                  setOpen(false);
+                }}
                 className={`w-6 h-6 rounded-md border hover:scale-110 transition-transform ${
                   current === c ? "ring-2 ring-blue-500 ring-offset-1" : "border-slate-200 dark:border-slate-600"
                 } ${c === "transparent" ? "bg-white dark:bg-slate-800" : ""}`}
@@ -123,7 +127,7 @@ function ColorDropdown({ colors, current, onPick, children, title }: {
           </div>
           <button
             type="button"
-            onClick={() => { onPick(null); setOpen(false); }}
+            onMouseDown={(e) => { e.preventDefault(); onPick(null); setOpen(false); }}
             className="w-full text-[11px] font-medium py-1 rounded-md text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
           >
             Clear
@@ -287,12 +291,15 @@ export default function RichTextEditor({ value, onChange }: Props) {
         .draft-editor-content u { text-decoration: underline; text-underline-offset: 3px; }
         .draft-editor-content s { text-decoration: line-through; color: #94a3b8; }
         .draft-editor-content mark { border-radius: 3px; padding: 1px 4px; }
-        .draft-editor-content table.draft-table { border-collapse: collapse; width: 100%; margin: 16px 0; table-layout: auto; }
+        .draft-editor-content table.draft-table { border-collapse: collapse; width: 100%; margin: 16px 0; table-layout: auto; border: 2px solid #64748b; }
         .draft-editor-content table.draft-table td,
         .draft-editor-content table.draft-table th {
-          border: 1.5px solid #cbd5e1; padding: 10px 12px; vertical-align: top; min-width: 60px;
+          border: 1.5px solid #94a3b8; padding: 10px 12px; vertical-align: top; min-width: 60px;
         }
-        .draft-editor-content table.draft-table th { background: #f8fafc; font-weight: 600; font-size: 0.9em; color: #475569; }
+        .draft-editor-content table.draft-table th { background: #f1f5f9; font-weight: 700; font-size: 0.9em; color: #334155; border-bottom: 2.5px solid #64748b; }
+        .draft-editor-content table { border-collapse: collapse; width: 100%; margin: 16px 0; border: 2px solid #64748b; }
+        .draft-editor-content table td, .draft-editor-content table th { border: 1.5px solid #94a3b8; padding: 10px 12px; vertical-align: top; min-width: 60px; }
+        .draft-editor-content table th { background: #f1f5f9; font-weight: 700; border-bottom: 2.5px solid #64748b; }
         .draft-editor-content table.draft-table .selectedCell {
           background: rgba(59, 130, 246, 0.08); outline: 2px solid #3b82f6; outline-offset: -2px;
         }
@@ -325,6 +332,27 @@ export default function RichTextEditor({ value, onChange }: Props) {
             <option value="h1">{isAr ? "عنوان ١" : "Heading 1"}</option>
             <option value="h2">{isAr ? "عنوان ٢" : "Heading 2"}</option>
             <option value="h3">{isAr ? "عنوان ٣" : "Heading 3"}</option>
+          </select>
+
+          {/* Font Size */}
+          <select
+            defaultValue=""
+            onChange={(e) => {
+              const v = e.target.value;
+              if (!v) editor.chain().focus().unsetMark("textStyle").run();
+              else editor.chain().focus().setMark("textStyle", { fontSize: `${v}px` }).run();
+            }}
+            className="h-8 px-1.5 rounded-md text-[13px] font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/30 cursor-pointer w-[62px]"
+          >
+            <option value="">{isAr ? "حجم" : "Size"}</option>
+            <option value="12">12</option>
+            <option value="14">14</option>
+            <option value="16">16</option>
+            <option value="18">18</option>
+            <option value="20">20</option>
+            <option value="24">24</option>
+            <option value="28">28</option>
+            <option value="32">32</option>
           </select>
 
           <Sep />
@@ -374,6 +402,8 @@ export default function RichTextEditor({ value, onChange }: Props) {
           {/* Lists */}
           <Btn onClick={() => editor.chain().focus().toggleBulletList().run()} active={editor.isActive("bulletList")} title={isAr ? "قائمة نقاط" : "Bullet List"}>{icons.bulletList}</Btn>
           <Btn onClick={() => editor.chain().focus().toggleOrderedList().run()} active={editor.isActive("orderedList")} title={isAr ? "قائمة مرقمة" : "Numbered List"}>{icons.orderedList}</Btn>
+          <Btn onClick={() => editor.chain().focus().sinkListItem("listItem").run()} title={isAr ? "مسافة بادئة" : "Indent"}>{icons.indent}</Btn>
+          <Btn onClick={() => editor.chain().focus().liftListItem("listItem").run()} title={isAr ? "إلغاء المسافة" : "Outdent"}>{icons.outdent}</Btn>
 
           <Sep />
 
