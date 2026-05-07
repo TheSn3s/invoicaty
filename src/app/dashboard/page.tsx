@@ -202,7 +202,6 @@ export default function DashboardPage() {
               <Link href="/admin" className="text-slate-400 hover:text-white p-1.5 md:p-2 rounded-lg hover:bg-slate-700/50 transition-all text-sm" title={t("nav.admin")}>🛡</Link>
             )}
             <Link href="/quotations" className="text-slate-400 hover:text-white p-1.5 md:p-2 rounded-lg hover:bg-slate-700/50 transition-all text-sm" title={t("quotation.title")}>📋</Link>
-            <Link href="/drafts" className="text-slate-400 hover:text-white p-1.5 md:p-2 rounded-lg hover:bg-slate-700/50 transition-all text-sm" title={t("draft.title")}>📝</Link>
             <Link href="/trash" className="relative text-slate-400 hover:text-white p-1.5 md:p-2 rounded-lg hover:bg-slate-700/50 transition-all text-sm" title={lang === 'ar' ? 'سلة المحذوفات' : 'Trash'}>
               🗑️
               {deletedCount > 0 && <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">{deletedCount}</span>}
