@@ -411,7 +411,11 @@ export default function RichTextEditor({ value, onChange }: Props) {
           <Btn onClick={() => editor.chain().focus().toggleBlockquote().run()} active={editor.isActive("blockquote")} title={isAr ? "اقتباس" : "Quote"}>{icons.blockquote}</Btn>
           <Btn onClick={() => editor.chain().focus().setHorizontalRule().run()} title={isAr ? "فاصل أفقي" : "Horizontal Rule"}>{icons.hr}</Btn>
           <Btn
-            onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()}
+            onClick={() => {
+              if (editor.isActive("table")) return;
+              editor.chain().focus("end").insertContent("<p></p>").insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
+            }}
+            active={editor.isActive("table")}
             title={isAr ? "إدراج جدول" : "Insert Table"}
           >
             {icons.table}
