@@ -1,7 +1,6 @@
 "use client";
 
 import { useEditor, EditorContent } from "@tiptap/react";
-import { BubbleMenu } from "@tiptap/react/menus";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
 import Highlight from "@tiptap/extension-highlight";
@@ -250,6 +249,11 @@ export default function RichTextEditor({ value, onChange }: Props) {
   const [slashPos, setSlashPos] = useState<{ top: number; left: number } | null>(null);
   const slashStartPos = useRef<number | null>(null);
 
+  // Bubble menu state
+  const [bubblePos, setBubblePos] = useState<{ top: number; left: number } | null>(null);
+  const [showBubble, setShowBubble] = useState(false);
+  const bubbleRef = useRef<HTMLDivElement>(null);
+
   const editor = useEditor({
     immediatelyRender: false,
     extensions: [
@@ -339,10 +343,26 @@ export default function RichTextEditor({ value, onChange }: Props) {
       if (slashOpen && slashStartPos.current !== null) {
         const { from } = e.state.selection;
         const text = e.state.doc.textBetween(slashStartPos.current, from, "");
-        // Text after the "/"
         setSlashQuery(text);
         setSlashIndex(0);
       }
+    },
+    onSelectionUpdate: ({ editor: e }) => {
+      const { from, to } = e.state.selection;
+      if (from === to) {
+        setShowBubble(false);
+        return;
+      }
+      // Position bubble above selection
+      const view = e.view;
+      const start = view.coordsAtPos(from);
+      const end = view.coordsAtPos(to);
+      const editorRect = view.dom.getBoundingClientRect();
+      setBubblePos({
+        top: start.top - editorRect.top - 48,
+        left: (start.left + end.left) / 2 - editorRect.left,
+      });
+      setShowBubble(true);
     },
   });
 
@@ -475,77 +495,59 @@ export default function RichTextEditor({ value, onChange }: Props) {
         .draft-editor-content ::selection { background: rgba(59, 130, 246, 0.2); }
       `}</style>
 
-      {/* ─── Bubble Menu (appears on text selection) ─── */}
-      <BubbleMenu
-        editor={editor}
-        tippyOptions={{
-          duration: 150,
-          placement: "top",
-          animation: "shift-away",
-        }}
-        className="bg-slate-800 rounded-xl shadow-2xl shadow-black/20 border border-slate-700 flex items-center gap-0.5 px-1.5 py-1"
-      >
-        <BubbleBtn onClick={() => editor.chain().focus().toggleBold().run()} active={editor.isActive("bold")} title="Bold">
-          <span className="font-black">B</span>
-        </BubbleBtn>
-        <BubbleBtn onClick={() => editor.chain().focus().toggleItalic().run()} active={editor.isActive("italic")} title="Italic">
-          <span className="italic">I</span>
-        </BubbleBtn>
-        <BubbleBtn onClick={() => editor.chain().focus().toggleUnderline().run()} active={editor.isActive("underline")} title="Underline">
-          <span className="underline">U</span>
-        </BubbleBtn>
-        <BubbleBtn onClick={() => editor.chain().focus().toggleStrike().run()} active={editor.isActive("strike")} title="Strikethrough">
-          <span className="line-through">S</span>
-        </BubbleBtn>
-
-        <span className="w-px h-4 bg-slate-600 mx-0.5" />
-
-        <InlineColorPicker
-          label="Text color"
-          colors={TEXT_COLORS}
-          current={editor.getAttributes("textStyle").color}
-          onPick={(c) => c ? editor.chain().focus().setColor(c).run() : editor.chain().focus().unsetColor().run()}
-        />
-        <InlineColorPicker
-          label="Highlight"
-          colors={BG_COLORS}
-          current={editor.getAttributes("highlight").color}
-          onPick={(c) => c ? editor.chain().focus().setHighlight({ color: c }).run() : editor.chain().focus().unsetHighlight().run()}
-        />
-
-        <span className="w-px h-4 bg-slate-600 mx-0.5" />
-
-        <BubbleBtn onClick={() => editor.chain().focus().setTextAlign("left").run()} active={editor.isActive({ textAlign: "left" })} title="Left">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="15" y2="12"/><line x1="3" y1="18" x2="18" y2="18"/></svg>
-        </BubbleBtn>
-        <BubbleBtn onClick={() => editor.chain().focus().setTextAlign("center").run()} active={editor.isActive({ textAlign: "center" })} title="Center">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="6" y1="12" x2="18" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
-        </BubbleBtn>
-        <BubbleBtn onClick={() => editor.chain().focus().setTextAlign("right").run()} active={editor.isActive({ textAlign: "right" })} title="Right">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="9" y1="12" x2="21" y2="12"/><line x1="6" y1="18" x2="21" y2="18"/></svg>
-        </BubbleBtn>
-      </BubbleMenu>
-
-      {/* ─── Table Toolbar (only when cursor is in table) ─── */}
-      {inTable && (
-        <div className="flex flex-wrap items-center gap-1 px-4 py-2 border-b border-slate-200 dark:border-slate-700 bg-blue-50 dark:bg-blue-500/5">
-          <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider mr-1">Table</span>
-          <TblBtn onClick={() => editor.chain().focus().addRowAfter().run()}>+ Row</TblBtn>
-          <TblBtn onClick={() => editor.chain().focus().addColumnAfter().run()}>+ Col</TblBtn>
-          <TblBtn onClick={() => editor.chain().focus().deleteRow().run()} danger>− Row</TblBtn>
-          <TblBtn onClick={() => editor.chain().focus().deleteColumn().run()} danger>− Col</TblBtn>
-          <span className="w-px h-4 bg-slate-300 dark:bg-slate-700 mx-1" />
-          <TblBtn onClick={() => editor.chain().focus().mergeCells().run()}>Merge</TblBtn>
-          <TblBtn onClick={() => editor.chain().focus().splitCell().run()}>Split</TblBtn>
-          <TblBtn onClick={() => editor.chain().focus().toggleHeaderRow().run()}>H-Row</TblBtn>
-          <span className="w-px h-4 bg-slate-300 dark:bg-slate-700 mx-1" />
-          <TblBtn onClick={() => editor.chain().focus().deleteTable().run()} danger>🗑 Delete</TblBtn>
-        </div>
-      )}
-
       {/* ─── Editor Content ─── */}
       <div className="relative">
         <EditorContent editor={editor} />
+
+        {/* ─── Bubble Menu (appears on text selection) ─── */}
+        {showBubble && bubblePos && (
+          <div
+            ref={bubbleRef}
+            className="absolute z-50 bg-slate-800 rounded-xl shadow-2xl shadow-black/20 border border-slate-700 flex items-center gap-0.5 px-1.5 py-1 transition-opacity"
+            style={{ top: bubblePos.top, left: bubblePos.left, transform: "translateX(-50%)" }}
+            onMouseDown={(e) => e.preventDefault()}
+          >
+            <BubbleBtn onClick={() => editor.chain().focus().toggleBold().run()} active={editor.isActive("bold")} title="Bold">
+              <span className="font-black">B</span>
+            </BubbleBtn>
+            <BubbleBtn onClick={() => editor.chain().focus().toggleItalic().run()} active={editor.isActive("italic")} title="Italic">
+              <span className="italic">I</span>
+            </BubbleBtn>
+            <BubbleBtn onClick={() => editor.chain().focus().toggleUnderline().run()} active={editor.isActive("underline")} title="Underline">
+              <span className="underline">U</span>
+            </BubbleBtn>
+            <BubbleBtn onClick={() => editor.chain().focus().toggleStrike().run()} active={editor.isActive("strike")} title="Strikethrough">
+              <span className="line-through">S</span>
+            </BubbleBtn>
+
+            <span className="w-px h-4 bg-slate-600 mx-0.5" />
+
+            <InlineColorPicker
+              label="Text color"
+              colors={TEXT_COLORS}
+              current={editor.getAttributes("textStyle").color}
+              onPick={(c) => c ? editor.chain().focus().setColor(c).run() : editor.chain().focus().unsetColor().run()}
+            />
+            <InlineColorPicker
+              label="Highlight"
+              colors={BG_COLORS}
+              current={editor.getAttributes("highlight").color}
+              onPick={(c) => c ? editor.chain().focus().setHighlight({ color: c }).run() : editor.chain().focus().unsetHighlight().run()}
+            />
+
+            <span className="w-px h-4 bg-slate-600 mx-0.5" />
+
+            <BubbleBtn onClick={() => editor.chain().focus().setTextAlign("left").run()} active={editor.isActive({ textAlign: "left" })} title="Left">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="15" y2="12"/><line x1="3" y1="18" x2="18" y2="18"/></svg>
+            </BubbleBtn>
+            <BubbleBtn onClick={() => editor.chain().focus().setTextAlign("center").run()} active={editor.isActive({ textAlign: "center" })} title="Center">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="6" y1="12" x2="18" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+            </BubbleBtn>
+            <BubbleBtn onClick={() => editor.chain().focus().setTextAlign("right").run()} active={editor.isActive({ textAlign: "right" })} title="Right">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="9" y1="12" x2="21" y2="12"/><line x1="6" y1="18" x2="21" y2="18"/></svg>
+            </BubbleBtn>
+          </div>
+        )}
 
         {/* ─── Slash Command Menu ─── */}
         {slashOpen && slashPos && (
@@ -563,6 +565,23 @@ export default function RichTextEditor({ value, onChange }: Props) {
           </div>
         )}
       </div>
+
+      {/* ─── Table Toolbar (only when cursor is in table) ─── */}
+      {inTable && (
+        <div className="flex flex-wrap items-center gap-1 px-4 py-2 border-b border-slate-200 dark:border-slate-700 bg-blue-50 dark:bg-blue-500/5">
+          <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider mr-1">Table</span>
+          <TblBtn onClick={() => editor.chain().focus().addRowAfter().run()}>+ Row</TblBtn>
+          <TblBtn onClick={() => editor.chain().focus().addColumnAfter().run()}>+ Col</TblBtn>
+          <TblBtn onClick={() => editor.chain().focus().deleteRow().run()} danger>− Row</TblBtn>
+          <TblBtn onClick={() => editor.chain().focus().deleteColumn().run()} danger>− Col</TblBtn>
+          <span className="w-px h-4 bg-slate-300 dark:bg-slate-700 mx-1" />
+          <TblBtn onClick={() => editor.chain().focus().mergeCells().run()}>Merge</TblBtn>
+          <TblBtn onClick={() => editor.chain().focus().splitCell().run()}>Split</TblBtn>
+          <TblBtn onClick={() => editor.chain().focus().toggleHeaderRow().run()}>H-Row</TblBtn>
+          <span className="w-px h-4 bg-slate-300 dark:bg-slate-700 mx-1" />
+          <TblBtn onClick={() => editor.chain().focus().deleteTable().run()} danger>🗑 Delete</TblBtn>
+        </div>
+      )}
 
       {/* ─── Bottom Hint ─── */}
       <div className="px-4 py-2 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
