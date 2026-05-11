@@ -183,14 +183,14 @@ export default function DraftsPage() {
         align={lang === 'ar' ? 'right' : 'left'}
       />
 
-      {showModal && <DraftModal draft={editDraft} onSave={handleSave} onClose={() => { setShowModal(false); setEditDraft(null); }} />}
+      {showModal && <DraftModal draft={editDraft} onSave={handleSave} onClose={() => { setShowModal(false); setEditDraft(null); }} brandColor={profile?.brand_color} />}
 
       <AppFooter compact />
     </div>
   );
 }
 
-function DraftModal({ draft, onSave, onClose }: { draft: Draft | null; onSave: (d: Partial<Draft>) => void; onClose: () => void; }) {
+function DraftModal({ draft, onSave, onClose, brandColor }: { draft: Draft | null; onSave: (d: Partial<Draft>) => void; onClose: () => void; brandColor?: string; }) {
   const { t, lang } = useI18n();
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
   const [client, setClient] = useState("");
@@ -272,7 +272,7 @@ function DraftModal({ draft, onSave, onClose }: { draft: Draft | null; onSave: (
           </div>
           <div>
             <label className="block text-[11px] font-bold text-slate-400 mb-2">{t("draft.content")}</label>
-            <RichTextEditor value={contentHtml} onChange={setContentHtml} />
+            <RichTextEditor value={contentHtml} onChange={setContentHtml} brandColor={brandColor} />
           </div>
           <button type="submit" disabled={saving} className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-500/20 transition-all disabled:opacity-50 text-base mt-2">
             {saving ? t("settings.saving") : `💾 ${t("invoice.save")}`}
