@@ -86,8 +86,8 @@ function Btn({ onClick, active, title, children, className = "" }: {
 function Sep() { return <span className="w-px h-6 bg-slate-200 dark:bg-slate-700 mx-0.5 flex-shrink-0" />; }
 
 /* ─── Dropdown wrapper (close on outside click) ─── */
-function Dropdown({ trigger, children, title, width = "w-[220px]" }: {
-  trigger: React.ReactNode; children: React.ReactNode; title: string; width?: string;
+function Dropdown({ trigger, children, title, width = "w-[220px]", align = "left" }: {
+  trigger: React.ReactNode; children: React.ReactNode; title: string; width?: string; align?: "left" | "right";
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -104,7 +104,7 @@ function Dropdown({ trigger, children, title, width = "w-[220px]" }: {
         {trigger}
       </button>
       {open && (
-        <div className={`absolute z-[100] mt-1 left-0 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-2xl p-2.5 ${width}`}
+        <div className={`absolute z-[100] mt-1 ${align === "right" ? "right-0" : "left-0"} bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-2xl p-2.5 ${width}`}
           onMouseDown={(e) => e.stopPropagation()}>
           {children}
         </div>
@@ -375,7 +375,7 @@ export default function RichTextEditor({ value, onChange, brandColor = "#3b82f6"
 
   return (
     <div className={isFullscreen ? "fixed inset-0 z-[90] bg-slate-950/80 backdrop-blur-sm p-2 sm:p-4" : ""}>
-      <div className={`border border-slate-200 dark:border-slate-700 overflow-hidden bg-white dark:bg-slate-950 shadow-sm ${isFullscreen ? "h-full rounded-2xl flex flex-col max-w-7xl mx-auto" : "rounded-2xl"}`}>
+      <div className={`border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 shadow-sm ${isFullscreen ? "h-full rounded-2xl flex flex-col max-w-7xl mx-auto overflow-hidden" : "rounded-2xl overflow-visible"}`}>
         <style jsx global>{`
           .draft-editor-content {
             min-height: 400px; outline: none; font-size: 16px; line-height: 1.7; padding: 24px 28px; color: #1e293b;
@@ -489,7 +489,7 @@ export default function RichTextEditor({ value, onChange, brandColor = "#3b82f6"
             <Btn onClick={() => editor.chain().focus().setHorizontalRule().run()} title={isAr ? "\u0641\u0627\u0635\u0644" : "HR"}>{icons.hr}</Btn>
 
             {/* ─── TABLE DROPDOWN ─── */}
-            <Dropdown trigger={icons.table} title={isAr ? "\u062c\u062f\u0648\u0644" : "Table"} width="w-[200px]">
+            <Dropdown trigger={icons.table} title={isAr ? "\u062c\u062f\u0648\u0644" : "Table"} width="w-[200px]" align="right">
               <div className="space-y-0.5">
                 <button type="button" onMouseDown={(e) => { e.preventDefault(); insertNewTable(); }}
                   className="w-full text-left px-3 py-2 rounded-lg text-[12px] font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
