@@ -114,8 +114,8 @@ function Dropdown({ trigger, children, title, width = "w-[220px]", align = "left
 }
 
 /* ─── Enhanced Color Picker (swatches + custom input) ─── */
-function ColorPicker({ colors, current, onPick, children, title }: {
-  colors: string[]; current?: string; onPick: (c: string | null) => void; children: React.ReactNode; title: string;
+function ColorPicker({ colors, current, onPick, children, title, popDirection = "down" }: {
+  colors: string[]; current?: string; onPick: (c: string | null) => void; children: React.ReactNode; title: string; popDirection?: "up" | "down";
 }) {
   const [open, setOpen] = useState(false);
   const [customHex, setCustomHex] = useState("");
@@ -137,7 +137,7 @@ function ColorPicker({ colors, current, onPick, children, title }: {
         {children}
       </button>
       {open && (
-        <div className="absolute z-[100] mt-1 left-0 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-2xl p-2.5 w-[220px]">
+        <div className={`absolute z-[200] ${popDirection === "up" ? "bottom-full mb-1 right-0" : "mt-1 right-0"} bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-2xl p-2.5 w-[220px]`}>
           <div className="grid grid-cols-6 gap-1.5 mb-2">
             {colors.map((c) => (
               <button key={c} type="button"
@@ -254,7 +254,7 @@ function buildTablePresetHtml(type: "pricing" | "tasks" | "comparison", brandCol
 
   if (type === "pricing") {
     const h = isAr ? ["البند", "الكمية", "السعر", "المجموع"] : ["Item", "Qty", "Price", "Total"];
-    return `<table class="draft-table"><thead><tr>${h.map(t => `<th style="${hdrStyle}">${t}</th>`).join("")}</tr></thead><tbody>
+    return `<table><thead><tr>${h.map(t => `<th style="${hdrStyle}">${t}</th>`).join("")}</tr></thead><tbody>
       <tr>${h.map((_, i) => `<td style="${cellStyle}">${i === 0 ? (isAr ? "خدمة ١" : "Service 1") : ""}</td>`).join("")}</tr>
       <tr>${h.map((_, i) => `<td style="${altStyle}">${i === 0 ? (isAr ? "خدمة ٢" : "Service 2") : ""}</td>`).join("")}</tr>
       <tr>${h.map((_, i) => `<td style="${cellStyle}">${i === 0 ? (isAr ? "خدمة ٣" : "Service 3") : ""}</td>`).join("")}</tr>
@@ -262,14 +262,14 @@ function buildTablePresetHtml(type: "pricing" | "tasks" | "comparison", brandCol
   }
   if (type === "tasks") {
     const h = isAr ? ["المهمة", "المسؤول", "الموعد", "الحالة"] : ["Task", "Owner", "Due Date", "Status"];
-    return `<table class="draft-table"><thead><tr>${h.map(t => `<th style="${hdrStyle}">${t}</th>`).join("")}</tr></thead><tbody>
+    return `<table><thead><tr>${h.map(t => `<th style="${hdrStyle}">${t}</th>`).join("")}</tr></thead><tbody>
       <tr>${h.map(() => `<td style="${cellStyle}"></td>`).join("")}</tr>
       <tr>${h.map(() => `<td style="${altStyle}"></td>`).join("")}</tr>
     </tbody></table>`;
   }
   // comparison
   const h = isAr ? ["الميزة", "الخيار أ", "الخيار ب", "الخيار ج"] : ["Feature", "Option A", "Option B", "Option C"];
-  return `<table class="draft-table"><thead><tr>${h.map(t => `<th style="${hdrStyle}">${t}</th>`).join("")}</tr></thead><tbody>
+  return `<table><thead><tr>${h.map(t => `<th style="${hdrStyle}">${t}</th>`).join("")}</tr></thead><tbody>
     <tr>${h.map((_, i) => `<td style="${cellStyle}">${i === 0 ? (isAr ? "ميزة ١" : "Feature 1") : ""}</td>`).join("")}</tr>
     <tr>${h.map((_, i) => `<td style="${altStyle}">${i === 0 ? (isAr ? "ميزة ٢" : "Feature 2") : ""}</td>`).join("")}</tr>
     <tr>${h.map((_, i) => `<td style="${cellStyle}">${i === 0 ? (isAr ? "ميزة ٣" : "Feature 3") : ""}</td>`).join("")}</tr>
@@ -356,6 +356,20 @@ export default function RichTextEditor({ value, onChange, brandColor = "#3b82f6"
   const insertPresetTable = (type: "pricing" | "tasks" | "comparison") => {
     const html = buildTablePresetHtml(type, brandColor, isAr);
     editor.chain().focus("end").insertContent("<p></p>").insertContent(html).run();
+  };
+
+  /* Apply attribute to ALL cells in the current table */
+  const setAllTableCellsAttr = (attr: string, val: string | null) => {
+    const { state, dispatch } = editor.view;
+    const { tr } = state;
+    let modified = false;
+    state.doc.descendants((node, pos) => {
+      if (node.type.name === "tableCell" || node.type.name === "tableHeader") {
+        tr.setNodeMarkup(pos, undefined, { ...node.attrs, [attr]: val });
+        modified = true;
+      }
+    });
+    if (modified) dispatch(tr);
   };
 
   const headingValue = editor.isActive("heading", { level: 1 }) ? "h1"
@@ -524,7 +538,7 @@ export default function RichTextEditor({ value, onChange, brandColor = "#3b82f6"
 
           {/* ─── Table tools row (shown when table exists) ─── */}
           {(inTable || hasAnyTable) && (
-            <div className="flex flex-wrap items-center gap-0.5 px-3 py-1.5 border-t border-slate-200 dark:border-slate-700 bg-blue-50/50 dark:bg-blue-500/5">
+            <div className="flex flex-wrap items-center gap-0.5 px-3 py-1.5 border-t border-slate-200 dark:border-slate-700 bg-blue-50/50 dark:bg-blue-500/5 relative overflow-visible">
               <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider mr-1.5">{isAr ? "\u062c\u062f\u0648\u0644" : "Table"}</span>
               {!inTable && hasAnyTable && (
                 <TblBtn onClick={focusFirstTableCell}>{isAr ? "\u062a\u062d\u062f\u064a\u062f \u0627\u0644\u062c\u062f\u0648\u0644" : "Focus table"}</TblBtn>
@@ -541,17 +555,17 @@ export default function RichTextEditor({ value, onChange, brandColor = "#3b82f6"
               <span className="w-px h-4 bg-slate-300 dark:bg-slate-700 mx-1" />
 
               {/* Cell BG */}
-              <ColorPicker colors={CELL_BG_COLORS}
+              <ColorPicker colors={CELL_BG_COLORS} popDirection="up"
                 current={editor.getAttributes("tableCell").backgroundColor || editor.getAttributes("tableHeader").backgroundColor}
-                onPick={(c) => editor.chain().focus().setCellAttribute("backgroundColor", c).run()}
+                onPick={(c) => setAllTableCellsAttr("backgroundColor", c)}
                 title={isAr ? "\u0644\u0648\u0646 \u0627\u0644\u062e\u0644\u064a\u0629" : "Cell BG"}>
                 <span className="text-[10px] font-bold">BG</span>
               </ColorPicker>
 
               {/* Border Color */}
-              <ColorPicker colors={BORDER_COLORS}
+              <ColorPicker colors={BORDER_COLORS} popDirection="up"
                 current={editor.getAttributes("tableCell").borderColor || editor.getAttributes("tableHeader").borderColor}
-                onPick={(c) => editor.chain().focus().setCellAttribute("borderColor", c).run()}
+                onPick={(c) => setAllTableCellsAttr("borderColor", c)}
                 title={isAr ? "\u0644\u0648\u0646 \u0627\u0644\u062d\u062f\u0648\u062f" : "Border Color"}>
                 <span className="text-[10px] font-bold">BD</span>
               </ColorPicker>
@@ -559,7 +573,7 @@ export default function RichTextEditor({ value, onChange, brandColor = "#3b82f6"
               {/* Border Width */}
               <select
                 value={editor.getAttributes("tableCell").borderWidth || editor.getAttributes("tableHeader").borderWidth || "1.5"}
-                onChange={(e) => editor.chain().focus().setCellAttribute("borderWidth", e.target.value).run()}
+                onChange={(e) => setAllTableCellsAttr("borderWidth", e.target.value)}
                 className="h-7 px-1.5 rounded-md text-[11px] font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 cursor-pointer"
                 title={isAr ? "\u0633\u0645\u0643 \u0627\u0644\u062d\u062f\u0648\u062f" : "Border Width"}>
                 {BORDER_WIDTHS.map(w => <option key={w} value={w}>{w}px</option>)}
