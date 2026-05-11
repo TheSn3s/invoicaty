@@ -6,6 +6,20 @@ import Underline from "@tiptap/extension-underline";
 import Highlight from "@tiptap/extension-highlight";
 import { TextStyle } from "@tiptap/extension-text-style";
 import Color from "@tiptap/extension-color";
+
+/* ─── Custom TextStyle with fontSize ─── */
+const CustomTextStyle = TextStyle.extend({
+  addAttributes() {
+    return {
+      ...this.parent?.(),
+      fontSize: {
+        default: null,
+        parseHTML: (el) => (el as HTMLElement).style.fontSize || null,
+        renderHTML: (a) => a.fontSize ? { style: `font-size: ${a.fontSize}` } : {},
+      },
+    };
+  },
+});
 import TextAlign from "@tiptap/extension-text-align";
 import { Table } from "@tiptap/extension-table";
 import TableRow from "@tiptap/extension-table-row";
@@ -311,7 +325,7 @@ export default function RichTextEditor({ value, onChange, brandColor = "#3b82f6"
       StarterKit.configure({ heading: { levels: [1, 2, 3] } }),
       Underline,
       Highlight.configure({ multicolor: true }),
-      TextStyle,
+      CustomTextStyle,
       Color,
       TextAlign.configure({ types: ["heading", "paragraph"] }),
       Table.configure({ resizable: true, HTMLAttributes: { class: "draft-table" } }),
@@ -404,12 +418,29 @@ export default function RichTextEditor({ value, onChange, brandColor = "#3b82f6"
     ]).run();
   };
 
+  /* Apply attribute to selected cell only */
+  const setSelectedCellAttr = (attr: string, val: string | null) => {
+    editor.chain().focus().setCellAttribute(attr, val).run();
+  };
+
   /* Apply attribute to ALL cells in the current table */
   const setAllTableCellsAttr = (attr: string, val: string | null) => {
     const { state, dispatch } = editor.view;
     const { tr } = state;
+    // Find the table that contains the current selection
+    const $pos = state.selection.$from;
+    let tableStart = -1;
+    let tableEnd = -1;
+    for (let d = $pos.depth; d > 0; d--) {
+      if ($pos.node(d).type.name === "table") {
+        tableStart = $pos.start(d) - 1;
+        tableEnd = tableStart + $pos.node(d).nodeSize;
+        break;
+      }
+    }
+    if (tableStart < 0) return;
     let modified = false;
-    state.doc.descendants((node, pos) => {
+    state.doc.nodesBetween(tableStart, tableEnd, (node, pos) => {
       if (node.type.name === "tableCell" || node.type.name === "tableHeader") {
         tr.setNodeMarkup(pos, undefined, { ...node.attrs, [attr]: val });
         modified = true;
@@ -512,7 +543,7 @@ export default function RichTextEditor({ value, onChange, brandColor = "#3b82f6"
               else editor.chain().focus().setMark("textStyle", { fontSize: `${v}px` }).run();
             }} className="h-8 px-1.5 rounded-md text-[13px] font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 focus:outline-none cursor-pointer w-[58px]">
               <option value="">{isAr ? "\u062d\u062c\u0645" : "Size"}</option>
-              {[12,14,16,18,20,24,28,32].map(s => <option key={s} value={String(s)}>{s}</option>)}
+              {[8,9,10,11,12,14,16,18,20,24,28,32,36,48].map(s => <option key={s} value={String(s)}>{s}</option>)}
             </select>
 
             <Sep />
@@ -604,7 +635,7 @@ export default function RichTextEditor({ value, onChange, brandColor = "#3b82f6"
               {/* Cell BG */}
               <ColorPicker colors={CELL_BG_COLORS} popDirection="up"
                 current={editor.getAttributes("tableCell").backgroundColor || editor.getAttributes("tableHeader").backgroundColor}
-                onPick={(c) => setAllTableCellsAttr("backgroundColor", c)}
+                onPick={(c) => setSelectedCellAttr("backgroundColor", c)}
                 title={isAr ? "\u0644\u0648\u0646 \u0627\u0644\u062e\u0644\u064a\u0629" : "Cell BG"}>
                 <span className="text-[10px] font-bold">BG</span>
               </ColorPicker>
