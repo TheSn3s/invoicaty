@@ -550,7 +550,7 @@ export default function RichTextEditor({ value, onChange, brandColor = "#3b82f6"
             <Btn onClick={() => editor.chain().focus().setHorizontalRule().run()} title={isAr ? "\u0641\u0627\u0635\u0644" : "HR"}>{icons.hr}</Btn>
 
             {/* ─── TABLE DROPDOWN ─── */}
-            <Dropdown trigger={icons.table} title={isAr ? "\u062c\u062f\u0648\u0644" : "Table"} width="w-[200px]" align="right">
+            <Dropdown trigger={icons.table} title={isAr ? "\u062c\u062f\u0648\u0644" : "Table"} width="w-[200px]" align={isAr ? "left" : "right"}>
               <div className="space-y-0.5">
                 <button type="button" onMouseDown={(e) => { e.preventDefault(); insertNewTable(); }}
                   className="w-full text-left px-3 py-2 rounded-lg text-[12px] font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
