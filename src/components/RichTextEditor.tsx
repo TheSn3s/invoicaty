@@ -189,19 +189,17 @@ function ColorPicker({ colors, current, onPick, children, title, popDirection = 
               </button>
             ))}
           </div>
-          <div className="flex items-center gap-2 mb-2 p-1.5 bg-slate-50 dark:bg-slate-800 rounded-lg">
+          <div className="flex items-center gap-1.5 mb-2">
             <input type="color" value={current || "#000000"}
               onChange={(e) => { onPick(e.target.value); setOpen(false); }}
-              className="w-10 h-10 rounded-lg border-2 border-slate-200 dark:border-slate-600 cursor-pointer p-0.5" style={{ appearance: "auto" }} />
-            <div className="flex-1 flex items-center gap-1">
-              <span className="text-slate-400 text-[12px] font-mono">#</span>
-              <input type="text" value={customHex} onChange={(e) => setCustomHex(e.target.value.replace(/[^0-9a-fA-F]/g, "").slice(0, 6))}
-                placeholder="hex code" maxLength={6}
-                onKeyDown={(e) => e.key === "Enter" && applyCustom()}
-                className="flex-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-md px-2 py-1.5 text-[12px] text-slate-700 dark:text-slate-200 outline-none font-mono" />
-              <button type="button" onMouseDown={(e) => { e.preventDefault(); applyCustom(); }}
-                className="px-2.5 py-1.5 rounded-md text-[11px] font-bold bg-blue-500 text-white hover:bg-blue-600">OK</button>
-            </div>
+              className="w-8 h-8 rounded-md border border-slate-200 dark:border-slate-600 cursor-pointer flex-shrink-0" />
+            <span className="text-slate-400 text-[11px] font-mono flex-shrink-0">#</span>
+            <input type="text" value={customHex} onChange={(e) => setCustomHex(e.target.value.replace(/[^0-9a-fA-F]/g, "").slice(0, 6))}
+              placeholder="hex" maxLength={6}
+              onKeyDown={(e) => e.key === "Enter" && applyCustom()}
+              className="w-[70px] bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md px-2 py-1 text-[11px] text-slate-700 dark:text-slate-200 outline-none font-mono" />
+            <button type="button" onMouseDown={(e) => { e.preventDefault(); applyCustom(); }}
+              className="px-2 py-1 rounded-md text-[10px] font-bold bg-blue-500 text-white hover:bg-blue-600 flex-shrink-0">OK</button>
           </div>
           {current && (
             <div className="flex items-center gap-2 mb-1.5 px-1">
