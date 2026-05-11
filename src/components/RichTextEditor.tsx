@@ -15,7 +15,6 @@ import Placeholder from "@tiptap/extension-placeholder";
 import { useEffect, useState, useRef } from "react";
 import { useI18n } from "@/lib/i18n";
 
-/* ─── Custom Table Extensions ─── */
 const CustomTableCell = TableCell.extend({
   addAttributes() {
     return {
@@ -33,6 +32,7 @@ const CustomTableCell = TableCell.extend({
     };
   },
 });
+
 const CustomTableHeader = TableHeader.extend({
   addAttributes() {
     return {
@@ -51,13 +51,11 @@ const CustomTableHeader = TableHeader.extend({
   },
 });
 
-/* ─── Types ─── */
 interface Props {
   value: string;
   onChange: (html: string) => void;
 }
 
-/* ─── Toolbar Button ─── */
 function Btn({ onClick, active, title, children, className = "" }: {
   onClick: () => void; active?: boolean; title: string; children: React.ReactNode; className?: string;
 }) {
@@ -77,7 +75,6 @@ function Btn({ onClick, active, title, children, className = "" }: {
   );
 }
 
-/* ─── Color Picker Dropdown ─── */
 function ColorDropdown({ colors, current, onPick, children, title }: {
   colors: string[]; current?: string; onPick: (c: string | null) => void; children: React.ReactNode; title: string;
 }) {
@@ -138,17 +135,16 @@ function ColorDropdown({ colors, current, onPick, children, title }: {
   );
 }
 
-/* ─── Separator ─── */
 function Sep() {
   return <span className="w-px h-6 bg-slate-200 dark:bg-slate-700 mx-0.5 flex-shrink-0" />;
 }
 
-/* ─── Color Swatches ─── */
 const TEXT_COLORS = [
   "#000000", "#434343", "#666666", "#999999", "#cccccc", "#efefef",
   "#dc2626", "#ea580c", "#ca8a04", "#16a34a", "#2563eb", "#7c3aed",
   "#db2777", "#0891b2", "#4f46e5", "#059669", "#d97706", "#9333ea",
 ];
+
 const HIGHLIGHT_COLORS = [
   "transparent",
   "#fef08a", "#fde68a", "#fed7aa", "#fecaca", "#bbf7d0",
@@ -157,7 +153,16 @@ const HIGHLIGHT_COLORS = [
   "#ede9fe", "#fdf2f8",
 ];
 
-/* ─── SVG Icons ─── */
+const CELL_BG_COLORS = [
+  "transparent", "#ffffff", "#f8fafc", "#fef9c3", "#fee2e2", "#dcfce7",
+  "#dbeafe", "#ede9fe", "#fce7f3", "#ccfbf1", "#e2e8f0", "#fde68a",
+];
+
+const BORDER_COLORS = [
+  "#94a3b8", "#64748b", "#475569", "#334155", "#0f172a", "#dc2626",
+  "#ea580c", "#ca8a04", "#16a34a", "#2563eb", "#7c3aed", "#db2777",
+];
+
 const icons = {
   undo: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>,
   redo: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.13-9.36L23 10"/></svg>,
@@ -179,9 +184,10 @@ const icons = {
   hr: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="3" y1="12" x2="21" y2="12"/></svg>,
   table: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>,
   clearFormat: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/><line x1="3" y1="21" x2="21" y2="3"/></svg>,
+  fullscreen: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>,
+  minimize: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="14" y1="10" x2="21" y2="3"/><line x1="3" y1="21" x2="10" y2="14"/></svg>,
 };
 
-/* ─── Table Button (compact) ─── */
 function TblBtn({ onClick, children, danger }: { onClick: () => void; children: React.ReactNode; danger?: boolean }) {
   return (
     <button
@@ -198,12 +204,10 @@ function TblBtn({ onClick, children, danger }: { onClick: () => void; children: 
   );
 }
 
-/* ═══════════════════════════════════════════
-   MAIN EDITOR
-   ═══════════════════════════════════════════ */
 export default function RichTextEditor({ value, onChange }: Props) {
   const { lang } = useI18n();
   const isAr = lang === "ar";
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   const editor = useEditor({
     immediatelyRender: false,
@@ -241,224 +245,262 @@ export default function RichTextEditor({ value, onChange }: Props) {
     }
   }, [value, editor]);
 
+  useEffect(() => {
+    if (!isFullscreen || typeof document === "undefined") return;
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, [isFullscreen]);
+
   if (!editor) return null;
 
   const inTable = editor.isActive("table");
+  let hasAnyTable = false;
+  let firstTableCellPos = -1;
 
-  // Current heading level for dropdown
+  editor.state.doc.descendants((node, pos) => {
+    if (!hasAnyTable && node.type.name === "table") hasAnyTable = true;
+    if (firstTableCellPos === -1 && node.type.name === "tableCell") firstTableCellPos = pos + 1;
+    return true;
+  });
+
+  const focusFirstTableCell = () => {
+    if (firstTableCellPos > 0) {
+      editor.chain().focus().setTextSelection(firstTableCellPos).run();
+      return true;
+    }
+    return false;
+  };
+
+  const handlePrimaryTableAction = () => {
+    if (hasAnyTable && !inTable && focusFirstTableCell()) return;
+    editor.chain().focus("end").insertContent("<p></p>").insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
+  };
+
+  const handleInsertNewTable = () => {
+    editor.chain().focus("end").insertContent("<p></p>").insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
+  };
+
   const headingValue = editor.isActive("heading", { level: 1 })
-    ? "h1" : editor.isActive("heading", { level: 2 })
-    ? "h2" : editor.isActive("heading", { level: 3 })
-    ? "h3" : "p";
+    ? "h1"
+    : editor.isActive("heading", { level: 2 })
+    ? "h2"
+    : editor.isActive("heading", { level: 3 })
+    ? "h3"
+    : "p";
 
   return (
-    <div className="border border-slate-200 dark:border-slate-700 rounded-2xl overflow-hidden bg-white dark:bg-slate-950 shadow-sm">
-      {/* ═══ Styles ═══ */}
-      <style jsx global>{`
-        .draft-editor-content {
-          min-height: 400px;
-          outline: none;
-          font-size: 16px;
-          line-height: 1.7;
-          padding: 24px 28px;
-          color: #1e293b;
-        }
-        @media (max-width: 640px) {
-          .draft-editor-content { padding: 16px 18px; font-size: 15px; line-height: 1.65; }
-        }
-        .draft-editor-content p.is-editor-empty:first-child::before {
-          content: attr(data-placeholder);
-          float: left; color: #94a3b8; pointer-events: none; height: 0;
-        }
-        [dir="rtl"] .draft-editor-content p.is-editor-empty:first-child::before { float: right; }
-        .draft-editor-content h1 { font-size: 1.75em; font-weight: 800; margin: 0.8em 0 0.3em; color: #0f172a; letter-spacing: -0.02em; }
-        .draft-editor-content h2 { font-size: 1.4em; font-weight: 700; margin: 0.7em 0 0.25em; color: #1e293b; }
-        .draft-editor-content h3 { font-size: 1.15em; font-weight: 700; margin: 0.6em 0 0.2em; color: #334155; }
-        .draft-editor-content p { margin: 0.25em 0; }
-        .draft-editor-content ul, .draft-editor-content ol { padding-inline-start: 1.5em; margin: 0.4em 0; }
-        .draft-editor-content ul { list-style: disc; }
-        .draft-editor-content ol { list-style: decimal; }
-        .draft-editor-content li { margin: 0.15em 0; }
-        .draft-editor-content li p { margin: 0; }
-        .draft-editor-content blockquote {
-          border-inline-start: 3px solid #3b82f6;
-          padding-inline-start: 1em; margin: 0.6em 0;
-          color: #64748b; font-style: italic;
-        }
-        .draft-editor-content hr { border: none; border-top: 2px solid #e2e8f0; margin: 1.5em 0; }
-        .draft-editor-content strong { font-weight: 700; }
-        .draft-editor-content em { font-style: italic; }
-        .draft-editor-content u { text-decoration: underline; text-underline-offset: 3px; }
-        .draft-editor-content s { text-decoration: line-through; color: #94a3b8; }
-        .draft-editor-content mark { border-radius: 3px; padding: 1px 4px; }
-        .draft-editor-content table.draft-table { border-collapse: collapse; width: 100%; margin: 16px 0; table-layout: auto; border: 2px solid #64748b; }
-        .draft-editor-content table.draft-table td,
-        .draft-editor-content table.draft-table th {
-          border: 1.5px solid #94a3b8; padding: 10px 12px; vertical-align: top; min-width: 60px;
-        }
-        .draft-editor-content table.draft-table th { background: #f1f5f9; font-weight: 700; font-size: 0.9em; color: #334155; border-bottom: 2.5px solid #64748b; }
-        .draft-editor-content table { border-collapse: collapse; width: 100%; margin: 16px 0; border: 2px solid #64748b; }
-        .draft-editor-content table td, .draft-editor-content table th { border: 1.5px solid #94a3b8; padding: 10px 12px; vertical-align: top; min-width: 60px; }
-        .draft-editor-content table th { background: #f1f5f9; font-weight: 700; border-bottom: 2.5px solid #64748b; }
-        .draft-editor-content table.draft-table .selectedCell {
-          background: rgba(59, 130, 246, 0.08); outline: 2px solid #3b82f6; outline-offset: -2px;
-        }
-        .draft-editor-content .tableWrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-        .draft-editor-content .column-resize-handle { background-color: #3b82f6; width: 2px; position: absolute; right: -1px; top: 0; bottom: 0; pointer-events: none; }
-        .draft-editor-content ::selection { background: rgba(59, 130, 246, 0.15); }
-      `}</style>
+    <div className={isFullscreen ? "fixed inset-0 z-[90] bg-slate-950/80 backdrop-blur-sm p-2 sm:p-4" : ""}>
+      <div className={`border border-slate-200 dark:border-slate-700 overflow-hidden bg-white dark:bg-slate-950 shadow-sm ${isFullscreen ? "h-full rounded-2xl flex flex-col max-w-7xl mx-auto" : "rounded-2xl"}`}>
+        <style jsx global>{`
+          .draft-editor-content {
+            min-height: 400px;
+            outline: none;
+            font-size: 16px;
+            line-height: 1.7;
+            padding: 24px 28px;
+            color: #1e293b;
+          }
+          @media (max-width: 640px) {
+            .draft-editor-content { padding: 16px 18px; font-size: 15px; line-height: 1.65; }
+          }
+          .draft-editor-content p.is-editor-empty:first-child::before {
+            content: attr(data-placeholder);
+            float: left; color: #94a3b8; pointer-events: none; height: 0;
+          }
+          [dir="rtl"] .draft-editor-content p.is-editor-empty:first-child::before { float: right; }
+          .draft-editor-content h1 { font-size: 1.75em; font-weight: 800; margin: 0.8em 0 0.3em; color: #0f172a; letter-spacing: -0.02em; }
+          .draft-editor-content h2 { font-size: 1.4em; font-weight: 700; margin: 0.7em 0 0.25em; color: #1e293b; }
+          .draft-editor-content h3 { font-size: 1.15em; font-weight: 700; margin: 0.6em 0 0.2em; color: #334155; }
+          .draft-editor-content p { margin: 0.25em 0; }
+          .draft-editor-content ul, .draft-editor-content ol { padding-inline-start: 1.5em; margin: 0.4em 0; }
+          .draft-editor-content ul { list-style: disc; }
+          .draft-editor-content ol { list-style: decimal; }
+          .draft-editor-content li { margin: 0.15em 0; }
+          .draft-editor-content li p { margin: 0; }
+          .draft-editor-content blockquote {
+            border-inline-start: 3px solid #3b82f6;
+            padding-inline-start: 1em; margin: 0.6em 0;
+            color: #64748b; font-style: italic;
+          }
+          .draft-editor-content hr { border: none; border-top: 2px solid #e2e8f0; margin: 1.5em 0; }
+          .draft-editor-content strong { font-weight: 700; }
+          .draft-editor-content em { font-style: italic; }
+          .draft-editor-content u { text-decoration: underline; text-underline-offset: 3px; }
+          .draft-editor-content s { text-decoration: line-through; color: #94a3b8; }
+          .draft-editor-content mark { border-radius: 3px; padding: 1px 4px; }
+          .draft-editor-content table.draft-table { border-collapse: collapse; width: 100%; margin: 16px 0; table-layout: auto; border: 2px solid #64748b; }
+          .draft-editor-content table.draft-table td,
+          .draft-editor-content table.draft-table th {
+            border: 1.5px solid #94a3b8; padding: 10px 12px; vertical-align: top; min-width: 60px;
+          }
+          .draft-editor-content table.draft-table th { background: #f1f5f9; font-weight: 700; font-size: 0.9em; color: #334155; border-bottom: 2.5px solid #64748b; }
+          .draft-editor-content table { border-collapse: collapse; width: 100%; margin: 16px 0; border: 2px solid #64748b; }
+          .draft-editor-content table td, .draft-editor-content table th { border: 1.5px solid #94a3b8; padding: 10px 12px; vertical-align: top; min-width: 60px; }
+          .draft-editor-content table th { background: #f1f5f9; font-weight: 700; border-bottom: 2.5px solid #64748b; }
+          .draft-editor-content table.draft-table .selectedCell {
+            background: rgba(59, 130, 246, 0.08); outline: 2px solid #3b82f6; outline-offset: -2px;
+          }
+          .draft-editor-content .tableWrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+          .draft-editor-content .column-resize-handle { background-color: #3b82f6; width: 2px; position: absolute; right: -1px; top: 0; bottom: 0; pointer-events: none; }
+          .draft-editor-content ::selection { background: rgba(59, 130, 246, 0.15); }
+        `}</style>
 
-      {/* ═══ Toolbar ═══ */}
-      <div className="border-b border-slate-200 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-900/80">
-        {/* Row 1: Main toolbar */}
-        <div className="flex items-center gap-0.5 px-2 py-1.5 overflow-x-auto scrollbar-hide">
-          {/* Undo / Redo */}
-          <Btn onClick={() => editor.chain().focus().undo().run()} title="Undo (Ctrl+Z)">{icons.undo}</Btn>
-          <Btn onClick={() => editor.chain().focus().redo().run()} title="Redo (Ctrl+Y)">{icons.redo}</Btn>
+        <div className="border-b border-slate-200 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-900/80">
+          <div className="flex items-center gap-0.5 px-2 py-1.5 overflow-x-auto scrollbar-hide">
+            <Btn onClick={() => setIsFullscreen((v) => !v)} title={isFullscreen ? (isAr ? "إلغاء ملء الشاشة" : "Exit Full Screen") : (isAr ? "ملء الشاشة" : "Full Screen")}>
+              {isFullscreen ? icons.minimize : icons.fullscreen}
+            </Btn>
+            <Sep />
+            <Btn onClick={() => editor.chain().focus().undo().run()} title="Undo (Ctrl+Z)">{icons.undo}</Btn>
+            <Btn onClick={() => editor.chain().focus().redo().run()} title="Redo (Ctrl+Y)">{icons.redo}</Btn>
+            <Sep />
 
-          <Sep />
+            <select
+              value={headingValue}
+              onChange={(e) => {
+                const v = e.target.value;
+                if (v === "p") editor.chain().focus().setParagraph().run();
+                else editor.chain().focus().toggleHeading({ level: Number(v.slice(1)) as 1 | 2 | 3 }).run();
+              }}
+              className="h-8 px-2 rounded-md text-[13px] font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/30 cursor-pointer min-w-[110px]"
+            >
+              <option value="p">{isAr ? "نص عادي" : "Paragraph"}</option>
+              <option value="h1">{isAr ? "عنوان ١" : "Heading 1"}</option>
+              <option value="h2">{isAr ? "عنوان ٢" : "Heading 2"}</option>
+              <option value="h3">{isAr ? "عنوان ٣" : "Heading 3"}</option>
+            </select>
 
-          {/* Heading Dropdown */}
-          <select
-            value={headingValue}
-            onChange={(e) => {
-              const v = e.target.value;
-              if (v === "p") editor.chain().focus().setParagraph().run();
-              else editor.chain().focus().toggleHeading({ level: Number(v.slice(1)) as 1 | 2 | 3 }).run();
-            }}
-            className="h-8 px-2 rounded-md text-[13px] font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/30 cursor-pointer min-w-[110px]"
-          >
-            <option value="p">{isAr ? "نص عادي" : "Paragraph"}</option>
-            <option value="h1">{isAr ? "عنوان ١" : "Heading 1"}</option>
-            <option value="h2">{isAr ? "عنوان ٢" : "Heading 2"}</option>
-            <option value="h3">{isAr ? "عنوان ٣" : "Heading 3"}</option>
-          </select>
+            <select
+              defaultValue=""
+              onChange={(e) => {
+                const v = e.target.value;
+                if (!v) editor.chain().focus().unsetMark("textStyle").run();
+                else editor.chain().focus().setMark("textStyle", { fontSize: `${v}px` }).run();
+              }}
+              className="h-8 px-1.5 rounded-md text-[13px] font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/30 cursor-pointer w-[62px]"
+            >
+              <option value="">{isAr ? "حجم" : "Size"}</option>
+              <option value="12">12</option>
+              <option value="14">14</option>
+              <option value="16">16</option>
+              <option value="18">18</option>
+              <option value="20">20</option>
+              <option value="24">24</option>
+              <option value="28">28</option>
+              <option value="32">32</option>
+            </select>
 
-          {/* Font Size */}
-          <select
-            defaultValue=""
-            onChange={(e) => {
-              const v = e.target.value;
-              if (!v) editor.chain().focus().unsetMark("textStyle").run();
-              else editor.chain().focus().setMark("textStyle", { fontSize: `${v}px` }).run();
-            }}
-            className="h-8 px-1.5 rounded-md text-[13px] font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/30 cursor-pointer w-[62px]"
-          >
-            <option value="">{isAr ? "حجم" : "Size"}</option>
-            <option value="12">12</option>
-            <option value="14">14</option>
-            <option value="16">16</option>
-            <option value="18">18</option>
-            <option value="20">20</option>
-            <option value="24">24</option>
-            <option value="28">28</option>
-            <option value="32">32</option>
-          </select>
+            <Sep />
+            <Btn onClick={() => editor.chain().focus().toggleBold().run()} active={editor.isActive("bold")} title="Bold (Ctrl+B)">{icons.bold}</Btn>
+            <Btn onClick={() => editor.chain().focus().toggleItalic().run()} active={editor.isActive("italic")} title="Italic (Ctrl+I)">{icons.italic}</Btn>
+            <Btn onClick={() => editor.chain().focus().toggleUnderline().run()} active={editor.isActive("underline")} title="Underline (Ctrl+U)">{icons.underline}</Btn>
+            <Btn onClick={() => editor.chain().focus().toggleStrike().run()} active={editor.isActive("strike")} title="Strikethrough">{icons.strike}</Btn>
 
-          <Sep />
+            <Sep />
+            <ColorDropdown
+              colors={TEXT_COLORS}
+              current={editor.getAttributes("textStyle").color}
+              onPick={(c) => c ? editor.chain().focus().setColor(c).run() : editor.chain().focus().unsetColor().run()}
+              title={isAr ? "لون النص" : "Text Color"}
+            >
+              <div className="flex flex-col items-center">
+                {icons.textColor}
+                <span className="w-4 h-1 rounded-full mt-0.5" style={{ background: editor.getAttributes("textStyle").color || "#000" }} />
+              </div>
+            </ColorDropdown>
+            <ColorDropdown
+              colors={HIGHLIGHT_COLORS}
+              current={editor.getAttributes("highlight").color}
+              onPick={(c) => c ? editor.chain().focus().setHighlight({ color: c }).run() : editor.chain().focus().unsetHighlight().run()}
+              title={isAr ? "تمييز" : "Highlight"}
+            >
+              <div className="flex flex-col items-center">
+                {icons.highlight}
+                <span className="w-4 h-1 rounded-full mt-0.5" style={{ background: editor.getAttributes("highlight").color || "#fef08a" }} />
+              </div>
+            </ColorDropdown>
 
-          {/* Bold / Italic / Underline / Strike */}
-          <Btn onClick={() => editor.chain().focus().toggleBold().run()} active={editor.isActive("bold")} title="Bold (Ctrl+B)">{icons.bold}</Btn>
-          <Btn onClick={() => editor.chain().focus().toggleItalic().run()} active={editor.isActive("italic")} title="Italic (Ctrl+I)">{icons.italic}</Btn>
-          <Btn onClick={() => editor.chain().focus().toggleUnderline().run()} active={editor.isActive("underline")} title="Underline (Ctrl+U)">{icons.underline}</Btn>
-          <Btn onClick={() => editor.chain().focus().toggleStrike().run()} active={editor.isActive("strike")} title="Strikethrough">{icons.strike}</Btn>
+            <Sep />
+            <Btn onClick={() => editor.chain().focus().setTextAlign("left").run()} active={editor.isActive({ textAlign: "left" })} title="Align Left">{icons.alignLeft}</Btn>
+            <Btn onClick={() => editor.chain().focus().setTextAlign("center").run()} active={editor.isActive({ textAlign: "center" })} title="Align Center">{icons.alignCenter}</Btn>
+            <Btn onClick={() => editor.chain().focus().setTextAlign("right").run()} active={editor.isActive({ textAlign: "right" })} title="Align Right">{icons.alignRight}</Btn>
+            <Btn onClick={() => editor.chain().focus().setTextAlign("justify").run()} active={editor.isActive({ textAlign: "justify" })} title="Justify">{icons.alignJustify}</Btn>
 
-          <Sep />
+            <Sep />
+            <Btn onClick={() => editor.chain().focus().toggleBulletList().run()} active={editor.isActive("bulletList")} title={isAr ? "قائمة نقاط" : "Bullet List"}>{icons.bulletList}</Btn>
+            <Btn onClick={() => editor.chain().focus().toggleOrderedList().run()} active={editor.isActive("orderedList")} title={isAr ? "قائمة مرقمة" : "Numbered List"}>{icons.orderedList}</Btn>
+            <Btn onClick={() => editor.chain().focus().sinkListItem("listItem").run()} title={isAr ? "مسافة بادئة" : "Indent"}>{icons.indent}</Btn>
+            <Btn onClick={() => editor.chain().focus().liftListItem("listItem").run()} title={isAr ? "إلغاء المسافة" : "Outdent"}>{icons.outdent}</Btn>
 
-          {/* Text Color & Highlight */}
-          <ColorDropdown
-            colors={TEXT_COLORS}
-            current={editor.getAttributes("textStyle").color}
-            onPick={(c) => c ? editor.chain().focus().setColor(c).run() : editor.chain().focus().unsetColor().run()}
-            title={isAr ? "لون النص" : "Text Color"}
-          >
-            <div className="flex flex-col items-center">
-              {icons.textColor}
-              <span className="w-4 h-1 rounded-full mt-0.5" style={{ background: editor.getAttributes("textStyle").color || "#000" }} />
+            <Sep />
+            <Btn onClick={() => editor.chain().focus().toggleBlockquote().run()} active={editor.isActive("blockquote")} title={isAr ? "اقتباس" : "Quote"}>{icons.blockquote}</Btn>
+            <Btn onClick={() => editor.chain().focus().setHorizontalRule().run()} title={isAr ? "فاصل أفقي" : "Horizontal Rule"}>{icons.hr}</Btn>
+            <Btn
+              onClick={handlePrimaryTableAction}
+              active={editor.isActive("table")}
+              title={hasAnyTable && !inTable ? (isAr ? "تعديل الجدول الحالي" : "Edit Existing Table") : (isAr ? "إدراج جدول" : "Insert Table")}
+            >
+              {icons.table}
+            </Btn>
+            {hasAnyTable && !inTable && (
+              <Btn onClick={handleInsertNewTable} title={isAr ? "إدراج جدول جديد" : "Insert New Table"} className="text-[10px] w-auto px-2">
+                +
+              </Btn>
+            )}
+
+            <Sep />
+            <Btn onClick={() => editor.chain().focus().clearNodes().unsetAllMarks().run()} title={isAr ? "مسح التنسيق" : "Clear Formatting"}>{icons.clearFormat}</Btn>
+          </div>
+
+          {(inTable || hasAnyTable) && (
+            <div className="flex flex-wrap items-center gap-0.5 px-3 py-1.5 border-t border-slate-200 dark:border-slate-700 bg-blue-50/50 dark:bg-blue-500/5">
+              <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider mr-1.5">{isAr ? "جدول" : "Table"}</span>
+              {!inTable && hasAnyTable && (
+                <TblBtn onClick={focusFirstTableCell}>{isAr ? "تحديد الجدول" : "Focus table"}</TblBtn>
+              )}
+              <TblBtn onClick={() => editor.chain().focus().addRowAfter().run()}>+ {isAr ? "صف" : "Row"}</TblBtn>
+              <TblBtn onClick={() => editor.chain().focus().addColumnAfter().run()}>+ {isAr ? "عمود" : "Col"}</TblBtn>
+              <TblBtn onClick={() => editor.chain().focus().deleteRow().run()} danger>− {isAr ? "صف" : "Row"}</TblBtn>
+              <TblBtn onClick={() => editor.chain().focus().deleteColumn().run()} danger>− {isAr ? "عمود" : "Col"}</TblBtn>
+              <span className="w-px h-4 bg-slate-300 dark:bg-slate-700 mx-1" />
+              <TblBtn onClick={() => editor.chain().focus().mergeCells().run()}>{isAr ? "دمج" : "Merge"}</TblBtn>
+              <TblBtn onClick={() => editor.chain().focus().splitCell().run()}>{isAr ? "فصل" : "Split"}</TblBtn>
+              <TblBtn onClick={() => editor.chain().focus().toggleHeaderRow().run()}>{isAr ? "صف رأسي" : "H-Row"}</TblBtn>
+              <TblBtn onClick={() => editor.chain().focus().toggleHeaderColumn().run()}>{isAr ? "عمود رأسي" : "H-Col"}</TblBtn>
+              <span className="w-px h-4 bg-slate-300 dark:bg-slate-700 mx-1" />
+              <ColorDropdown
+                colors={CELL_BG_COLORS}
+                current={editor.getAttributes("tableCell").backgroundColor || editor.getAttributes("tableHeader").backgroundColor}
+                onPick={(c) => editor.chain().focus().setCellAttribute("backgroundColor", c).run()}
+                title={isAr ? "لون الخلية" : "Cell Background"}
+              >
+                <span className="text-[10px] font-bold">BG</span>
+              </ColorDropdown>
+              <ColorDropdown
+                colors={BORDER_COLORS}
+                current={editor.getAttributes("tableCell").borderColor || editor.getAttributes("tableHeader").borderColor}
+                onPick={(c) => editor.chain().focus().setCellAttribute("borderColor", c).run()}
+                title={isAr ? "لون الحدود" : "Border Color"}
+              >
+                <span className="text-[10px] font-bold">BD</span>
+              </ColorDropdown>
+              <span className="w-px h-4 bg-slate-300 dark:bg-slate-700 mx-1" />
+              <TblBtn onClick={() => editor.chain().focus().deleteTable().run()} danger>🗑 {isAr ? "حذف" : "Delete"}</TblBtn>
             </div>
-          </ColorDropdown>
-          <ColorDropdown
-            colors={HIGHLIGHT_COLORS}
-            current={editor.getAttributes("highlight").color}
-            onPick={(c) => c ? editor.chain().focus().setHighlight({ color: c }).run() : editor.chain().focus().unsetHighlight().run()}
-            title={isAr ? "تمييز" : "Highlight"}
-          >
-            <div className="flex flex-col items-center">
-              {icons.highlight}
-              <span className="w-4 h-1 rounded-full mt-0.5" style={{ background: editor.getAttributes("highlight").color || "#fef08a" }} />
-            </div>
-          </ColorDropdown>
-
-          <Sep />
-
-          {/* Alignment */}
-          <Btn onClick={() => editor.chain().focus().setTextAlign("left").run()} active={editor.isActive({ textAlign: "left" })} title="Align Left">{icons.alignLeft}</Btn>
-          <Btn onClick={() => editor.chain().focus().setTextAlign("center").run()} active={editor.isActive({ textAlign: "center" })} title="Align Center">{icons.alignCenter}</Btn>
-          <Btn onClick={() => editor.chain().focus().setTextAlign("right").run()} active={editor.isActive({ textAlign: "right" })} title="Align Right">{icons.alignRight}</Btn>
-          <Btn onClick={() => editor.chain().focus().setTextAlign("justify").run()} active={editor.isActive({ textAlign: "justify" })} title="Justify">{icons.alignJustify}</Btn>
-
-          <Sep />
-
-          {/* Lists */}
-          <Btn onClick={() => editor.chain().focus().toggleBulletList().run()} active={editor.isActive("bulletList")} title={isAr ? "قائمة نقاط" : "Bullet List"}>{icons.bulletList}</Btn>
-          <Btn onClick={() => editor.chain().focus().toggleOrderedList().run()} active={editor.isActive("orderedList")} title={isAr ? "قائمة مرقمة" : "Numbered List"}>{icons.orderedList}</Btn>
-          <Btn onClick={() => editor.chain().focus().sinkListItem("listItem").run()} title={isAr ? "مسافة بادئة" : "Indent"}>{icons.indent}</Btn>
-          <Btn onClick={() => editor.chain().focus().liftListItem("listItem").run()} title={isAr ? "إلغاء المسافة" : "Outdent"}>{icons.outdent}</Btn>
-
-          <Sep />
-
-          {/* Blockquote / HR / Table */}
-          <Btn onClick={() => editor.chain().focus().toggleBlockquote().run()} active={editor.isActive("blockquote")} title={isAr ? "اقتباس" : "Quote"}>{icons.blockquote}</Btn>
-          <Btn onClick={() => editor.chain().focus().setHorizontalRule().run()} title={isAr ? "فاصل أفقي" : "Horizontal Rule"}>{icons.hr}</Btn>
-          <Btn
-            onClick={() => {
-              if (editor.isActive("table")) return;
-              editor.chain().focus("end").insertContent("<p></p>").insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
-            }}
-            active={editor.isActive("table")}
-            title={isAr ? "إدراج جدول" : "Insert Table"}
-          >
-            {icons.table}
-          </Btn>
-
-          <Sep />
-
-          {/* Clear Formatting */}
-          <Btn
-            onClick={() => editor.chain().focus().clearNodes().unsetAllMarks().run()}
-            title={isAr ? "مسح التنسيق" : "Clear Formatting"}
-          >
-            {icons.clearFormat}
-          </Btn>
+          )}
         </div>
 
-        {/* Row 2: Table tools (only visible when cursor is in table) */}
-        {inTable && (
-          <div className="flex flex-wrap items-center gap-0.5 px-3 py-1.5 border-t border-slate-200 dark:border-slate-700 bg-blue-50/50 dark:bg-blue-500/5">
-            <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider mr-1.5">{isAr ? "جدول" : "Table"}</span>
-            <TblBtn onClick={() => editor.chain().focus().addRowAfter().run()}>+ {isAr ? "صف" : "Row"}</TblBtn>
-            <TblBtn onClick={() => editor.chain().focus().addColumnAfter().run()}>+ {isAr ? "عمود" : "Col"}</TblBtn>
-            <TblBtn onClick={() => editor.chain().focus().deleteRow().run()} danger>− {isAr ? "صف" : "Row"}</TblBtn>
-            <TblBtn onClick={() => editor.chain().focus().deleteColumn().run()} danger>− {isAr ? "عمود" : "Col"}</TblBtn>
-            <span className="w-px h-4 bg-slate-300 dark:bg-slate-700 mx-1" />
-            <TblBtn onClick={() => editor.chain().focus().mergeCells().run()}>{isAr ? "دمج" : "Merge"}</TblBtn>
-            <TblBtn onClick={() => editor.chain().focus().splitCell().run()}>{isAr ? "فصل" : "Split"}</TblBtn>
-            <TblBtn onClick={() => editor.chain().focus().toggleHeaderRow().run()}>{isAr ? "صف رأسي" : "H-Row"}</TblBtn>
-            <span className="w-px h-4 bg-slate-300 dark:bg-slate-700 mx-1" />
-            <TblBtn onClick={() => editor.chain().focus().deleteTable().run()} danger>🗑 {isAr ? "حذف" : "Delete"}</TblBtn>
-          </div>
-        )}
-      </div>
+        <div className={`bg-white dark:bg-slate-950 ${isFullscreen ? "flex-1 overflow-y-auto" : ""}`}>
+          <EditorContent editor={editor} />
+        </div>
 
-      {/* ═══ Editor Area ═══ */}
-      <EditorContent editor={editor} />
-
-      {/* ═══ Status Bar ═══ */}
-      <div className="flex items-center justify-between px-4 py-1.5 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 text-[10px] text-slate-400">
-        <span>{headingValue === "p" ? (isAr ? "نص عادي" : "Paragraph") : headingValue.toUpperCase()}</span>
-        <span>
-          {editor.getText().split(/\s+/).filter(Boolean).length} {isAr ? "كلمة" : "words"}
-        </span>
+        <div className="flex items-center justify-between px-4 py-1.5 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 text-[10px] text-slate-400">
+          <span>{headingValue === "p" ? (isAr ? "نص عادي" : "Paragraph") : headingValue.toUpperCase()}</span>
+          <span>{editor.getText().split(/\s+/).filter(Boolean).length} {isAr ? "كلمة" : "words"}</span>
+        </div>
       </div>
     </div>
   );
