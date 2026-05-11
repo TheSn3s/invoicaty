@@ -23,17 +23,29 @@ const CustomTableCell = TableCell.extend({
       backgroundColor: {
         default: null,
         parseHTML: (el) => (el as HTMLElement).style.backgroundColor || (el as HTMLElement).getAttribute("data-bg") || null,
-        renderHTML: (a) => a.backgroundColor ? { style: `background-color: ${a.backgroundColor}` } : {},
+        renderHTML: (a) => {
+          const s: string[] = [];
+          if (a.backgroundColor) s.push(`background-color:${a.backgroundColor}`);
+          if (a.borderColor) s.push(`border-color:${a.borderColor}`);
+          if (a.borderWidth) s.push(`border-width:${a.borderWidth}px`);
+          return s.length ? { style: s.join(";") } : {};
+        },
       },
       borderColor: {
         default: null,
-        parseHTML: (el) => (el as HTMLElement).getAttribute("data-border") || null,
-        renderHTML: (a) => a.borderColor ? { "data-border": a.borderColor } : {},
+        parseHTML: (el) => {
+          const bc = (el as HTMLElement).style.borderColor;
+          return bc || (el as HTMLElement).getAttribute("data-border") || null;
+        },
+        renderHTML: () => ({}),
       },
       borderWidth: {
         default: null,
-        parseHTML: (el) => (el as HTMLElement).getAttribute("data-bw") || null,
-        renderHTML: (a) => a.borderWidth ? { "data-bw": a.borderWidth } : {},
+        parseHTML: (el) => {
+          const bw = (el as HTMLElement).style.borderWidth;
+          return bw ? parseFloat(bw).toString() : (el as HTMLElement).getAttribute("data-bw") || null;
+        },
+        renderHTML: () => ({}),
       },
     };
   },
@@ -46,17 +58,29 @@ const CustomTableHeader = TableHeader.extend({
       backgroundColor: {
         default: null,
         parseHTML: (el) => (el as HTMLElement).style.backgroundColor || null,
-        renderHTML: (a) => a.backgroundColor ? { style: `background-color: ${a.backgroundColor}` } : {},
+        renderHTML: (a) => {
+          const s: string[] = [];
+          if (a.backgroundColor) s.push(`background-color:${a.backgroundColor}`);
+          if (a.borderColor) s.push(`border-color:${a.borderColor}`);
+          if (a.borderWidth) s.push(`border-width:${a.borderWidth}px`);
+          return s.length ? { style: s.join(";") } : {};
+        },
       },
       borderColor: {
         default: null,
-        parseHTML: (el) => (el as HTMLElement).getAttribute("data-border") || null,
-        renderHTML: (a) => a.borderColor ? { "data-border": a.borderColor } : {},
+        parseHTML: (el) => {
+          const bc = (el as HTMLElement).style.borderColor;
+          return bc || (el as HTMLElement).getAttribute("data-border") || null;
+        },
+        renderHTML: () => ({}),
       },
       borderWidth: {
         default: null,
-        parseHTML: (el) => (el as HTMLElement).getAttribute("data-bw") || null,
-        renderHTML: (a) => a.borderWidth ? { "data-bw": a.borderWidth } : {},
+        parseHTML: (el) => {
+          const bw = (el as HTMLElement).style.borderWidth;
+          return bw ? parseFloat(bw).toString() : (el as HTMLElement).getAttribute("data-bw") || null;
+        },
+        renderHTML: () => ({}),
       },
     };
   },
@@ -351,50 +375,33 @@ export default function RichTextEditor({ value, onChange, brandColor = "#3b82f6"
 
   const insertPresetTable = (type: PresetType) => {
     const cfg = getPresetConfig(type, isAr);
-    const totalRows = cfg.rows.length + 1; // +1 for header
-    editor.chain().focus("end").insertContent("<p></p>").insertTable({ rows: totalRows, cols: cfg.cols, withHeaderRow: true }).run();
-    // Fill cells after table is inserted
-    setTimeout(() => {
-      const { state } = editor.view;
-      const cells: { pos: number; isHeader: boolean }[] = [];
-      state.doc.descendants((node, pos) => {
-        if (node.type.name === "tableHeader" || node.type.name === "tableCell") {
-          cells.push({ pos, isHeader: node.type.name === "tableHeader" });
-        }
-      });
-      // Find the last inserted table's cells (take last totalRows*cols cells)
-      const tableCells = cells.slice(-totalRows * cfg.cols);
-      if (tableCells.length === totalRows * cfg.cols) {
-        const { tr } = editor.view.state;
-        // Fill header cells
-        for (let c = 0; c < cfg.cols; c++) {
-          const cell = tableCells[c];
-          if (cell) {
-            const cellNode = tr.doc.nodeAt(cell.pos);
-            if (cellNode) {
-              const textPos = cell.pos + 1;
-              tr.insertText(cfg.headers[c] || "", textPos, textPos + cellNode.content.size);
-            }
-          }
-        }
-        // Fill body cells
-        for (let r = 0; r < cfg.rows.length; r++) {
-          for (let c = 0; c < cfg.cols; c++) {
-            const idx = (r + 1) * cfg.cols + c;
-            const cell = tableCells[idx];
-            const val = cfg.rows[r][c];
-            if (cell && val) {
-              const cellNode = tr.doc.nodeAt(cell.pos);
-              if (cellNode) {
-                const textPos = cell.pos + 1;
-                tr.insertText(val, textPos, textPos + cellNode.content.size);
-              }
-            }
-          }
-        }
-        editor.view.dispatch(tr);
-      }
-    }, 50);
+    // Build Tiptap-compatible JSON content for the table
+    const headerRow = {
+      type: "tableRow",
+      content: cfg.headers.map(h => ({
+        type: "tableHeader",
+        attrs: { backgroundColor: brandColor, borderColor: brandColor, borderWidth: "1.5" },
+        content: [{ type: "paragraph", content: h ? [{ type: "text", text: h }] : [] }],
+      })),
+    };
+    const bg = lighten(brandColor, 0.85);
+    const borderCol = lighten(brandColor, 0.5);
+    const bodyRows = cfg.rows.map((row, ri) => ({
+      type: "tableRow",
+      content: row.map(cellVal => ({
+        type: "tableCell",
+        attrs: {
+          backgroundColor: ri % 2 === 1 ? bg : null,
+          borderColor: borderCol,
+          borderWidth: "1.5",
+        },
+        content: [{ type: "paragraph", content: cellVal ? [{ type: "text", text: cellVal }] : [] }],
+      })),
+    }));
+    editor.chain().focus("end").insertContent([
+      { type: "paragraph" },
+      { type: "table", content: [headerRow, ...bodyRows] },
+    ]).run();
   };
 
   /* Apply attribute to ALL cells in the current table */
@@ -424,16 +431,8 @@ export default function RichTextEditor({ value, onChange, brandColor = "#3b82f6"
     : editor.isActive("heading", { level: 2 }) ? "h2"
     : editor.isActive("heading", { level: 3 }) ? "h3" : "p";
 
-  /* ─── Dynamic border CSS for data-border / data-bw attributes ─── */
-  const dynamicBorderCss = `
-    .draft-editor-content table [data-border] { border-color: attr(data-border) !important; }
-    .draft-editor-content table [data-bw="0"] { border-width: 0 !important; }
-    .draft-editor-content table [data-bw="1"] { border-width: 1px !important; }
-    .draft-editor-content table [data-bw="1.5"] { border-width: 1.5px !important; }
-    .draft-editor-content table [data-bw="2"] { border-width: 2px !important; }
-    .draft-editor-content table [data-bw="3"] { border-width: 3px !important; }
-    .draft-editor-content table [data-bw="4"] { border-width: 4px !important; }
-  `;
+  /* ─── Dynamic border CSS ─── */
+  const dynamicBorderCss = "";
 
   return (
     <div className={isFullscreen ? "fixed inset-0 z-[90] bg-slate-950/80 backdrop-blur-sm p-2 sm:p-4" : ""}>
@@ -463,12 +462,12 @@ export default function RichTextEditor({ value, onChange, brandColor = "#3b82f6"
           .draft-editor-content u { text-decoration: underline; text-underline-offset: 3px; }
           .draft-editor-content s { text-decoration: line-through; color: #94a3b8; }
           .draft-editor-content mark { border-radius: 3px; padding: 1px 4px; }
-          .draft-editor-content table.draft-table { border-collapse: collapse; width: 100%; margin: 16px 0; table-layout: auto; border: 2px solid #64748b; }
-          .draft-editor-content table.draft-table td, .draft-editor-content table.draft-table th { border: 1.5px solid #94a3b8; padding: 10px 12px; vertical-align: top; min-width: 60px; }
-          .draft-editor-content table.draft-table th { background: #f1f5f9; font-weight: 700; font-size: 0.9em; color: #334155; border-bottom: 2.5px solid #64748b; }
-          .draft-editor-content table { border-collapse: collapse; width: 100%; margin: 16px 0; border: 2px solid #64748b; }
-          .draft-editor-content table td, .draft-editor-content table th { border: 1.5px solid #94a3b8; padding: 10px 12px; vertical-align: top; min-width: 60px; }
-          .draft-editor-content table th { background: #f1f5f9; font-weight: 700; border-bottom: 2.5px solid #64748b; }
+          .draft-editor-content table.draft-table { border-collapse: collapse; width: 100%; margin: 16px 0; table-layout: auto; border: 2px solid ${brandColor}; }
+          .draft-editor-content table.draft-table td, .draft-editor-content table.draft-table th { border: 1.5px solid ${lighten(brandColor, 0.5)}; padding: 10px 12px; vertical-align: top; min-width: 60px; }
+          .draft-editor-content table.draft-table th { background: ${brandColor}; font-weight: 700; font-size: 0.9em; color: #fff; border-bottom: 2.5px solid ${brandColor}; }
+          .draft-editor-content table { border-collapse: collapse; width: 100%; margin: 16px 0; border: 2px solid ${brandColor}; }
+          .draft-editor-content table td, .draft-editor-content table th { border: 1.5px solid ${lighten(brandColor, 0.5)}; padding: 10px 12px; vertical-align: top; min-width: 60px; }
+          .draft-editor-content table th { background: ${brandColor}; color: #fff; font-weight: 700; border-bottom: 2.5px solid ${brandColor}; }
           .draft-editor-content table .selectedCell { background: rgba(59,130,246,0.08); outline: 2px solid #3b82f6; outline-offset: -2px; }
           .draft-editor-content .tableWrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
           .draft-editor-content .column-resize-handle { background-color: #3b82f6; width: 2px; position: absolute; right: -1px; top: 0; bottom: 0; pointer-events: none; }
