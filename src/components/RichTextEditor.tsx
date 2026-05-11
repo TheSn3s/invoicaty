@@ -152,8 +152,8 @@ function Dropdown({ trigger, children, title, width = "w-[220px]", align = "left
 }
 
 /* ─── Enhanced Color Picker (swatches + custom input) ─── */
-function ColorPicker({ colors, current, onPick, children, title, popDirection = "down" }: {
-  colors: string[]; current?: string; onPick: (c: string | null) => void; children: React.ReactNode; title: string; popDirection?: "up" | "down";
+function ColorPicker({ colors, current, onPick, children, title, popDirection = "down", isAr = false }: {
+  colors: string[]; current?: string; onPick: (c: string | null) => void; children: React.ReactNode; title: string; popDirection?: "up" | "down"; isAr?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const [customHex, setCustomHex] = useState("");
@@ -175,36 +175,45 @@ function ColorPicker({ colors, current, onPick, children, title, popDirection = 
         {children}
       </button>
       {open && (
-        <div className={`absolute z-[200] ${popDirection === "up" ? "bottom-full mb-1 right-0" : "mt-1 right-0"} bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-2xl p-2.5 w-[220px]`}>
+        <div className={`absolute z-[200] ${popDirection === "up" ? "bottom-full mb-1 right-0" : "mt-1 right-0"} bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-2xl p-2.5 w-[240px]`}>
           <div className="grid grid-cols-6 gap-1.5 mb-2">
             {colors.map((c) => (
               <button key={c} type="button"
                 onMouseDown={(e) => { e.preventDefault(); onPick(c === "transparent" ? null : c); setOpen(false); }}
-                className={`w-6 h-6 rounded-md border hover:scale-110 transition-transform ${
+                className={`w-7 h-7 rounded-md border hover:scale-110 transition-transform ${
                   current === c ? "ring-2 ring-blue-500 ring-offset-1" : "border-slate-200 dark:border-slate-600"
                 } ${c === "transparent" ? "bg-white dark:bg-slate-800" : ""}`}
                 style={c !== "transparent" ? { background: c } : undefined}
                 title={c === "transparent" ? "Clear" : c}>
-                {c === "transparent" && <span className="text-[8px] text-slate-400 flex items-center justify-center">✕</span>}
+                {c === "transparent" && <span className="text-[9px] text-slate-400 flex items-center justify-center">✕</span>}
               </button>
             ))}
           </div>
-          <div className="flex items-center gap-1.5 mb-1.5">
+          <div className="flex items-center gap-2 mb-2 p-1.5 bg-slate-50 dark:bg-slate-800 rounded-lg">
             <input type="color" value={current || "#000000"}
               onChange={(e) => { onPick(e.target.value); setOpen(false); }}
-              className="w-8 h-8 rounded-md border border-slate-200 dark:border-slate-700 cursor-pointer bg-transparent p-0" />
+              className="w-10 h-10 rounded-lg border-2 border-slate-200 dark:border-slate-600 cursor-pointer p-0.5" style={{ appearance: "auto" }} />
             <div className="flex-1 flex items-center gap-1">
-              <span className="text-slate-400 text-[11px]">#</span>
+              <span className="text-slate-400 text-[12px] font-mono">#</span>
               <input type="text" value={customHex} onChange={(e) => setCustomHex(e.target.value.replace(/[^0-9a-fA-F]/g, "").slice(0, 6))}
-                placeholder="hex" maxLength={6}
+                placeholder="hex code" maxLength={6}
                 onKeyDown={(e) => e.key === "Enter" && applyCustom()}
-                className="flex-1 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md px-2 py-1 text-[11px] text-slate-700 dark:text-slate-200 outline-none font-mono" />
+                className="flex-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-md px-2 py-1.5 text-[12px] text-slate-700 dark:text-slate-200 outline-none font-mono" />
               <button type="button" onMouseDown={(e) => { e.preventDefault(); applyCustom(); }}
-                className="px-2 py-1 rounded-md text-[10px] font-bold bg-blue-500 text-white hover:bg-blue-600">OK</button>
+                className="px-2.5 py-1.5 rounded-md text-[11px] font-bold bg-blue-500 text-white hover:bg-blue-600">OK</button>
             </div>
           </div>
+          {current && (
+            <div className="flex items-center gap-2 mb-1.5 px-1">
+              <span className="text-[10px] text-slate-400">{isAr ? "\u0627\u0644\u062d\u0627\u0644\u064a:" : "Current:"}</span>
+              <span className="w-5 h-5 rounded border border-slate-300" style={{ background: current }} />
+              <span className="text-[11px] font-mono text-slate-500">{current}</span>
+            </div>
+          )}
           <button type="button" onMouseDown={(e) => { e.preventDefault(); onPick(null); setOpen(false); }}
-            className="w-full text-[11px] font-medium py-1 rounded-md text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800">Clear</button>
+            className="w-full text-[11px] font-medium py-1.5 rounded-md text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 border border-transparent hover:border-red-200 dark:hover:border-red-500/20">
+            {isAr ? "\u0645\u0633\u062d" : "Clear"}
+          </button>
         </div>
       )}
     </div>
