@@ -175,7 +175,7 @@ function ColorPicker({ colors, current, onPick, children, title, popDirection = 
         {children}
       </button>
       {open && (
-        <div className={`absolute z-[200] ${popDirection === "up" ? "bottom-full mb-1 right-0" : "mt-1 right-0"} bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-2xl p-2.5 w-[240px]`}>
+        <div className={`absolute z-[200] ${popDirection === "up" ? "bottom-full mb-1 right-0" : "mt-1 right-0"} bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-2xl p-2.5 w-[240px]`} dir="ltr">
           <div className="grid grid-cols-6 gap-1.5 mb-2">
             {colors.map((c) => (
               <button key={c} type="button"
@@ -189,7 +189,7 @@ function ColorPicker({ colors, current, onPick, children, title, popDirection = 
               </button>
             ))}
           </div>
-          <div className="flex items-center gap-1.5 mb-2">
+          <div className="flex items-center gap-1.5 mb-2" dir="ltr">
             <input type="color" value={current || "#000000"}
               onChange={(e) => { onPick(e.target.value); setOpen(false); }}
               className="w-8 h-8 rounded-md border border-slate-200 dark:border-slate-600 cursor-pointer flex-shrink-0" />
