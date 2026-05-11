@@ -246,34 +246,29 @@ const icons = {
 /* ═══════════════════════════════════════════
    TABLE PRESETS GENERATOR
    ═══════════════════════════════════════════ */
-function buildTablePresetHtml(type: "pricing" | "tasks" | "comparison", brandColor: string, isAr: boolean): string {
-  const bg = lighten(brandColor, 0.85);
-  const hdrStyle = `background-color:${brandColor};color:#fff;font-weight:700;padding:10px 12px;border:1.5px solid ${brandColor};`;
-  const cellStyle = `padding:10px 12px;border:1.5px solid ${lighten(brandColor, 0.5)};`;
-  const altStyle = `${cellStyle}background-color:${bg};`;
+type PresetType = "pricing" | "tasks" | "script";
 
+function getPresetConfig(type: PresetType, isAr: boolean): { headers: string[]; rows: string[][]; cols: number } {
   if (type === "pricing") {
     const h = isAr ? ["البند", "الكمية", "السعر", "المجموع"] : ["Item", "Qty", "Price", "Total"];
-    return `<table><thead><tr>${h.map(t => `<th style="${hdrStyle}">${t}</th>`).join("")}</tr></thead><tbody>
-      <tr>${h.map((_, i) => `<td style="${cellStyle}">${i === 0 ? (isAr ? "خدمة ١" : "Service 1") : ""}</td>`).join("")}</tr>
-      <tr>${h.map((_, i) => `<td style="${altStyle}">${i === 0 ? (isAr ? "خدمة ٢" : "Service 2") : ""}</td>`).join("")}</tr>
-      <tr>${h.map((_, i) => `<td style="${cellStyle}">${i === 0 ? (isAr ? "خدمة ٣" : "Service 3") : ""}</td>`).join("")}</tr>
-    </tbody></table>`;
+    return { headers: h, cols: 4, rows: [
+      [isAr ? "خدمة ١" : "Service 1", "", "", ""],
+      [isAr ? "خدمة ٢" : "Service 2", "", "", ""],
+      [isAr ? "خدمة ٣" : "Service 3", "", "", ""],
+    ]};
   }
   if (type === "tasks") {
     const h = isAr ? ["المهمة", "المسؤول", "الموعد", "الحالة"] : ["Task", "Owner", "Due Date", "Status"];
-    return `<table><thead><tr>${h.map(t => `<th style="${hdrStyle}">${t}</th>`).join("")}</tr></thead><tbody>
-      <tr>${h.map(() => `<td style="${cellStyle}"></td>`).join("")}</tr>
-      <tr>${h.map(() => `<td style="${altStyle}"></td>`).join("")}</tr>
-    </tbody></table>`;
+    return { headers: h, cols: 4, rows: [["", "", "", ""], ["", "", "", ""]] };
   }
-  // comparison
-  const h = isAr ? ["الميزة", "الخيار أ", "الخيار ب", "الخيار ج"] : ["Feature", "Option A", "Option B", "Option C"];
-  return `<table><thead><tr>${h.map(t => `<th style="${hdrStyle}">${t}</th>`).join("")}</tr></thead><tbody>
-    <tr>${h.map((_, i) => `<td style="${cellStyle}">${i === 0 ? (isAr ? "ميزة ١" : "Feature 1") : ""}</td>`).join("")}</tr>
-    <tr>${h.map((_, i) => `<td style="${altStyle}">${i === 0 ? (isAr ? "ميزة ٢" : "Feature 2") : ""}</td>`).join("")}</tr>
-    <tr>${h.map((_, i) => `<td style="${cellStyle}">${i === 0 ? (isAr ? "ميزة ٣" : "Feature 3") : ""}</td>`).join("")}</tr>
-  </tbody></table>`;
+  // script
+  const h = isAr ? ["رقم اللقطة", "المشهد", "الصوت"] : ["Shot #", "Scene", "Audio"];
+  return { headers: h, cols: 3, rows: [
+    ["1", "", ""],
+    ["2", "", ""],
+    ["3", "", ""],
+    ["4", "", ""],
+  ]};
 }
 
 /* ═══════════════════════════════════════════
@@ -284,6 +279,7 @@ export default function RichTextEditor({ value, onChange, brandColor = "#3b82f6"
   const isAr = lang === "ar";
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [editorDir, setEditorDir] = useState<"rtl" | "ltr">(isAr ? "rtl" : "ltr");
+  const [tableWidth, setTableWidth] = useState(100);
 
   const editor = useEditor({
     immediatelyRender: false,
@@ -353,9 +349,52 @@ export default function RichTextEditor({ value, onChange, brandColor = "#3b82f6"
     editor.chain().focus("end").insertContent("<p></p>").insertTable({ rows, cols, withHeaderRow: true }).run();
   };
 
-  const insertPresetTable = (type: "pricing" | "tasks" | "comparison") => {
-    const html = buildTablePresetHtml(type, brandColor, isAr);
-    editor.chain().focus("end").insertContent("<p></p>").insertContent(html).run();
+  const insertPresetTable = (type: PresetType) => {
+    const cfg = getPresetConfig(type, isAr);
+    const totalRows = cfg.rows.length + 1; // +1 for header
+    editor.chain().focus("end").insertContent("<p></p>").insertTable({ rows: totalRows, cols: cfg.cols, withHeaderRow: true }).run();
+    // Fill cells after table is inserted
+    setTimeout(() => {
+      const { state } = editor.view;
+      const cells: { pos: number; isHeader: boolean }[] = [];
+      state.doc.descendants((node, pos) => {
+        if (node.type.name === "tableHeader" || node.type.name === "tableCell") {
+          cells.push({ pos, isHeader: node.type.name === "tableHeader" });
+        }
+      });
+      // Find the last inserted table's cells (take last totalRows*cols cells)
+      const tableCells = cells.slice(-totalRows * cfg.cols);
+      if (tableCells.length === totalRows * cfg.cols) {
+        const { tr } = editor.view.state;
+        // Fill header cells
+        for (let c = 0; c < cfg.cols; c++) {
+          const cell = tableCells[c];
+          if (cell) {
+            const cellNode = tr.doc.nodeAt(cell.pos);
+            if (cellNode) {
+              const textPos = cell.pos + 1;
+              tr.insertText(cfg.headers[c] || "", textPos, textPos + cellNode.content.size);
+            }
+          }
+        }
+        // Fill body cells
+        for (let r = 0; r < cfg.rows.length; r++) {
+          for (let c = 0; c < cfg.cols; c++) {
+            const idx = (r + 1) * cfg.cols + c;
+            const cell = tableCells[idx];
+            const val = cfg.rows[r][c];
+            if (cell && val) {
+              const cellNode = tr.doc.nodeAt(cell.pos);
+              if (cellNode) {
+                const textPos = cell.pos + 1;
+                tr.insertText(val, textPos, textPos + cellNode.content.size);
+              }
+            }
+          }
+        }
+        editor.view.dispatch(tr);
+      }
+    }, 50);
   };
 
   /* Apply attribute to ALL cells in the current table */
@@ -370,6 +409,15 @@ export default function RichTextEditor({ value, onChange, brandColor = "#3b82f6"
       }
     });
     if (modified) dispatch(tr);
+  };
+
+  /* Adjust table width via DOM */
+  const updateTableWidth = (pct: number) => {
+    setTableWidth(pct);
+    const tables = editor.view.dom.querySelectorAll("table");
+    tables.forEach((tbl) => {
+      (tbl as HTMLElement).style.width = `${pct}%`;
+    });
   };
 
   const headingValue = editor.isActive("heading", { level: 1 }) ? "h1"
@@ -525,9 +573,9 @@ export default function RichTextEditor({ value, onChange, brandColor = "#3b82f6"
                   className="w-full text-left px-3 py-2 rounded-lg text-[12px] text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all flex items-center gap-2">
                   <span className="w-3 h-3 rounded-sm" style={{ background: brandColor }} /> {isAr ? "\u062c\u062f\u0648\u0644 \u0645\u0647\u0627\u0645" : "Task Table"}
                 </button>
-                <button type="button" onMouseDown={(e) => { e.preventDefault(); insertPresetTable("comparison"); }}
+                <button type="button" onMouseDown={(e) => { e.preventDefault(); insertPresetTable("script"); }}
                   className="w-full text-left px-3 py-2 rounded-lg text-[12px] text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all flex items-center gap-2">
-                  <span className="w-3 h-3 rounded-sm" style={{ background: brandColor }} /> {isAr ? "\u062c\u062f\u0648\u0644 \u0645\u0642\u0627\u0631\u0646\u0629" : "Comparison Table"}
+                  <span className="w-3 h-3 rounded-sm" style={{ background: brandColor }} /> {isAr ? "\u062c\u062f\u0648\u0644 \u0633\u0643\u0631\u064a\u0628\u062a" : "Script Table"}
                 </button>
               </div>
             </Dropdown>
@@ -578,6 +626,17 @@ export default function RichTextEditor({ value, onChange, brandColor = "#3b82f6"
                 title={isAr ? "\u0633\u0645\u0643 \u0627\u0644\u062d\u062f\u0648\u062f" : "Border Width"}>
                 {BORDER_WIDTHS.map(w => <option key={w} value={w}>{w}px</option>)}
               </select>
+
+              <span className="w-px h-4 bg-slate-300 dark:bg-slate-700 mx-1" />
+
+              {/* Table Width Slider */}
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 whitespace-nowrap">{isAr ? "\u0639\u0631\u0636" : "W"}</span>
+                <input type="range" min="30" max="100" step="5" value={tableWidth}
+                  onChange={(e) => updateTableWidth(Number(e.target.value))}
+                  className="w-16 h-1.5 accent-blue-500 cursor-pointer" />
+                <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400 w-8">{tableWidth}%</span>
+              </div>
 
               <span className="w-px h-4 bg-slate-300 dark:bg-slate-700 mx-1" />
               <TblBtn onClick={() => editor.chain().focus().deleteTable().run()} danger>{"\ud83d\uddd1"} {isAr ? "\u062d\u0630\u0641" : "Delete"}</TblBtn>
