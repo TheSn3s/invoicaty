@@ -375,7 +375,7 @@ export default function RichTextEditor({ value, onChange, brandColor = "#3b82f6"
 
   return (
     <div className={isFullscreen ? "fixed inset-0 z-[90] bg-slate-950/80 backdrop-blur-sm p-2 sm:p-4" : ""}>
-      <div className={`border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 shadow-sm ${isFullscreen ? "h-full rounded-2xl flex flex-col max-w-7xl mx-auto overflow-hidden" : "rounded-2xl overflow-visible"}`}>
+      <div className={`border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 shadow-sm ${isFullscreen ? "h-full rounded-2xl flex flex-col max-w-7xl mx-auto overflow-hidden" : "rounded-2xl"}`}>
         <style jsx global>{`
           .draft-editor-content {
             min-height: 400px; outline: none; font-size: 16px; line-height: 1.7; padding: 24px 28px; color: #1e293b;
@@ -415,8 +415,8 @@ export default function RichTextEditor({ value, onChange, brandColor = "#3b82f6"
         `}</style>
 
         {/* ═══ TOOLBAR (sticky in fullscreen) ═══ */}
-        <div className={`border-b border-slate-200 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-900/80 ${isFullscreen ? "sticky top-0 z-10" : ""}`}>
-          <div className="flex items-center gap-0.5 px-2 py-1.5 overflow-x-auto scrollbar-hide flex-wrap">
+        <div className={`border-b border-slate-200 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-900/80 relative z-20 ${isFullscreen ? "sticky top-0 z-10" : ""}`}>
+          <div className="flex items-center gap-0.5 px-2 py-1.5 flex-wrap">
             {/* Fullscreen */}
             <Btn onClick={() => setIsFullscreen(v => !v)} title={isFullscreen ? (isAr ? "\u0625\u0644\u063a\u0627\u0621 \u0645\u0644\u0621 \u0627\u0644\u0634\u0627\u0634\u0629" : "Exit Full Screen") : (isAr ? "\u0645\u0644\u0621 \u0627\u0644\u0634\u0627\u0634\u0629" : "Full Screen")}>
               {isFullscreen ? icons.minimize : icons.fullscreen}
