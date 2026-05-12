@@ -146,6 +146,8 @@ body { padding: 24px; display: flex; justify-content: center; }
   padding: 40px 44px 32px 44px;
   box-shadow: 0 25px 60px rgba(15,23,42,0.08);
   border-radius: 4px;
+  display: flex;
+  flex-direction: column;
 }
 .inv::before {
   content: "";
@@ -253,10 +255,6 @@ body { padding: 24px; display: flex; justify-content: center; }
   align-items: center;
   font-size: 11px;
   color: var(--ink-3);
-  position: absolute;
-  bottom: 28px;
-  left: 44px;
-  right: 44px;
 }
 .ftr-contact { display: flex; gap: 16px; }
 
@@ -295,10 +293,9 @@ body { padding: 24px; display: flex; justify-content: center; }
 @media print {
   html, body { background: white !important; }
   body { padding: 0; }
-  .inv { margin: 0; padding: 28px 32px 24px 32px; min-height: auto; box-shadow: none; border-radius: 0; width: 100%; }
+  .inv { margin: 0; padding: 28px 32px 24px 32px; min-height: 100vh; box-shadow: none; border-radius: 0; width: 100%; }
   .inv::before { border-radius: 0; }
   .pbtn { display: none !important; }
-  .ftr { position: relative; bottom: auto; left: auto; right: auto; margin-top: 24px; }
 }
 </style>
 </head>
