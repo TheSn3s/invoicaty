@@ -236,7 +236,7 @@ body { padding: 24px; display: flex; justify-content: center; }
   text-align: ${align};
 }
 .content table td {
-  padding: 7px 10px;
+  padding: 5px 10px 2px 10px;
   border-bottom: 1px solid var(--line);
   vertical-align: top;
 }
