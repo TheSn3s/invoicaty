@@ -62,7 +62,7 @@ export function sanitizeDraftHtml(html: string) {
 export function buildDraftHtml(doc: DraftDoc, profile: DraftProfile | null, lang?: "ar" | "en") {
   const brand = profile?.brand_color || "#2563eb";
   const business = profile?.business_name || profile?.full_name || "Invoicaty";
-  const logo = profile?.logo_url ? `<img src="${escapeHtml(profile.logo_url)}" alt="Logo" style="max-height:56px;max-width:140px;object-fit:contain;display:block" />` : "";
+  const logo = profile?.logo_url ? `<img src="${escapeHtml(profile.logo_url)}" alt="Logo" style="max-height:48px;max-width:120px;object-fit:contain;display:block" />` : "";
   const content = sanitizeDraftHtml(doc.content_html);
 
   // Detect language: explicit param > profile preference > content detection
@@ -86,12 +86,9 @@ export function buildDraftHtml(doc: DraftDoc, profile: DraftProfile | null, lang
   ${googleFont}
   <title>${escapeHtml(doc.title || "Draft")} — ${escapeHtml(doc.serial)}</title>
   <style>
-    /* ═══════════════════════════════════════════════════════════
-       PRINT-FIRST LAYOUT — identical on screen and in PDF
-       ═══════════════════════════════════════════════════════════ */
     @page {
       size: A4;
-      margin: 12mm 10mm;
+      margin: 10mm 8mm;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body {
@@ -99,8 +96,8 @@ export function buildDraftHtml(doc: DraftDoc, profile: DraftProfile | null, lang
       color: #0f172a;
       direction: ${dir};
       text-align: ${align};
-      line-height: 1.55;
-      font-size: 14px;
+      line-height: 1.4;
+      font-size: 13px;
       -webkit-font-smoothing: antialiased;
       -webkit-print-color-adjust: exact;
       print-color-adjust: exact;
@@ -117,150 +114,139 @@ export function buildDraftHtml(doc: DraftDoc, profile: DraftProfile | null, lang
       min-height: 297mm;
       margin: 0 auto;
       background: white;
-      padding: 16mm 14mm;
+      padding: 8mm 10mm;
       box-shadow: 0 8px 40px rgba(15,23,42,0.07);
     }
 
-    /* ─── Header ─── */
+    /* Header */
     .header {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      gap: 16px;
+      gap: 12px;
       border-bottom: 3px solid ${brand};
-      padding-bottom: 14px;
-      margin-bottom: 20px;
+      padding-bottom: 8px;
+      margin-bottom: 10px;
     }
     .header-start { flex: 1; min-width: 0; text-align: ${align}; }
     .header-end { text-align: ${alignOpp}; flex-shrink: 0; }
     .doc-title {
-      font-size: 24px;
+      font-size: 20px;
       font-weight: 800;
-      margin-bottom: 5px;
+      margin-bottom: 2px;
       color: #0f172a;
       line-height: 1.1;
     }
-    .client-name { font-weight: 700; font-size: 15px; margin-bottom: 2px; color: #1e293b; }
-    .project-name { color: #64748b; font-size: 12px; }
-    .biz-name { font-weight: 700; margin-top: 6px; font-size: 13px; color: #0f172a; }
-    .meta-line { color: #64748b; font-size: 11px; margin-top: 2px; }
+    .client-name { font-weight: 700; font-size: 13px; margin-bottom: 1px; color: #1e293b; }
+    .project-name { color: #64748b; font-size: 11px; }
+    .biz-name { font-weight: 700; margin-top: 4px; font-size: 11px; color: #0f172a; }
+    .meta-line { color: #64748b; font-size: 10px; margin-top: 1px; }
     .badge {
       display: inline-block;
-      padding: 3px 10px;
+      padding: 2px 8px;
       border-radius: 999px;
       background: ${brand}15;
       color: ${brand};
-      font-size: 10px;
+      font-size: 9px;
       font-weight: 700;
-      margin-top: 6px;
+      margin-top: 4px;
       border: 1px solid ${brand}30;
     }
 
-    /* ─── Summary ─── */
+    /* Summary */
     .summary {
       background: #f8fafc;
       border: 1px solid #e2e8f0;
-      border-radius: 6px;
-      padding: 10px 14px;
-      margin-bottom: 18px;
-      font-size: 13px;
+      border-radius: 4px;
+      padding: 5px 8px;
+      margin-bottom: 8px;
+      font-size: 11px;
       color: #334155;
-      line-height: 1.5;
+      line-height: 1.35;
     }
 
-    /* ─── Content ─── */
+    /* Content */
     .content {
-      font-size: 14px;
-      line-height: 1.65;
+      font-size: 12px;
+      line-height: 1.45;
       color: #1e293b;
     }
-    .content p { margin-bottom: 10px; }
-    .content h1 { font-size: 22px; font-weight: 800; margin: 18px 0 8px; color: #0f172a; }
-    .content h2 { font-size: 18px; font-weight: 700; margin: 14px 0 6px; color: #0f172a; }
-    .content h3 { font-size: 15px; font-weight: 700; margin: 12px 0 4px; color: #1e293b; }
-    .content h4 { font-size: 14px; font-weight: 700; margin: 10px 0 4px; color: #334155; }
-    .content ul, .content ol { margin: 8px 0; padding-${isRtl ? "right" : "left"}: 22px; }
-    .content li { margin-bottom: 4px; }
+    .content p { margin-bottom: 5px; }
+    .content h1 { font-size: 17px; font-weight: 800; margin: 10px 0 4px; color: #0f172a; }
+    .content h2 { font-size: 14px; font-weight: 700; margin: 8px 0 3px; color: #0f172a; }
+    .content h3 { font-size: 12px; font-weight: 700; margin: 6px 0 2px; color: #1e293b; }
+    .content h4 { font-size: 11px; font-weight: 700; margin: 5px 0 2px; color: #334155; }
+    .content ul, .content ol { margin: 4px 0; padding-${isRtl ? "right" : "left"}: 16px; }
+    .content li { margin-bottom: 2px; }
     .content blockquote {
       border-${isRtl ? "right" : "left"}: 3px solid ${brand};
-      padding: 8px 14px;
-      margin: 10px 0;
+      padding: 4px 8px;
+      margin: 6px 0;
       background: #f8fafc;
-      color: #475569;
+      color: #334155;
       font-style: italic;
     }
+
+    /* Tables — compact padding, uniform border for ALL cells */
     .content table {
       width: 100%;
       border-collapse: collapse;
-      margin: 12px 0;
-      font-size: 13px;
+      margin: 6px 0;
+      font-size: 11px;
     }
     .content table th,
     .content table td {
-      border: 1px solid #e2e8f0;
-      padding: 7px 10px;
-      text-align: ${align};
+      padding: 3px 5px;
+      border: 1px solid #cbd5e1;
+      vertical-align: top;
+      line-height: 1.3;
     }
     .content table th {
-      background: #f1f5f9;
       font-weight: 700;
-      color: #0f172a;
+      background: #f1f5f9;
     }
-    .content strong, .content b { font-weight: 700; }
-    .content em, .content i { font-style: italic; }
-    .content u { text-decoration: underline; }
-    .content s { text-decoration: line-through; color: #94a3b8; }
-    .content mark { background: #fef08a; padding: 1px 3px; border-radius: 2px; }
 
-    /* ─── Footer ─── */
+    /* Footer */
     .footer {
-      margin-top: 32px;
-      padding-top: 12px;
+      margin-top: 16px;
+      padding-top: 6px;
       border-top: 1px solid #e2e8f0;
       text-align: center;
-      font-size: 10px;
+      font-size: 9px;
       color: #94a3b8;
     }
 
-    /* ─── Print button (screen only) ─── */
+    /* Print button (screen only) */
     .pbtn {
       position: fixed;
-      bottom: 24px;
-      ${isRtl ? "left" : "right"}: 24px;
+      bottom: 20px;
+      ${isRtl ? "left" : "right"}: 20px;
       background: ${brand};
       color: white;
       border: none;
-      padding: 12px 22px;
-      border-radius: 999px;
-      font-size: 14px;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 13px;
       font-weight: 700;
       cursor: pointer;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
       z-index: 9999;
     }
-    .pbtn:hover { opacity: 0.9; transform: translateY(-1px); }
+    .pbtn:hover { opacity: 0.9; }
 
-    /* ═══════════════════════════════════════════════════════════
-       PRINT OVERRIDES — minimal, because layout is already A4
-       ═══════════════════════════════════════════════════════════ */
+    /* Print overrides */
     @media print {
-      html, body {
-        background: white !important;
-        padding: 0 !important;
-        margin: 0 !important;
-      }
-      body { display: block; }
+      html, body { background: white !important; }
+      body { padding: 0; }
       .page {
-        width: 100% !important;
-        min-height: auto !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        box-shadow: none !important;
+        margin: 0;
+        padding: 0;
+        min-height: auto;
+        box-shadow: none;
+        width: 100%;
       }
       .pbtn { display: none !important; }
       .header { break-inside: avoid; }
-      .content table { break-inside: avoid; }
-      .content blockquote { break-inside: avoid; }
       .footer { break-inside: avoid; }
     }
   </style>
@@ -285,7 +271,7 @@ export function buildDraftHtml(doc: DraftDoc, profile: DraftProfile | null, lang
     <div class="content">${content}</div>
     <div class="footer">Generated by Invoicaty</div>
   </div>
-  <button class="pbtn" onclick="window.print()">\u{1F5A8}\uFE0F ${isRtl ? "حفظ كـ PDF" : "Save as PDF"}</button>
+  <button class="pbtn" onclick="window.print()">🖨️ ${isRtl ? "حفظ كـ PDF" : "Save as PDF"}</button>
 </body>
 </html>`;
 }
