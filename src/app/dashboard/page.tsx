@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { createClient } from "@/lib/supabase";
 import { trackFirstInvoice } from "@/lib/gtag";
 import { useRouter } from "next/navigation";
@@ -11,6 +11,7 @@ import InvoiceModal from "@/components/InvoiceModal";
 import DeleteModal from "@/components/DeleteModal";
 import ImportModal from "@/components/ImportModal";
 import StatsCards from "@/components/StatsCards";
+import FinancialOverviewChart from "@/components/FinancialOverviewChart";
 import InvoiceTable from "@/components/InvoiceTable";
 import CreateMenu from "@/components/CreateMenu";
 import AppFooter from "@/components/AppFooter";
@@ -189,6 +190,44 @@ export default function DashboardPage() {
   const outstandingTotal = outstanding.reduce((s, i) => s + effectiveTotal(i), 0);
   const deletedCount = invoices.filter(i => i.status === "Deleted").length;
 
+  const chartData = useMemo(() => {
+    const monthNamesAr = ["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
+    const monthNamesEn = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    const monthNames = lang === "ar" ? monthNamesAr : monthNamesEn;
+
+    const monthly = new Map<string, { label: string; income: number; expenses: number; sortKey: string }>();
+
+    invoices
+      .filter(i => i.status !== "Cancelled" && i.status !== "Deleted")
+      .forEach(inv => {
+        const d = new Date(inv.date);
+        if (isNaN(d.getTime())) return;
+        const year = d.getFullYear();
+        const month = d.getMonth();
+        const key = `${year}-${String(month + 1).padStart(2, "0")}`;
+        const label = `${monthNames[month]} ${String(year).slice(-2)}`;
+        const current = monthly.get(key) || { label, income: 0, expenses: 0, sortKey: key };
+        current.income += effectiveTotal(inv);
+        monthly.set(key, current);
+      });
+
+    validExpenses.forEach(exp => {
+      const d = new Date(exp.date);
+      if (isNaN(d.getTime())) return;
+      const year = d.getFullYear();
+      const month = d.getMonth();
+      const key = `${year}-${String(month + 1).padStart(2, "0")}`;
+      const label = `${monthNames[month]} ${String(year).slice(-2)}`;
+      const current = monthly.get(key) || { label, income: 0, expenses: 0, sortKey: key };
+      current.expenses += expenseTotalOf(exp);
+      monthly.set(key, current);
+    });
+
+    return Array.from(monthly.values())
+      .sort((a, b) => a.sortKey.localeCompare(b.sortKey))
+      .map(({ label, income, expenses }) => ({ label, income, expenses }));
+  }, [invoices, validExpenses, lang]);
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -280,6 +319,8 @@ export default function DashboardPage() {
         ) : (
           /* ===== NORMAL STATE — User has invoices ===== */
           <>
+        <FinancialOverviewChart data={chartData} currencySymbol={effectiveSymbol} />
+
         <StatsCards total={totalIncome} month={monthIncome} year={yearIncome} expensesTotal={totalExpenses} netProfit={netProfit} outstanding={outstandingTotal} outstandingCount={outstanding.length} currencySymbol={effectiveSymbol} />
 
         <div className="mt-6 flex flex-col sm:flex-row gap-3">

@@ -329,7 +329,10 @@
     "outstanding": "مستحقات معلقة",
     "invoiceCount": "فاتورة",
     "totalExpenses": "إجمالي المصروفات",
-    "netProfit": "صافي الربح"
+    "netProfit": "صافي الربح",
+    "chartTitle": "حركة الدخل والمصروف",
+    "chartSubtitle": "من بداية استخدامك للنظام حتى اليوم",
+    "chartEmpty": "لا توجد بيانات كافية للرسم البياني بعد"
   },
   "invoice": {
     "serial": "#",

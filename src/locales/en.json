@@ -329,7 +329,10 @@
     "outstanding": "Outstanding",
     "invoiceCount": "invoices",
     "totalExpenses": "Total Expenses",
-    "netProfit": "Net Profit"
+    "netProfit": "Net Profit",
+    "chartTitle": "Income vs Expenses",
+    "chartSubtitle": "From your first activity until today",
+    "chartEmpty": "Not enough data for the chart yet"
   },
   "invoice": {
     "serial": "#",
