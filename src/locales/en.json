@@ -331,7 +331,7 @@
     "totalExpenses": "Total Expenses",
     "netProfit": "Net Profit",
     "chartTitle": "Income vs Expenses",
-    "chartSubtitle": "From your first activity until today",
+    "chartSubtitle": "Last 8 months of activity",
     "chartEmpty": "Not enough data for the chart yet"
   },
   "invoice": {
