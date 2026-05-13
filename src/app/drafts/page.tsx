@@ -23,6 +23,7 @@ interface Draft {
   summary: string;
   content_html: string;
   status: string;
+  deleted_at?: string | null;
 }
 
 interface Profile {
@@ -68,7 +69,7 @@ export default function DraftsPage() {
       supabase.from("drafts").select("*").eq("user_id", user.id).order("date", { ascending: false }),
       supabase.from("profiles").select("*").eq("id", user.id).single()
     ]);
-    setDrafts(d || []);
+    setDrafts((d || []).filter(item => item.status !== "Deleted"));
     setProfile(prof || null);
     setLoading(false);
   }, [supabase, router]);
@@ -102,7 +103,7 @@ export default function DraftsPage() {
   };
 
   const handleDelete = async (id: string) => {
-    await supabase.from("drafts").delete().eq("id", id);
+    await supabase.from("drafts").update({ status: "Deleted", deleted_at: new Date().toISOString() }).eq("id", id);
     loadData();
   };
 

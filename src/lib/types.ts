@@ -100,3 +100,17 @@ export interface Expense {
   created_at: string;
   updated_at: string;
 }
+
+export interface Draft {
+  id: string;
+  user_id: string;
+  serial: string;
+  date: string;
+  client: string;
+  project: string;
+  title: string;
+  summary: string;
+  content_html: string;
+  status: string;
+  deleted_at?: string | null;
+}

@@ -15,7 +15,7 @@ import Link from "next/link";
 export const dynamic = "force-dynamic";
 
 interface Quotation {
-  id: string; serial: string; date: string; valid_until: string | null;
+  id: string; serial: string; date: string; valid_until: string | null; deleted_at?: string | null;
   client: string; project: string; description: string; amount: number;
   discount: number; tax_rate: number; tax_amount: number; total: number;
   notes: string; status: string; converted_invoice_id: string | null;
@@ -68,7 +68,7 @@ export default function QuotationsPage() {
       const { data: curr } = await supabase.from("currencies").select("*").eq("code", prof.default_currency).single();
       if (curr) setCurrencyData(curr);
     }
-    setQuotations(q || []);
+    setQuotations((q || []).filter(item => item.status !== "Deleted"));
     setLoading(false);
   }, [supabase, router]);
 
@@ -123,7 +123,7 @@ export default function QuotationsPage() {
   };
 
   const handleDelete = async (id: string) => {
-    await supabase.from("quotations").delete().eq("id", id);
+    await supabase.from("quotations").update({ status: "Deleted", deleted_at: new Date().toISOString() }).eq("id", id);
     loadData();
   };
 
