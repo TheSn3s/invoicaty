@@ -325,8 +325,9 @@ function ExpenseModal({ expense, onSave, onClose, currencySymbol, defaultTaxRate
     }
   }, [expense, defaultTaxRate]);
 
+  const showTax = defaultTaxRate > 0;
   const amountNum = Number(amount) || 0;
-  const taxRateNum = Number(taxRate) || 0;
+  const taxRateNum = showTax ? (Number(taxRate) || 0) : 0;
   const taxAmount = +(amountNum * (taxRateNum / 100)).toFixed(3);
   const total = +(amountNum + taxAmount).toFixed(3);
   const fmt = (n: number) => n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 3 });
@@ -378,21 +379,23 @@ function ExpenseModal({ expense, onSave, onClose, currencySymbol, defaultTaxRate
             <textarea value={description} onChange={e => setDescription(e.target.value)} rows={2} placeholder={lang === "ar" ? "وصف مختصر للمصروف" : "Short expense description"} className="w-full bg-slate-800/50 border border-slate-600/30 rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:ring-2 focus:ring-blue-500/40 outline-none resize-none" />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className={`grid gap-3 ${showTax ? "grid-cols-2" : "grid-cols-1"}`}>
             <div>
               <label className="block text-[11px] font-bold text-slate-400 mb-1.5">{t("expense.amount") || t("invoice.amount")} ({symbol})</label>
               <input type="number" value={amount} onChange={e => setAmount(e.target.value)} step="0.001" min="0" className="w-full bg-slate-800/50 border border-slate-600/30 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-blue-500/40 outline-none font-inter" />
             </div>
-            <div>
-              <label className="block text-[11px] font-bold text-slate-400 mb-1.5">{t("expense.taxRate") || t("invoice.taxRate")}</label>
-              <input type="number" value={taxRate} onChange={e => setTaxRate(e.target.value)} step="0.01" min="0" max="100" dir="ltr" className="w-full bg-slate-800/50 border border-slate-600/30 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-blue-500/40 outline-none font-inter" />
-            </div>
+            {showTax && (
+              <div>
+                <label className="block text-[11px] font-bold text-slate-400 mb-1.5">{t("expense.taxRate") || t("invoice.taxRate")}</label>
+                <input type="number" value={taxRate} onChange={e => setTaxRate(e.target.value)} step="0.01" min="0" max="100" dir="ltr" className="w-full bg-slate-800/50 border border-slate-600/30 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-blue-500/40 outline-none font-inter" />
+              </div>
+            )}
           </div>
 
           {amountNum > 0 && (
             <div className="bg-slate-800/40 border border-slate-700/40 rounded-xl p-3 space-y-1.5">
               <div className="flex justify-between text-xs"><span className="text-slate-400">{t("invoice.subtotal")}</span><span className="font-inter text-white">{fmt(amountNum)} {symbol}</span></div>
-              {taxRateNum > 0 && <div className="flex justify-between text-xs"><span className="text-slate-400">+ {t("invoice.tax")} ({taxRateNum}%)</span><span className="font-inter text-amber-400">{fmt(taxAmount)} {symbol}</span></div>}
+              {showTax && taxRateNum > 0 && <div className="flex justify-between text-xs"><span className="text-slate-400">+ {t("invoice.tax")} ({taxRateNum}%)</span><span className="font-inter text-amber-400">{fmt(taxAmount)} {symbol}</span></div>}
               <div className="flex justify-between text-sm pt-1.5 border-t border-slate-700/40 font-bold"><span className="text-white">{t("invoice.total")}</span><span className="font-inter text-amber-400">{fmt(total)} {symbol}</span></div>
             </div>
           )}
