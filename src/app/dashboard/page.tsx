@@ -318,29 +318,6 @@ export default function DashboardPage() {
 
         <StatsCards total={totalIncome} month={monthIncome} year={yearIncome} expensesTotal={totalExpenses} netProfit={netProfit} outstanding={outstandingTotal} outstandingCount={outstanding.length} currencySymbol={effectiveSymbol} />
 
-        <div className="mt-6 glass rounded-3xl p-3 md:p-4 border border-slate-700/40">
-          <div className="overflow-x-auto no-scrollbar">
-            <div className="flex items-center gap-2 min-w-max">
-              <button onClick={() => { setEditInvoice(null); setShowModal(true); }} className="flex items-center gap-2 rounded-xl px-3 py-2 bg-blue-500/10 hover:bg-blue-500/15 border border-blue-500/20 transition-all active:scale-[.99] text-white text-sm font-bold whitespace-nowrap">
-                <span className="text-base">🧾</span>
-                <span>{lang === 'ar' ? 'فاتورة جديدة' : 'New Invoice'}</span>
-              </button>
-              <button onClick={() => router.push('/expenses?new=1')} className="flex items-center gap-2 rounded-xl px-3 py-2 bg-amber-500/10 hover:bg-amber-500/15 border border-amber-500/20 transition-all active:scale-[.99] text-white text-sm font-bold whitespace-nowrap">
-                <span className="text-base">💸</span>
-                <span>{lang === 'ar' ? 'مصروف جديد' : 'New Expense'}</span>
-              </button>
-              <button onClick={() => router.push('/quotations?new=1')} className="flex items-center gap-2 rounded-xl px-3 py-2 bg-purple-500/10 hover:bg-purple-500/15 border border-purple-500/20 transition-all active:scale-[.99] text-white text-sm font-bold whitespace-nowrap">
-                <span className="text-base">📋</span>
-                <span>{lang === 'ar' ? 'عرض سعر جديد' : 'New Quotation'}</span>
-              </button>
-              <button onClick={() => router.push('/drafts?new=1')} className="flex items-center gap-2 rounded-xl px-3 py-2 bg-emerald-500/10 hover:bg-emerald-500/15 border border-emerald-500/20 transition-all active:scale-[.99] text-white text-sm font-bold whitespace-nowrap">
-                <span className="text-base">📝</span>
-                <span>{lang === 'ar' ? 'مسودة جديدة' : 'New Draft'}</span>
-              </button>
-            </div>
-          </div>
-        </div>
-
         <div className="mt-6 flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
             <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm">🔍</span>
