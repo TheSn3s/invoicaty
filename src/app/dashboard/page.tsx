@@ -14,7 +14,7 @@ import StatsCards from "@/components/StatsCards";
 import FinancialOverviewChart from "@/components/FinancialOverviewChart";
 import InvoiceTable from "@/components/InvoiceTable";
 import CreateMenu from "@/components/CreateMenu";
-import NavigationMenu from "@/components/NavigationMenu";
+import AppNav from "@/components/AppNav";
 import AppFooter from "@/components/AppFooter";
 import { printInvoice } from "@/lib/print-invoice";
 import Link from "next/link";
@@ -233,10 +233,8 @@ export default function DashboardPage() {
     { href: "/dashboard", label: t("nav.dashboard") || (lang === "ar" ? "الرئيسية" : "Dashboard"), icon: "🏠" },
     { href: "/expenses", label: t("expense.title") || (lang === "ar" ? "المصروفات" : "Expenses"), icon: "💸" },
     { href: "/quotations", label: t("quotation.title") || (lang === "ar" ? "عروض الأسعار" : "Quotations"), icon: "📋" },
-    { href: "/drafts", label: t("nav.newDraft") || (lang === "ar" ? "المسودات" : "Drafts"), icon: "📝" },
+    { href: "/drafts", label: t("nav.drafts") || (lang === "ar" ? "المسودات" : "Drafts"), icon: "📝" },
     { href: "/trash", label: lang === 'ar' ? 'سلة المهملات' : 'Trash', icon: "🗑️", badge: deletedCount },
-    { href: "/settings", label: t("nav.settings") || (lang === "ar" ? "الإعدادات" : "Settings"), icon: "⚙️" },
-    ...(profile?.role === 'admin' ? [{ href: "/admin", label: t("nav.admin") || "Admin", icon: "🛡" }] : []),
   ];
 
   if (loading) {
@@ -263,7 +261,11 @@ export default function DashboardPage() {
           </div>
           <div className="flex items-center gap-1 md:gap-1.5 flex-shrink-0">
             <LanguageSwitcher />
-            <NavigationMenu items={navItems} align={lang === 'ar' ? 'left' : 'right'} />
+            <AppNav deletedCount={deletedCount} />
+            {profile?.role === 'admin' && (
+              <Link href="/admin" className="text-slate-400 hover:text-white p-1.5 md:p-2 rounded-lg hover:bg-slate-700/50 transition-all text-sm" title={t("nav.admin")}>🛡</Link>
+            )}
+            <Link href="/settings" className="text-slate-400 hover:text-white p-1.5 md:p-2 rounded-lg hover:bg-slate-700/50 transition-all text-sm" title={t("nav.settings")}>⚙️</Link>
             <CreateMenu
               onNewInvoice={() => { setEditInvoice(null); setShowModal(true); }}
               onNewExpense={() => router.push("/expenses?new=1")}

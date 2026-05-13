@@ -7,6 +7,7 @@ import { useI18n } from "@/lib/i18n";
 import { getCurrencyLabel } from "@/lib/currency";
 import type { Currency, Expense, ExpenseStatus, PaymentMethod } from "@/lib/types";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import AppNav from "@/components/AppNav";
 import CreateMenu from "@/components/CreateMenu";
 import AppFooter from "@/components/AppFooter";
 import Link from "next/link";
@@ -172,7 +173,7 @@ export default function ExpensesPage() {
           </div>
           <div className="flex items-center gap-1.5">
             <LanguageSwitcher />
-            <Link href="/dashboard" className="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-700/50 transition-all text-sm" title={t("nav.dashboard")}>🏠</Link>
+            <AppNav />
             <CreateMenu
               onNewInvoice={() => router.push("/dashboard?new=1")}
               onNewExpense={() => { setEditExpense(null); setShowModal(true); }}

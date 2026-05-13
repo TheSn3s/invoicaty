@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import { useI18n } from "@/lib/i18n";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import AppNav from "@/components/AppNav";
 import CreateMenu from "@/components/CreateMenu";
 import AppFooter from "@/components/AppFooter";
 import RichTextEditor from "@/components/RichTextEditor";
@@ -122,7 +123,7 @@ export default function DraftsPage() {
           </div>
           <div className="flex items-center gap-1.5">
             <LanguageSwitcher />
-            <Link href="/dashboard" className="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-700/50 transition-all text-sm" title={t("nav.dashboard")}>🏠</Link>
+            <AppNav />
             <CreateMenu
               onNewInvoice={() => router.push("/dashboard?new=1")}
               onNewQuotation={() => router.push("/quotations?new=1")}

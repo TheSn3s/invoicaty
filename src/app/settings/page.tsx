@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase";
 import { useI18n } from "@/lib/i18n";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import AppNav from "@/components/AppNav";
 import AppFooter from "@/components/AppFooter";
 import ImportModal from "@/components/ImportModal";
 import { SUPPORT_LINKS } from "@/lib/developer-info";
