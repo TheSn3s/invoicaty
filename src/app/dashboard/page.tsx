@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { useI18n } from "@/lib/i18n";
 import { getCurrencyLabel } from "@/lib/currency";
 import type { Currency } from "@/lib/types";
-import LanguageSwitcher from "@/components/LanguageSwitcher";
 import InvoiceModal from "@/components/InvoiceModal";
 import DeleteModal from "@/components/DeleteModal";
 import ImportModal from "@/components/ImportModal";
@@ -14,7 +13,7 @@ import StatsCards from "@/components/StatsCards";
 import FinancialOverviewChart from "@/components/FinancialOverviewChart";
 import InvoiceTable from "@/components/InvoiceTable";
 import CreateMenu from "@/components/CreateMenu";
-import AppNav from "@/components/AppNav";
+import AppHeader from "@/components/AppHeader";
 import AppFooter from "@/components/AppFooter";
 import { printInvoice } from "@/lib/print-invoice";
 import Link from "next/link";
@@ -229,13 +228,6 @@ export default function DashboardPage() {
       .map(({ label, income, expenses }) => ({ label, income, expenses }));
   }, [invoices, validExpenses, lang]);
 
-  const navItems = [
-    { href: "/dashboard", label: t("nav.dashboard") || (lang === "ar" ? "الرئيسية" : "Dashboard"), icon: "🏠" },
-    { href: "/expenses", label: t("expense.title") || (lang === "ar" ? "المصروفات" : "Expenses"), icon: "💸" },
-    { href: "/quotations", label: t("quotation.title") || (lang === "ar" ? "عروض الأسعار" : "Quotations"), icon: "📋" },
-    { href: "/drafts", label: t("nav.drafts") || (lang === "ar" ? "المسودات" : "Drafts"), icon: "📝" },
-    { href: "/trash", label: lang === 'ar' ? 'سلة المهملات' : 'Trash', icon: "🗑️", badge: deletedCount },
-  ];
 
   if (loading) {
     return (
@@ -250,22 +242,21 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen pb-24 md:pb-8 overflow-x-hidden">
-      <header className="sticky top-0 z-30 glass border-b border-slate-700/50 px-3 py-3 md:px-8 md:py-4">
-        <div className="max-w-6xl mx-auto flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2 min-w-0 flex-shrink">
-            <img src="/logo-dark.png" alt="Invoicaty" className="h-8 w-auto flex-shrink-0" />
-            <div className="hidden sm:block min-w-0">
-              <h1 className="text-sm font-bold text-white leading-tight truncate">Invoicaty</h1>
-              <p className="text-[10px] text-slate-400 truncate">{profile?.full_name || profile?.business_name || t("dashboard.welcome")}</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-1 md:gap-1.5 flex-shrink-0">
-            <LanguageSwitcher />
-            <AppNav deletedCount={deletedCount} />
+      <AppHeader
+        showLogo
+        subtitle={profile?.full_name || profile?.business_name || t("dashboard.welcome")}
+        showNav
+        deletedCount={deletedCount}
+        extraActions={(
+          <>
             {profile?.role === 'admin' && (
               <Link href="/admin" className="text-slate-400 hover:text-white p-1.5 md:p-2 rounded-lg hover:bg-slate-700/50 transition-all text-sm" title={t("nav.admin")}>🛡</Link>
             )}
             <Link href="/settings" className="text-slate-400 hover:text-white p-1.5 md:p-2 rounded-lg hover:bg-slate-700/50 transition-all text-sm" title={t("nav.settings")}>⚙️</Link>
+          </>
+        )}
+        rightSlot={(
+          <>
             <CreateMenu
               onNewInvoice={() => { setEditInvoice(null); setShowModal(true); }}
               onNewExpense={() => router.push("/expenses?new=1")}
@@ -274,9 +265,9 @@ export default function DashboardPage() {
               align={lang === 'ar' ? 'left' : 'right'}
             />
             <button onClick={handleLogout} className="text-slate-400 hover:text-white p-1.5 md:p-2 rounded-lg hover:bg-slate-700/50 transition-all text-sm" title={t("nav.logout")}>⬅️</button>
-          </div>
-        </div>
-      </header>
+          </>
+        )}
+      />
 
       <main className="max-w-6xl mx-auto px-4 md:px-8 pt-5">
         {invoices.length === 0 ? (

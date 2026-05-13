@@ -6,8 +6,7 @@ import { useRouter } from "next/navigation";
 import { useI18n } from "@/lib/i18n";
 import { getCurrencyLabel } from "@/lib/currency";
 import type { Currency, Expense, ExpenseStatus, PaymentMethod } from "@/lib/types";
-import LanguageSwitcher from "@/components/LanguageSwitcher";
-import AppNav from "@/components/AppNav";
+import AppHeader from "@/components/AppHeader";
 import CreateMenu from "@/components/CreateMenu";
 import AppFooter from "@/components/AppFooter";
 import Link from "next/link";
@@ -165,25 +164,22 @@ export default function ExpensesPage() {
 
   return (
     <div className="min-h-screen pb-24 md:pb-8">
-      <header className="sticky top-0 z-30 glass border-b border-slate-700/50 px-4 py-3 md:px-8 md:py-4">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <Link href="/dashboard" className="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-slate-700/50 transition-all">{lang === 'ar' ? '→' : '←'}</Link>
-            <h1 className="text-sm font-bold text-white">💸 {t("expense.title") || (lang === "ar" ? "المصروفات" : "Expenses")}</h1>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <LanguageSwitcher />
-            <AppNav />
-            <CreateMenu
-              onNewInvoice={() => router.push("/dashboard?new=1")}
-              onNewExpense={() => { setEditExpense(null); setShowModal(true); }}
-              onNewQuotation={() => router.push("/quotations?new=1")}
-              onNewDraft={() => router.push("/drafts?new=1")}
-              align={lang === 'ar' ? 'left' : 'right'}
-            />
-          </div>
-        </div>
-      </header>
+      <AppHeader
+        showBack
+        backHref="/dashboard"
+        icon="💸"
+        title={t("expense.title") || (lang === "ar" ? "المصروفات" : "Expenses")}
+        showNav
+        rightSlot={(
+          <CreateMenu
+            onNewInvoice={() => router.push("/dashboard?new=1")}
+            onNewExpense={() => { setEditExpense(null); setShowModal(true); }}
+            onNewQuotation={() => router.push("/quotations?new=1")}
+            onNewDraft={() => router.push("/drafts?new=1")}
+            align={lang === 'ar' ? 'left' : 'right'}
+          />
+        )}
+      />
 
       <main className="max-w-6xl mx-auto px-4 md:px-8 pt-5">
         <div className="flex flex-col sm:flex-row gap-3 mb-4">

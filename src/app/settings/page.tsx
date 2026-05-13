@@ -2,8 +2,7 @@
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase";
 import { useI18n } from "@/lib/i18n";
-import LanguageSwitcher from "@/components/LanguageSwitcher";
-import AppNav from "@/components/AppNav";
+import AppHeader from "@/components/AppHeader";
 import AppFooter from "@/components/AppFooter";
 import ImportModal from "@/components/ImportModal";
 import { SUPPORT_LINKS } from "@/lib/developer-info";
@@ -463,23 +462,13 @@ export default function SettingsPage() {
 
   return (
     <div className="min-h-screen pb-20">
-      <header className="sticky top-0 z-30 glass border-b border-slate-700/50 px-4 py-3 md:px-8 md:py-4">
-        <div className="max-w-2xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <Link href="/dashboard" className="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-slate-700/50 transition-all">
-              {lang === 'ar' ? '→' : '←'}
-            </Link>
-            <h1 className="text-sm font-bold text-white">⚙️ {t("settings.title")}</h1>
-          </div>
-          <div className="flex items-center gap-2">
-            <LanguageSwitcher />
-            <button onClick={handleSave} disabled={saving}
-              className="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2 rounded-xl text-xs font-bold transition-all disabled:opacity-50 shadow-lg shadow-blue-500/20">
-              {saving ? t("settings.saving") : saved ? t("settings.saved") : `💾 ${t("settings.save")}`}
-            </button>
-          </div>
-        </div>
-      </header>
+      <AppHeader
+        showBack
+        backHref="/dashboard"
+        icon="⚙️"
+        title={t("nav.settings") || (lang === "ar" ? "الإعدادات" : "Settings")}
+        showNav
+      />
 
       <main className="max-w-2xl mx-auto px-4 md:px-8 pt-5">
         {/* Tabs */}
