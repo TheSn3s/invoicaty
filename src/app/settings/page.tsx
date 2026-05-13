@@ -470,9 +470,24 @@ export default function SettingsPage() {
         showNav
       />
 
-      <main className="max-w-2xl mx-auto px-4 md:px-8 pt-5">
-        {/* Tabs */}
-        <div className="flex gap-1 sm:gap-1.5 mb-6">
+      <main className="max-w-4xl mx-auto px-4 md:px-8 pt-5">
+        <div className="glass rounded-3xl p-4 md:p-5 mb-6 border border-slate-700/40">
+          <div className="flex items-start justify-between gap-4 flex-col sm:flex-row sm:items-center mb-4">
+            <div>
+              <h2 className="text-base md:text-lg font-bold text-white">{lang === 'ar' ? 'إعدادات الحساب والفواتير' : 'Account & invoice settings'}</h2>
+              <p className="text-xs text-slate-400 mt-1">{lang === 'ar' ? 'رتّب بياناتك، الفوترة، الهوية، والنسخ الاحتياطية من مكان واحد.' : 'Manage your profile, invoices, branding, and backups from one place.'}</p>
+            </div>
+            <div className="text-[11px] text-slate-500 bg-slate-800/50 border border-slate-700/50 rounded-full px-3 py-1.5">
+              {tab === 'profile' && (lang === 'ar' ? 'الملف الشخصي' : 'Profile')}
+              {tab === 'security' && (lang === 'ar' ? 'الأمان' : 'Security')}
+              {tab === 'region' && (lang === 'ar' ? 'المنطقة' : 'Region')}
+              {tab === 'invoice' && (lang === 'ar' ? 'الفاتورة والهوية' : 'Invoice & branding')}
+              {tab === 'data' && (lang === 'ar' ? 'البيانات' : 'Data')}
+            </div>
+          </div>
+
+          {/* Tabs */}
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
           <button onClick={() => setTab("profile")}
             className={`flex-1 min-w-0 py-2.5 px-2 sm:px-3 rounded-xl text-[12px] sm:text-sm font-bold transition-all flex items-center justify-center gap-1 whitespace-nowrap ${tab === "profile" ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20" : "glass text-slate-400 hover:text-white"}`}>
             <span>👤</span>
@@ -498,12 +513,27 @@ export default function SettingsPage() {
             <span>💾</span>
             <span className={`${tab === "data" ? "inline" : "hidden"} sm:inline truncate`}>{t("settings.dataTab")}</span>
           </button>
+          </div>
         </div>
 
         {tab === "profile" && (
           <div className="space-y-6 fade-in">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div className="glass rounded-2xl p-4 border border-slate-700/40">
+                <div className="text-[11px] text-slate-400 mb-1">{lang === 'ar' ? 'الاسم المعروض' : 'Display name'}</div>
+                <div className="text-sm font-bold text-white truncate">{fullName || '—'}</div>
+              </div>
+              <div className="glass rounded-2xl p-4 border border-slate-700/40">
+                <div className="text-[11px] text-slate-400 mb-1">{lang === 'ar' ? 'العلامة التجارية' : 'Business name'}</div>
+                <div className="text-sm font-bold text-white truncate">{businessName || '—'}</div>
+              </div>
+              <div className="glass rounded-2xl p-4 border border-slate-700/40">
+                <div className="text-[11px] text-slate-400 mb-1">{lang === 'ar' ? 'وسيلة التواصل' : 'Contact'}</div>
+                <div className="text-sm font-bold text-white truncate">{email || phone || '—'}</div>
+              </div>
+            </div>
             {/* Brand Logo */}
-            <div className="glass rounded-2xl p-5">
+            <div className="glass rounded-3xl p-5 md:p-6 border border-slate-700/40 shadow-[0_10px_30px_rgba(2,6,23,0.18)]">
               <h3 className="text-sm font-bold text-white mb-4 flex items-center gap-2">
                 <span className="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center text-sm">🖼️</span>
                 {lang === "ar" ? "شعار العلامة التجارية" : "Brand Logo"}
@@ -543,11 +573,12 @@ export default function SettingsPage() {
               )}
             </div>
 
-            <div className="glass rounded-2xl p-5">
-              <h3 className="text-sm font-bold text-white mb-4 flex items-center gap-2">
+            <div className="glass rounded-3xl p-5 md:p-6 border border-slate-700/40 shadow-[0_10px_30px_rgba(2,6,23,0.18)]">
+              <h3 className="text-sm font-bold text-white mb-1 flex items-center gap-2">
                 <span className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center text-sm">👤</span>
                 {t("settings.personalInfo")}
               </h3>
+              <p className="text-[11px] text-slate-400 mb-4 ms-10">{lang === 'ar' ? 'البيانات الأساسية التي تظهر في حسابك ومستنداتك.' : 'Your core account details used across the app and documents.'}</p>
               <div className="space-y-3">
                 <div>
                   <label className="block text-[11px] font-bold text-slate-400 mb-1.5">{t("settings.fullName")}</label>
@@ -603,11 +634,12 @@ export default function SettingsPage() {
               </div>
             </div>
 
-            <div className="glass rounded-2xl p-5">
-              <h3 className="text-sm font-bold text-white mb-4 flex items-center gap-2">
+            <div className="glass rounded-3xl p-5 md:p-6 border border-slate-700/40 shadow-[0_10px_30px_rgba(2,6,23,0.18)]">
+              <h3 className="text-sm font-bold text-white mb-1 flex items-center gap-2">
                 <span className="w-8 h-8 rounded-lg bg-green-500/20 flex items-center justify-center text-sm">🏦</span>
                 {t("settings.bankInfo")} <span className="text-[10px] text-slate-500 font-normal">{t("settings.bankInfoNote")}</span>
               </h3>
+              <p className="text-[11px] text-slate-400 mb-4 ms-10">{lang === 'ar' ? 'هذه البيانات اختيارية، لكنها تظهر في الفاتورة عند الحاجة.' : 'Optional banking details shown on invoices when needed.'}</p>
               <div className="space-y-3">
                 <div className="grid grid-cols-2 gap-3">
                   <div>
@@ -638,8 +670,12 @@ export default function SettingsPage() {
 
         {tab === "security" && (
           <div className="space-y-6 fade-in">
+            <div className="glass rounded-2xl p-4 border border-slate-700/40 bg-amber-500/5">
+              <div className="text-[11px] text-amber-300 font-bold">{lang === 'ar' ? 'نصيحة أمان' : 'Security tip'}</div>
+              <div className="text-xs text-slate-400 mt-1">{lang === 'ar' ? 'استخدم كلمة مرور طويلة وفريدة، وغيّرها عند الشك بأي وصول غير مصرح.' : 'Use a long unique password and rotate it if you suspect unauthorized access.'}</div>
+            </div>
             {/* Change Password Card */}
-            <div className="glass rounded-2xl p-5">
+            <div className="glass rounded-3xl p-5 md:p-6 border border-slate-700/40 shadow-[0_10px_30px_rgba(2,6,23,0.18)]">
               <h3 className="text-sm font-bold text-white mb-1 flex items-center gap-2">
                 <span className="w-8 h-8 rounded-lg bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-sm">🔐</span>
                 {t("settings.changePassword")}
@@ -685,7 +721,21 @@ export default function SettingsPage() {
 
         {tab === "region" && (
           <div className="space-y-6 fade-in">
-            <div className="glass rounded-2xl p-5">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div className="glass rounded-2xl p-4 border border-slate-700/40">
+                <div className="text-[11px] text-slate-400 mb-1">{lang === 'ar' ? 'الدولة' : 'Country'}</div>
+                <div className="text-sm font-bold text-white truncate">{countries.find(c => c.code === countryCode)?.[lang === 'ar' ? 'name_ar' : 'name_en'] || '—'}</div>
+              </div>
+              <div className="glass rounded-2xl p-4 border border-slate-700/40">
+                <div className="text-[11px] text-slate-400 mb-1">{lang === 'ar' ? 'العملة الافتراضية' : 'Default currency'}</div>
+                <div className="text-sm font-bold text-white truncate">{defaultCurrency || '—'}</div>
+              </div>
+              <div className="glass rounded-2xl p-4 border border-slate-700/40">
+                <div className="text-[11px] text-slate-400 mb-1">{lang === 'ar' ? 'الضريبة الافتراضية' : 'Default tax'}</div>
+                <div className="text-sm font-bold text-white truncate">{taxRate}%</div>
+              </div>
+            </div>
+            <div className="glass rounded-3xl p-5 md:p-6 border border-slate-700/40 shadow-[0_10px_30px_rgba(2,6,23,0.18)]">
               <h3 className="text-sm font-bold text-white mb-4 flex items-center gap-2">
                 <span className="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center text-sm">🌍</span>
                 {t("settings.regionTab")}
@@ -758,8 +808,22 @@ export default function SettingsPage() {
 
         {tab === "invoice" && (
           <div className="space-y-6 fade-in">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div className="glass rounded-2xl p-4 border border-slate-700/40">
+                <div className="text-[11px] text-slate-400 mb-1">{lang === 'ar' ? 'القالب الحالي' : 'Current template'}</div>
+                <div className="text-sm font-bold text-white truncate">{t(`settings.${invoiceTemplate}`)}</div>
+              </div>
+              <div className="glass rounded-2xl p-4 border border-slate-700/40">
+                <div className="text-[11px] text-slate-400 mb-1">{lang === 'ar' ? 'لون الهوية' : 'Brand color'}</div>
+                <div className="flex items-center gap-2"><span className="w-4 h-4 rounded-full border border-white/20" style={{ backgroundColor: brandColor }} /><span className="text-sm font-bold text-white font-inter">{brandColor}</span></div>
+              </div>
+              <div className="glass rounded-2xl p-4 border border-slate-700/40">
+                <div className="text-[11px] text-slate-400 mb-1">{lang === 'ar' ? 'الشعار' : 'Logo'}</div>
+                <div className="text-sm font-bold text-white truncate">{logoUrl ? (lang === 'ar' ? 'مرفوع' : 'Uploaded') : (lang === 'ar' ? 'غير مرفوع' : 'Not uploaded')}</div>
+              </div>
+            </div>
             {/* Template picker */}
-            <div className="glass rounded-2xl p-5">
+            <div className="glass rounded-3xl p-5 md:p-6 border border-slate-700/40 shadow-[0_10px_30px_rgba(2,6,23,0.18)]">
               <h3 className="text-sm font-bold text-white mb-1 flex items-center gap-2">
                 <span className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center text-sm">📄</span>
                 {t("settings.templateTitle")}
@@ -837,7 +901,7 @@ export default function SettingsPage() {
         {tab === "data" && (
           <div className="space-y-5 fade-in">
             {/* Header */}
-            <div className="glass rounded-2xl p-5">
+            <div className="glass rounded-3xl p-5 md:p-6 border border-slate-700/40 shadow-[0_10px_30px_rgba(2,6,23,0.18)]">
               <h3 className="text-sm font-bold text-white mb-1 flex items-center gap-2">
                 <span className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center text-sm">💾</span>
                 {t("data.title")}
@@ -846,7 +910,7 @@ export default function SettingsPage() {
             </div>
 
             {/* Import */}
-            <div className="glass rounded-2xl p-5">
+            <div className="glass rounded-3xl p-5 md:p-6 border border-slate-700/40 shadow-[0_10px_30px_rgba(2,6,23,0.18)]">
               <div className="flex items-start justify-between gap-3 mb-3">
                 <div className="flex items-start gap-3">
                   <span className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500/25 to-blue-600/15 border border-blue-500/30 flex items-center justify-center text-lg shrink-0">📥</span>
@@ -862,7 +926,7 @@ export default function SettingsPage() {
             </div>
 
             {/* Export CSV */}
-            <div className="glass rounded-2xl p-5">
+            <div className="glass rounded-3xl p-5 md:p-6 border border-slate-700/40 shadow-[0_10px_30px_rgba(2,6,23,0.18)]">
               <div className="flex items-start justify-between gap-3 mb-3">
                 <div className="flex items-start gap-3">
                   <span className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500/25 to-emerald-600/15 border border-emerald-500/30 flex items-center justify-center text-lg shrink-0">📊</span>
@@ -878,7 +942,7 @@ export default function SettingsPage() {
             </div>
 
             {/* Full Backup */}
-            <div className="glass rounded-2xl p-5">
+            <div className="glass rounded-3xl p-5 md:p-6 border border-slate-700/40 shadow-[0_10px_30px_rgba(2,6,23,0.18)]">
               <div className="flex items-start justify-between gap-3 mb-3">
                 <div className="flex items-start gap-3">
                   <span className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/25 to-purple-600/15 border border-purple-500/30 flex items-center justify-center text-lg shrink-0">💾</span>
@@ -895,7 +959,7 @@ export default function SettingsPage() {
             </div>
 
             {/* Support block */}
-            <div className="glass rounded-2xl p-5 border border-blue-500/20">
+            <div className="glass rounded-3xl p-5 md:p-6 border border-blue-500/20 shadow-[0_10px_30px_rgba(2,6,23,0.18)]">
               <div className="flex items-start gap-3 mb-3">
                 <span className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500/25 to-cyan-600/15 border border-blue-500/30 flex items-center justify-center text-lg shrink-0">🛟</span>
                 <div>
