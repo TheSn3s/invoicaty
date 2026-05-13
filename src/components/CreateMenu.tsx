@@ -75,8 +75,8 @@ export default function CreateMenu({ onNewInvoice, onNewExpense, onNewQuotation,
   };
 
   const triggerClass = variant === "fab"
-    ? (className || "md:hidden fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl shadow-2xl shadow-blue-500/30 flex items-center justify-center text-white text-2xl z-20 active:scale-95 transition-transform safe-bottom")
-    : (className || "bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-lg shadow-blue-500/20");
+    ? (className || "md:hidden fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl shadow-2xl shadow-blue-500/30 flex items-center justify-center text-white text-2xl z-20 active:scale-95 transition-all safe-bottom")
+    : (className || "bg-blue-600 hover:bg-blue-500 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30");
 
   const menuAlignClass = variant === "fab"
     ? (align === "left" ? "left-0 bottom-full mb-3" : "right-0 bottom-full mb-3")
@@ -98,7 +98,7 @@ export default function CreateMenu({ onNewInvoice, onNewExpense, onNewQuotation,
         ) : (
           <>
             <span className={`inline-block transition-transform ${open ? "rotate-45" : ""}`}>+</span>
-            <span className="hidden sm:inline">{t("nav.create") || (lang === "ar" ? "إنشاء جديد" : "New")}</span>
+            <span className="hidden sm:inline">{t("nav.create") || (lang === "ar" ? "إنشاء" : "Create")}</span>
             <span className="sm:hidden">{t("nav.new") || (lang === "ar" ? "جديد" : "New")}</span>
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className={`transition-transform ${open ? "rotate-180" : ""}`}>
               <polyline points="6 9 12 15 18 9" />
@@ -125,52 +125,40 @@ export default function CreateMenu({ onNewInvoice, onNewExpense, onNewQuotation,
             type="button"
             role="menuitem"
             onClick={handleInvoice}
-            className="w-full flex items-center gap-3 px-3 py-3 bg-slate-900 hover:bg-blue-600/20 transition-colors text-start group"
+            className="w-full flex items-center gap-3 px-3 py-2.5 bg-slate-900 hover:bg-blue-600/15 transition-all text-start group"
           >
-            <span className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500/30 to-blue-600/20 border border-blue-500/40 flex items-center justify-center text-lg group-hover:scale-110 transition-transform">🧾</span>
-            <div className="flex-1">
-              <div className="text-sm text-white font-bold">{t("nav.newInvoice") || (lang === "ar" ? "فاتورة جديدة" : "New Invoice")}</div>
-              <div className="text-[10px] text-slate-400">{lang === "ar" ? "إصدار فاتورة للعميل" : "Issue an invoice to a client"}</div>
-            </div>
+            <span className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500/25 to-blue-600/15 border border-blue-500/30 flex items-center justify-center text-base group-hover:scale-105 transition-transform">🧾</span>
+            <div className="flex-1 text-sm text-white font-bold">{t("nav.newInvoice") || (lang === "ar" ? "فاتورة جديدة" : "New Invoice")}</div>
           </button>
 
           <button
             type="button"
             role="menuitem"
             onClick={handleExpense}
-            className="w-full flex items-center gap-3 px-3 py-3 bg-slate-900 hover:bg-amber-600/20 transition-colors text-start group border-t border-slate-700/60"
+            className="w-full flex items-center gap-3 px-3 py-2.5 bg-slate-900 hover:bg-amber-600/15 transition-all text-start group border-t border-slate-700/60"
           >
-            <span className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-500/30 to-amber-600/20 border border-amber-500/40 flex items-center justify-center text-lg group-hover:scale-110 transition-transform">💸</span>
-            <div className="flex-1">
-              <div className="text-sm text-white font-bold">{t("nav.newExpense") || (lang === "ar" ? "مصروف جديد" : "New Expense")}</div>
-              <div className="text-[10px] text-slate-400">{lang === "ar" ? "تسجيل مصروف على النشاط" : "Record a business expense"}</div>
-            </div>
+            <span className="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-500/25 to-amber-600/15 border border-amber-500/30 flex items-center justify-center text-base group-hover:scale-105 transition-transform">💸</span>
+            <div className="flex-1 text-sm text-white font-bold">{t("nav.newExpense") || (lang === "ar" ? "مصروف جديد" : "New Expense")}</div>
           </button>
 
           <button
             type="button"
             role="menuitem"
             onClick={handleQuotation}
-            className="w-full flex items-center gap-3 px-3 py-3 bg-slate-900 hover:bg-purple-600/20 transition-colors text-start group border-t border-slate-700/60"
+            className="w-full flex items-center gap-3 px-3 py-2.5 bg-slate-900 hover:bg-purple-600/15 transition-all text-start group border-t border-slate-700/60"
           >
-            <span className="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-500/30 to-purple-600/20 border border-purple-500/40 flex items-center justify-center text-lg group-hover:scale-110 transition-transform">📋</span>
-            <div className="flex-1">
-              <div className="text-sm text-white font-bold">{t("nav.newQuotation") || (lang === "ar" ? "عرض سعر جديد" : "New Quotation")}</div>
-              <div className="text-[10px] text-slate-400">{lang === "ar" ? "إعداد عرض سعر للعميل" : "Prepare a quote for a client"}</div>
-            </div>
+            <span className="w-8 h-8 rounded-xl bg-gradient-to-br from-purple-500/25 to-purple-600/15 border border-purple-500/30 flex items-center justify-center text-base group-hover:scale-105 transition-transform">📋</span>
+            <div className="flex-1 text-sm text-white font-bold">{t("nav.newQuotation") || (lang === "ar" ? "عرض سعر جديد" : "New Quotation")}</div>
           </button>
 
           <button
             type="button"
             role="menuitem"
             onClick={handleDraft}
-            className="w-full flex items-center gap-3 px-3 py-3 bg-slate-900 hover:bg-emerald-600/20 transition-colors text-start group border-t border-slate-700/60"
+            className="w-full flex items-center gap-3 px-3 py-2.5 bg-slate-900 hover:bg-emerald-600/15 transition-all text-start group border-t border-slate-700/60"
           >
-            <span className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500/30 to-emerald-600/20 border border-emerald-500/40 flex items-center justify-center text-lg group-hover:scale-110 transition-transform">📝</span>
-            <div className="flex-1">
-              <div className="text-sm text-white font-bold">{t("nav.newDraft") || (lang === "ar" ? "مسودة جديدة" : "New Draft")}</div>
-              <div className="text-[10px] text-slate-400">{lang === "ar" ? "كتابة سكربت أو نص وتصديره PDF" : "Write a script or text and export as PDF"}</div>
-            </div>
+            <span className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500/25 to-emerald-600/15 border border-emerald-500/30 flex items-center justify-center text-base group-hover:scale-105 transition-transform">📝</span>
+            <div className="flex-1 text-sm text-white font-bold">{t("nav.newDraft") || (lang === "ar" ? "مسودة جديدة" : "New Draft")}</div>
           </button>
         </div>
       )}
