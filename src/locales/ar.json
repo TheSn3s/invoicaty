@@ -327,7 +327,9 @@
     "monthIncome": "هذا الشهر",
     "yearIncome": "هذه السنة",
     "outstanding": "مستحقات معلقة",
-    "invoiceCount": "فاتورة"
+    "invoiceCount": "فاتورة",
+    "totalExpenses": "إجمالي المصروفات",
+    "netProfit": "صافي الربح"
   },
   "invoice": {
     "serial": "#",

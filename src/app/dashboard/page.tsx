@@ -35,9 +35,18 @@ interface Profile {
   tax_rate?: number; logo_url?: string; onboarding_completed?: boolean;
 }
 
+interface Expense {
+  id: string;
+  date: string;
+  amount: number;
+  total?: number;
+  status: string;
+}
+
 export default function DashboardPage() {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [expenses, setExpenses] = useState<Expense[]>([]);
   const [currencyData, setCurrencyData] = useState<Currency | null>(null);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -71,9 +80,10 @@ export default function DashboardPage() {
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (!user || authError) { router.push("/login"); return; }
 
-    const [{ data: inv }, { data: prof }] = await Promise.all([
+    const [{ data: inv }, { data: prof }, { data: exp }] = await Promise.all([
       supabase.from("invoices").select("*").eq("user_id", user.id).order("date", { ascending: false }),
-      supabase.from("profiles").select("*").eq("id", user.id).single()
+      supabase.from("profiles").select("*").eq("id", user.id).single(),
+      supabase.from("expenses").select("id, date, amount, total, status").eq("user_id", user.id).order("date", { ascending: false })
     ]);
 
     if (!prof) {
@@ -91,6 +101,7 @@ export default function DashboardPage() {
     }
 
     setInvoices(inv || []);
+    setExpenses((exp || []).filter((row: Expense) => row.status !== "Deleted"));
     setLoading(false);
   }, [supabase, router]);
 
@@ -170,6 +181,10 @@ export default function DashboardPage() {
   const totalIncome = invoices.reduce((s, i) => s + (i.status !== "Cancelled" && i.status !== "Deleted" ? effectiveTotal(i) : 0), 0);
   const monthIncome = invoices.filter(i => { const d = new Date(i.date); return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth() && i.status !== "Cancelled" && i.status !== "Deleted"; }).reduce((s, i) => s + effectiveTotal(i), 0);
   const yearIncome = invoices.filter(i => new Date(i.date).getFullYear() === now.getFullYear() && i.status !== "Cancelled" && i.status !== "Deleted").reduce((s, i) => s + effectiveTotal(i), 0);
+  const expenseTotalOf = (e: Expense) => Number(e.total) || Number(e.amount) || 0;
+  const validExpenses = expenses.filter(e => e.status !== "Cancelled" && e.status !== "Deleted");
+  const totalExpenses = validExpenses.reduce((s, e) => s + expenseTotalOf(e), 0);
+  const netProfit = totalIncome - totalExpenses;
   const outstanding = invoices.filter(i => i.status === "Not Paid");
   const outstandingTotal = outstanding.reduce((s, i) => s + effectiveTotal(i), 0);
   const deletedCount = invoices.filter(i => i.status === "Deleted").length;
@@ -202,6 +217,7 @@ export default function DashboardPage() {
               <Link href="/admin" className="text-slate-400 hover:text-white p-1.5 md:p-2 rounded-lg hover:bg-slate-700/50 transition-all text-sm" title={t("nav.admin")}>🛡</Link>
             )}
             <Link href="/quotations" className="text-slate-400 hover:text-white p-1.5 md:p-2 rounded-lg hover:bg-slate-700/50 transition-all text-sm" title={t("quotation.title")}>📋</Link>
+            <Link href="/expenses" className="text-slate-400 hover:text-white p-1.5 md:p-2 rounded-lg hover:bg-slate-700/50 transition-all text-sm" title={t("expense.title")}>💸</Link>
             <Link href="/trash" className="relative text-slate-400 hover:text-white p-1.5 md:p-2 rounded-lg hover:bg-slate-700/50 transition-all text-sm" title={lang === 'ar' ? 'سلة المحذوفات' : 'Trash'}>
               🗑️
               {deletedCount > 0 && <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">{deletedCount}</span>}
@@ -209,6 +225,7 @@ export default function DashboardPage() {
             <Link href="/settings" className="text-slate-400 hover:text-white p-1.5 md:p-2 rounded-lg hover:bg-slate-700/50 transition-all text-sm" title={t("nav.settings")}>⚙️</Link>
             <CreateMenu
               onNewInvoice={() => { setEditInvoice(null); setShowModal(true); }}
+              onNewExpense={() => router.push("/expenses?new=1")}
               onNewQuotation={() => router.push("/quotations?new=1")}
               onNewDraft={() => router.push("/drafts?new=1")}
               align={lang === 'ar' ? 'left' : 'right'}
@@ -263,7 +280,7 @@ export default function DashboardPage() {
         ) : (
           /* ===== NORMAL STATE — User has invoices ===== */
           <>
-        <StatsCards total={totalIncome} month={monthIncome} year={yearIncome} outstanding={outstandingTotal} outstandingCount={outstanding.length} currencySymbol={effectiveSymbol} />
+        <StatsCards total={totalIncome} month={monthIncome} year={yearIncome} expensesTotal={totalExpenses} netProfit={netProfit} outstanding={outstandingTotal} outstandingCount={outstanding.length} currencySymbol={effectiveSymbol} />
 
         <div className="mt-6 flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
@@ -319,6 +336,7 @@ export default function DashboardPage() {
       <CreateMenu
         variant="fab"
         onNewInvoice={() => { setEditInvoice(null); setShowModal(true); }}
+        onNewExpense={() => router.push("/expenses?new=1")}
         onNewQuotation={() => router.push("/quotations?new=1")}
         onNewDraft={() => router.push("/drafts?new=1")}
         align={lang === 'ar' ? 'right' : 'left'}

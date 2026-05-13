@@ -327,7 +327,9 @@
     "monthIncome": "This Month",
     "yearIncome": "This Year",
     "outstanding": "Outstanding",
-    "invoiceCount": "invoices"
+    "invoiceCount": "invoices",
+    "totalExpenses": "Total Expenses",
+    "netProfit": "Net Profit"
   },
   "invoice": {
     "serial": "#",
