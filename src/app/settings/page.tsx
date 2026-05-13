@@ -487,32 +487,34 @@ export default function SettingsPage() {
           </div>
 
           {/* Tabs */}
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+          <div className="overflow-x-auto no-scrollbar -mx-1 px-1">
+            <div className="inline-flex min-w-full sm:min-w-0 gap-1.5 bg-slate-900/40 border border-slate-700/40 rounded-2xl p-1">
           <button onClick={() => setTab("profile")}
-            className={`flex-1 min-w-0 py-2.5 px-2 sm:px-3 rounded-xl text-[12px] sm:text-sm font-bold transition-all flex items-center justify-center gap-1 whitespace-nowrap ${tab === "profile" ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20" : "glass text-slate-400 hover:text-white"}`}>
+            className={`shrink-0 py-2 px-3 rounded-xl text-[11px] sm:text-xs font-bold transition-all flex items-center justify-center gap-1 whitespace-nowrap ${tab === "profile" ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20" : "text-slate-400 hover:text-white hover:bg-slate-800/70"}`}>
             <span>👤</span>
             <span className={`${tab === "profile" ? "inline" : "hidden"} sm:inline truncate`}>{t("settings.profileTab")}</span>
           </button>
           <button onClick={() => setTab("security")}
-            className={`flex-1 min-w-0 py-2.5 px-2 sm:px-3 rounded-xl text-[12px] sm:text-sm font-bold transition-all flex items-center justify-center gap-1 whitespace-nowrap ${tab === "security" ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20" : "glass text-slate-400 hover:text-white"}`}>
+            className={`shrink-0 py-2 px-3 rounded-xl text-[11px] sm:text-xs font-bold transition-all flex items-center justify-center gap-1 whitespace-nowrap ${tab === "security" ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20" : "text-slate-400 hover:text-white hover:bg-slate-800/70"}`}>
             <span>🔐</span>
             <span className={`${tab === "security" ? "inline" : "hidden"} sm:inline truncate`}>{t("settings.security")}</span>
           </button>
           <button onClick={() => setTab("region")}
-            className={`flex-1 min-w-0 py-2.5 px-2 sm:px-3 rounded-xl text-[12px] sm:text-sm font-bold transition-all flex items-center justify-center gap-1 whitespace-nowrap ${tab === "region" ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20" : "glass text-slate-400 hover:text-white"}`}>
+            className={`shrink-0 py-2 px-3 rounded-xl text-[11px] sm:text-xs font-bold transition-all flex items-center justify-center gap-1 whitespace-nowrap ${tab === "region" ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20" : "text-slate-400 hover:text-white hover:bg-slate-800/70"}`}>
             <span>🌍</span>
             <span className={`${tab === "region" ? "inline" : "hidden"} sm:inline truncate`}>{t("settings.regionTab")}</span>
           </button>
           <button onClick={() => setTab("invoice")}
-            className={`flex-1 min-w-0 py-2.5 px-2 sm:px-3 rounded-xl text-[12px] sm:text-sm font-bold transition-all flex items-center justify-center gap-1 whitespace-nowrap ${tab === "invoice" ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20" : "glass text-slate-400 hover:text-white"}`}>
+            className={`shrink-0 py-2 px-3 rounded-xl text-[11px] sm:text-xs font-bold transition-all flex items-center justify-center gap-1 whitespace-nowrap ${tab === "invoice" ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20" : "text-slate-400 hover:text-white hover:bg-slate-800/70"}`}>
             <span>🎨</span>
             <span className={`${tab === "invoice" ? "inline" : "hidden"} sm:inline truncate`}>{t("settings.invoiceTab")}</span>
           </button>
           <button onClick={() => setTab("data")}
-            className={`flex-1 min-w-0 py-2.5 px-2 sm:px-3 rounded-xl text-[12px] sm:text-sm font-bold transition-all flex items-center justify-center gap-1 whitespace-nowrap ${tab === "data" ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20" : "glass text-slate-400 hover:text-white"}`}>
+            className={`shrink-0 py-2 px-3 rounded-xl text-[11px] sm:text-xs font-bold transition-all flex items-center justify-center gap-1 whitespace-nowrap ${tab === "data" ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20" : "text-slate-400 hover:text-white hover:bg-slate-800/70"}`}>
             <span>💾</span>
             <span className={`${tab === "data" ? "inline" : "hidden"} sm:inline truncate`}>{t("settings.dataTab")}</span>
           </button>
+            </div>
           </div>
         </div>
 
