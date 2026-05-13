@@ -33,8 +33,8 @@ export default function TrashPage() {
 
     const [{ data: inv }, { data: quo }, { data: drafts }] = await Promise.all([
       supabase.from("invoices").select("*").eq("user_id", user.id).eq("status", "Deleted"),
-      supabase.from("quotations").select("*").eq("user_id", user.id).eq("status", "Deleted"),
-      supabase.from("drafts").select("*").eq("user_id", user.id).eq("status", "Deleted"),
+      supabase.from("quotations").select("*").eq("user_id", user.id).not("deleted_at", "is", null),
+      supabase.from("drafts").select("*").eq("user_id", user.id).not("deleted_at", "is", null),
     ]);
 
     const merged: TrashItem[] = [
@@ -60,7 +60,7 @@ export default function TrashPage() {
         subtitle: row.project,
         amount: Number(row.total || row.amount),
         currency: row.currency,
-        restoreStatus: "Draft",
+        restoreStatus: row.status && row.status !== "Deleted" ? row.status : "Draft",
       })),
       ...(drafts || []).map((row) => ({
         id: row.id,
@@ -70,7 +70,7 @@ export default function TrashPage() {
         type: "draft" as const,
         title: row.title,
         subtitle: `${row.client} — ${row.project}`,
-        restoreStatus: "Draft",
+        restoreStatus: row.status && row.status !== "Deleted" ? row.status : "Draft",
       })),
     ].sort((a, b) => new Date(b.deleted_at || b.date).getTime() - new Date(a.deleted_at || a.date).getTime());
 
@@ -123,8 +123,8 @@ export default function TrashPage() {
     if (!user) return;
     await Promise.all([
       supabase.from("invoices").delete().eq("user_id", user.id).eq("status", "Deleted"),
-      supabase.from("quotations").delete().eq("user_id", user.id).eq("status", "Deleted"),
-      supabase.from("drafts").delete().eq("user_id", user.id).eq("status", "Deleted"),
+      supabase.from("quotations").delete().eq("user_id", user.id).not("deleted_at", "is", null),
+      supabase.from("drafts").delete().eq("user_id", user.id).not("deleted_at", "is", null),
     ]);
     loadData();
   };

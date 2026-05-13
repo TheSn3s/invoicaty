@@ -69,7 +69,7 @@ export default function DraftsPage() {
       supabase.from("drafts").select("*").eq("user_id", user.id).order("date", { ascending: false }),
       supabase.from("profiles").select("*").eq("id", user.id).single()
     ]);
-    setDrafts((d || []).filter(item => item.status !== "Deleted"));
+    setDrafts((d || []).filter(item => !item.deleted_at && item.status !== "Deleted"));
     setProfile(prof || null);
     setLoading(false);
   }, [supabase, router]);
@@ -103,7 +103,17 @@ export default function DraftsPage() {
   };
 
   const handleDelete = async (id: string) => {
-    await supabase.from("drafts").update({ status: "Deleted", deleted_at: new Date().toISOString() }).eq("id", id);
+    const { error } = await supabase
+      .from("drafts")
+      .update({ deleted_at: new Date().toISOString() })
+      .eq("id", id);
+
+    if (error) {
+      console.error("Failed to soft-delete draft", error);
+      alert(lang === 'ar' ? 'تعذر حذف المسودة. تحقق من صلاحية قاعدة البيانات أو قيود الحقول.' : 'Failed to delete draft. Check database constraints or permissions.');
+      return;
+    }
+
     loadData();
   };
 

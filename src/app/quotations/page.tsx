@@ -68,7 +68,7 @@ export default function QuotationsPage() {
       const { data: curr } = await supabase.from("currencies").select("*").eq("code", prof.default_currency).single();
       if (curr) setCurrencyData(curr);
     }
-    setQuotations((q || []).filter(item => item.status !== "Deleted"));
+    setQuotations((q || []).filter(item => !item.deleted_at && item.status !== "Deleted"));
     setLoading(false);
   }, [supabase, router]);
 
@@ -123,7 +123,7 @@ export default function QuotationsPage() {
   };
 
   const handleDelete = async (id: string) => {
-    await supabase.from("quotations").update({ status: "Deleted", deleted_at: new Date().toISOString() }).eq("id", id);
+    await supabase.from("quotations").update({ deleted_at: new Date().toISOString() }).eq("id", id);
     loadData();
   };
 
