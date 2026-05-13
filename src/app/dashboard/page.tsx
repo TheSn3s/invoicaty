@@ -318,6 +318,37 @@ export default function DashboardPage() {
 
         <StatsCards total={totalIncome} month={monthIncome} year={yearIncome} expensesTotal={totalExpenses} netProfit={netProfit} outstanding={outstandingTotal} outstandingCount={outstanding.length} currencySymbol={effectiveSymbol} />
 
+        <div className="mt-6 glass rounded-3xl p-4 md:p-5 border border-slate-700/40">
+          <div className="flex items-center justify-between gap-3 flex-wrap mb-4">
+            <div>
+              <h3 className="text-sm font-bold text-white">{lang === 'ar' ? 'إجراءات سريعة' : 'Quick Actions'}</h3>
+              <p className="text-[11px] text-slate-400 mt-1">{lang === 'ar' ? 'ابدأ أكثر العمليات استخدامًا من هنا مباشرة.' : 'Start the most common actions directly from here.'}</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            <button onClick={() => { setEditInvoice(null); setShowModal(true); }} className="text-start rounded-2xl p-4 bg-blue-500/10 hover:bg-blue-500/15 border border-blue-500/20 transition-all active:scale-[.99]">
+              <div className="text-2xl mb-2">🧾</div>
+              <div className="text-sm font-bold text-white">{lang === 'ar' ? 'فاتورة جديدة' : 'New Invoice'}</div>
+              <div className="text-[11px] text-slate-400 mt-1">{lang === 'ar' ? 'ابدأ فاتورة جديدة بسرعة' : 'Create a new invoice quickly'}</div>
+            </button>
+            <button onClick={() => router.push('/expenses?new=1')} className="text-start rounded-2xl p-4 bg-amber-500/10 hover:bg-amber-500/15 border border-amber-500/20 transition-all active:scale-[.99]">
+              <div className="text-2xl mb-2">💸</div>
+              <div className="text-sm font-bold text-white">{lang === 'ar' ? 'مصروف جديد' : 'New Expense'}</div>
+              <div className="text-[11px] text-slate-400 mt-1">{lang === 'ar' ? 'سجل مصروفًا جديدًا' : 'Record a new expense'}</div>
+            </button>
+            <button onClick={() => router.push('/quotations?new=1')} className="text-start rounded-2xl p-4 bg-purple-500/10 hover:bg-purple-500/15 border border-purple-500/20 transition-all active:scale-[.99]">
+              <div className="text-2xl mb-2">📋</div>
+              <div className="text-sm font-bold text-white">{lang === 'ar' ? 'عرض سعر جديد' : 'New Quotation'}</div>
+              <div className="text-[11px] text-slate-400 mt-1">{lang === 'ar' ? 'أنشئ عرض سعر سريعًا' : 'Prepare a quotation quickly'}</div>
+            </button>
+            <button onClick={() => router.push('/drafts?new=1')} className="text-start rounded-2xl p-4 bg-emerald-500/10 hover:bg-emerald-500/15 border border-emerald-500/20 transition-all active:scale-[.99]">
+              <div className="text-2xl mb-2">📝</div>
+              <div className="text-sm font-bold text-white">{lang === 'ar' ? 'مسودة جديدة' : 'New Draft'}</div>
+              <div className="text-[11px] text-slate-400 mt-1">{lang === 'ar' ? 'اكتب مسودة أو سكربت جديد' : 'Write a new draft or script'}</div>
+            </button>
+          </div>
+        </div>
+
         <div className="mt-6 flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
             <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm">🔍</span>
