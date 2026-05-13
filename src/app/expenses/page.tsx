@@ -70,6 +70,14 @@ export default function ExpensesPage() {
 
   useEffect(() => { loadData(); }, [loadData]);
 
+  const summary = useMemo(() => {
+    const total = expenses.reduce((sum, exp) => sum + Number(exp.total || exp.amount || 0), 0);
+    const paid = expenses.filter(exp => exp.status === "Paid").reduce((sum, exp) => sum + Number(exp.total || exp.amount || 0), 0);
+    const pending = expenses.filter(exp => exp.status === "Pending").reduce((sum, exp) => sum + Number(exp.total || exp.amount || 0), 0);
+    const cancelled = expenses.filter(exp => exp.status === "Cancelled").length;
+    return { total, paid, pending, cancelled, count: expenses.length };
+  }, [expenses]);
+
   const filtered = useMemo(() => expenses.filter(exp => {
     const q = search.toLowerCase();
     const matchSearch = !search
@@ -182,6 +190,29 @@ export default function ExpensesPage() {
       />
 
       <main className="max-w-6xl mx-auto px-4 md:px-8 pt-5">
+        <div className="grid grid-cols-2 xl:grid-cols-5 gap-3 mb-4">
+          <div className="glass rounded-2xl p-4">
+            <div className="text-[11px] text-slate-400 mb-1">{lang === "ar" ? "إجمالي المصروفات" : "Total Expenses"}</div>
+            <div className="font-inter text-lg font-bold text-white">{summary.total.toLocaleString()} <span className="text-[11px] text-slate-400">{effectiveSymbol}</span></div>
+          </div>
+          <div className="glass rounded-2xl p-4">
+            <div className="text-[11px] text-slate-400 mb-1">{lang === "ar" ? "المدفوع" : "Paid"}</div>
+            <div className="font-inter text-lg font-bold text-green-400">{summary.paid.toLocaleString()} <span className="text-[11px] text-slate-400">{effectiveSymbol}</span></div>
+          </div>
+          <div className="glass rounded-2xl p-4">
+            <div className="text-[11px] text-slate-400 mb-1">{lang === "ar" ? "المعلّق" : "Pending"}</div>
+            <div className="font-inter text-lg font-bold text-amber-400">{summary.pending.toLocaleString()} <span className="text-[11px] text-slate-400">{effectiveSymbol}</span></div>
+          </div>
+          <div className="glass rounded-2xl p-4">
+            <div className="text-[11px] text-slate-400 mb-1">{lang === "ar" ? "الملغي" : "Cancelled"}</div>
+            <div className="font-inter text-lg font-bold text-slate-300">{summary.cancelled}</div>
+          </div>
+          <div className="glass rounded-2xl p-4">
+            <div className="text-[11px] text-slate-400 mb-1">{lang === "ar" ? "عدد السجلات" : "Records"}</div>
+            <div className="font-inter text-lg font-bold text-blue-400">{summary.count}</div>
+          </div>
+        </div>
+
         <div className="flex flex-col sm:flex-row gap-3 mb-4">
           <div className="relative flex-1">
             <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm">🔍</span>

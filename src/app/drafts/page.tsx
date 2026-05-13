@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { createClient } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import { useI18n } from "@/lib/i18n";
@@ -117,6 +117,15 @@ export default function DraftsPage() {
     loadData();
   };
 
+  const summary = useMemo(() => {
+    const draft = drafts.filter(d => d.status === "Draft").length;
+    const sent = drafts.filter(d => d.status === "Sent").length;
+    const approved = drafts.filter(d => d.status === "Approved").length;
+    const archived = drafts.filter(d => d.status === "Archived").length;
+    const latest = drafts.length > 0 ? drafts.reduce((latest, d) => new Date(d.date) > new Date(latest.date) ? d : latest, drafts[0]) : null;
+    return { draft, sent, approved, archived, latest, count: drafts.length };
+  }, [drafts]);
+
   const filtered = drafts.filter(d => !search || d.client.toLowerCase().includes(search.toLowerCase()) || d.project.toLowerCase().includes(search.toLowerCase()) || d.title.toLowerCase().includes(search.toLowerCase()) || d.serial.includes(search));
 
   if (loading) {
@@ -142,6 +151,29 @@ export default function DraftsPage() {
       />
 
       <main className="max-w-6xl mx-auto px-4 md:px-8 pt-5">
+        <div className="grid grid-cols-2 xl:grid-cols-5 gap-3 mb-4">
+          <div className="glass rounded-2xl p-4">
+            <div className="text-[11px] text-slate-400 mb-1">{lang === "ar" ? "إجمالي المسودات" : "Total Drafts"}</div>
+            <div className="font-inter text-lg font-bold text-white">{summary.count}</div>
+          </div>
+          <div className="glass rounded-2xl p-4">
+            <div className="text-[11px] text-slate-400 mb-1">{lang === "ar" ? "مسودة" : "Draft"}</div>
+            <div className="font-inter text-lg font-bold text-slate-300">{summary.draft}</div>
+          </div>
+          <div className="glass rounded-2xl p-4">
+            <div className="text-[11px] text-slate-400 mb-1">{lang === "ar" ? "مرسل" : "Sent"}</div>
+            <div className="font-inter text-lg font-bold text-blue-400">{summary.sent}</div>
+          </div>
+          <div className="glass rounded-2xl p-4">
+            <div className="text-[11px] text-slate-400 mb-1">{lang === "ar" ? "معتمد" : "Approved"}</div>
+            <div className="font-inter text-lg font-bold text-green-400">{summary.approved}</div>
+          </div>
+          <div className="glass rounded-2xl p-4">
+            <div className="text-[11px] text-slate-400 mb-1">{lang === "ar" ? "آخر تحديث" : "Latest"}</div>
+            <div className="font-inter text-sm font-bold text-purple-400">{summary.latest ? summary.latest.date : '-'}</div>
+          </div>
+        </div>
+
         <div className="flex flex-col sm:flex-row gap-3 mb-4">
           <div className="relative flex-1">
             <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm">🔍</span>

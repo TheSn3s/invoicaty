@@ -74,6 +74,15 @@ export default function QuotationsPage() {
 
   useEffect(() => { loadData(); }, [loadData]);
 
+  const summary = useMemo(() => {
+    const total = quotations.reduce((sum, q) => sum + Number(q.total || q.amount || 0), 0);
+    const accepted = quotations.filter(q => q.status === "Accepted").length;
+    const sent = quotations.filter(q => q.status === "Sent").length;
+    const draft = quotations.filter(q => q.status === "Draft").length;
+    const converted = quotations.filter(q => !!q.converted_invoice_id).length;
+    return { total, accepted, sent, draft, converted, count: quotations.length };
+  }, [quotations]);
+
   const filtered = useMemo(() => quotations.filter(q => {
     const matchSearch = !search || q.client.toLowerCase().includes(search.toLowerCase()) || q.project.toLowerCase().includes(search.toLowerCase()) || q.serial.includes(search);
     const matchStatus = statusFilter === "all" || q.status === statusFilter;
@@ -163,6 +172,29 @@ export default function QuotationsPage() {
       />
 
       <main className="max-w-6xl mx-auto px-4 md:px-8 pt-5">
+        <div className="grid grid-cols-2 xl:grid-cols-5 gap-3 mb-4">
+          <div className="glass rounded-2xl p-4">
+            <div className="text-[11px] text-slate-400 mb-1">{lang === "ar" ? "إجمالي العروض" : "Total Quotations"}</div>
+            <div className="font-inter text-lg font-bold text-white">{summary.total.toLocaleString()} <span className="text-[11px] text-slate-400">{effectiveSymbol}</span></div>
+          </div>
+          <div className="glass rounded-2xl p-4">
+            <div className="text-[11px] text-slate-400 mb-1">{lang === "ar" ? "مقبول" : "Accepted"}</div>
+            <div className="font-inter text-lg font-bold text-green-400">{summary.accepted}</div>
+          </div>
+          <div className="glass rounded-2xl p-4">
+            <div className="text-[11px] text-slate-400 mb-1">{lang === "ar" ? "مرسل" : "Sent"}</div>
+            <div className="font-inter text-lg font-bold text-blue-400">{summary.sent}</div>
+          </div>
+          <div className="glass rounded-2xl p-4">
+            <div className="text-[11px] text-slate-400 mb-1">{lang === "ar" ? "مسودة" : "Draft"}</div>
+            <div className="font-inter text-lg font-bold text-slate-300">{summary.draft}</div>
+          </div>
+          <div className="glass rounded-2xl p-4">
+            <div className="text-[11px] text-slate-400 mb-1">{lang === "ar" ? "تم تحويله" : "Converted"}</div>
+            <div className="font-inter text-lg font-bold text-purple-400">{summary.converted}</div>
+          </div>
+        </div>
+
         <div className="flex flex-col sm:flex-row gap-3 mb-4">
           <div className="relative flex-1">
             <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm">🔍</span>
