@@ -1,6 +1,16 @@
 "use client";
 
+import { useMemo } from "react";
 import { useI18n } from "@/lib/i18n";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  ResponsiveContainer,
+  Tooltip,
+  CartesianGrid,
+} from "recharts";
 
 interface ChartPoint {
   label: string;
@@ -13,32 +23,21 @@ interface Props {
   currencySymbol?: string;
 }
 
-function getCoordinates(values: number[], width: number, height: number, maxValue: number) {
-  if (!values.length) return [] as Array<{ x: number; y: number }>;
-  const stepX = values.length > 1 ? width / (values.length - 1) : 0;
-  return values.map((value, index) => ({
-    x: index * stepX,
-    y: height - (value / maxValue) * height,
-  }));
-}
-
-function buildLinePath(points: Array<{ x: number; y: number }>) {
-  if (!points.length) return "";
-  return points.map((point, index) => `${index === 0 ? "M" : "L"} ${point.x} ${point.y}`).join(" ");
-}
-
-function buildAreaPath(points: Array<{ x: number; y: number }>, height: number) {
-  if (!points.length) return "";
-  const line = buildLinePath(points);
-  const last = points[points.length - 1];
-  const first = points[0];
-  return `${line} L ${last.x} ${height} L ${first.x} ${height} Z`;
-}
-
 export default function FinancialOverviewChart({ data, currencySymbol }: Props) {
   const { t, lang } = useI18n();
   const symbol = currencySymbol || (lang === "ar" ? "د.ك" : "KWD");
   const chartData = data.slice(-12);
+
+  const maxValue = useMemo(
+    () => Math.max(...chartData.flatMap((d) => [d.income, d.expenses]), 0),
+    [chartData]
+  );
+
+  const format = (n: number) =>
+    n.toLocaleString(undefined, {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 3,
+    });
 
   if (!chartData.length) {
     return (
@@ -59,20 +58,12 @@ export default function FinancialOverviewChart({ data, currencySymbol }: Props) 
     );
   }
 
-  const maxValue = Math.max(...chartData.flatMap((d) => [d.income, d.expenses]), 1);
-  const chartWidth = 100;
-  const chartHeight = 82;
-  const incomePoints = getCoordinates(chartData.map((d) => d.income), chartWidth, chartHeight, maxValue);
-  const expensePoints = getCoordinates(chartData.map((d) => d.expenses), chartWidth, chartHeight, maxValue);
-  const incomeLine = buildLinePath(incomePoints);
-  const incomeArea = buildAreaPath(incomePoints, chartHeight);
-  const expenseLine = buildLinePath(expensePoints);
-
-  const format = (n: number) =>
-    n.toLocaleString(undefined, {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 3,
-    });
+  const tooltipStyle = {
+    backgroundColor: "rgba(15, 23, 42, 0.96)",
+    border: "1px solid rgba(148, 163, 184, 0.18)",
+    borderRadius: "14px",
+    boxShadow: "0 10px 30px rgba(0,0,0,0.25)",
+  };
 
   return (
     <div className="glass rounded-2xl p-4 mt-5 mb-4 overflow-hidden">
@@ -87,42 +78,56 @@ export default function FinancialOverviewChart({ data, currencySymbol }: Props) 
         </div>
       </div>
 
-      <div className="flex gap-3 items-stretch">
-        <div className="w-10 shrink-0 flex flex-col justify-between text-[10px] text-slate-500 py-1 font-inter">
-          <span>{format(maxValue)}</span>
-          <span>0</span>
-        </div>
-
-        <div className="flex-1 min-w-0">
-          <div className="relative h-24">
-            <div className="absolute inset-0 flex flex-col justify-between pointer-events-none">
-              <div className="border-t border-slate-700/30" />
-              <div className="border-t border-slate-700/20" />
-              <div className="border-t border-slate-700/30" />
-            </div>
-
-            <svg viewBox={`0 0 ${chartWidth} ${chartHeight}`} className="absolute inset-0 w-full h-full" preserveAspectRatio="none">
-              <defs>
-                <linearGradient id="incomeAreaGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="rgba(52,211,153,0.26)" />
-                  <stop offset="100%" stopColor="rgba(52,211,153,0.02)" />
-                </linearGradient>
-              </defs>
-
-              <path d={incomeArea} fill="url(#incomeAreaGradient)" />
-              <path d={incomeLine} fill="none" stroke="rgba(52,211,153,0.95)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-              <path d={expenseLine} fill="none" stroke="rgba(253,224,71,0.95)" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="0" />
-            </svg>
-          </div>
-
-          <div className="grid mt-2 text-[10px] text-slate-500" style={{ gridTemplateColumns: `repeat(${chartData.length}, minmax(0, 1fr))` }}>
-            {chartData.map((point) => (
-              <div key={point.label} className="text-center truncate px-0.5" title={`${point.label} | ${t("dashboard.totalIncome")}: ${format(point.income)} ${symbol} | ${t("dashboard.totalExpenses")}: ${format(point.expenses)} ${symbol}`}>
-                {point.label}
-              </div>
-            ))}
-          </div>
-        </div>
+      <div className="h-[150px] w-full">
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart
+            data={chartData}
+            margin={{ top: 8, right: 8, left: -20, bottom: 0 }}
+          >
+            <CartesianGrid stroke="rgba(148,163,184,0.10)" strokeDasharray="3 3" vertical={false} />
+            <XAxis
+              dataKey="label"
+              tick={{ fill: "rgba(148,163,184,0.85)", fontSize: 10 }}
+              tickLine={false}
+              axisLine={false}
+              interval="preserveStartEnd"
+              minTickGap={14}
+            />
+            <YAxis
+              tick={{ fill: "rgba(148,163,184,0.85)", fontSize: 10 }}
+              tickFormatter={(value) => format(Number(value))}
+              tickLine={false}
+              axisLine={false}
+              width={44}
+              domain={[0, Math.max(maxValue, 1)]}
+              ticks={[0, Math.max(maxValue, 1)]}
+            />
+            <Tooltip
+              contentStyle={tooltipStyle}
+              labelStyle={{ color: "#e2e8f0", fontWeight: 700, marginBottom: 6 }}
+              formatter={(value: number, name: string) => [
+                `${format(Number(value))} ${symbol}`,
+                name === "income" ? t("dashboard.totalIncome") : t("dashboard.totalExpenses"),
+              ]}
+            />
+            <Line
+              type="monotone"
+              dataKey="income"
+              stroke="rgba(52,211,153,0.98)"
+              strokeWidth={2.5}
+              dot={false}
+              activeDot={{ r: 4, fill: "rgba(52,211,153,1)", strokeWidth: 0 }}
+            />
+            <Line
+              type="monotone"
+              dataKey="expenses"
+              stroke="rgba(253,224,71,0.95)"
+              strokeWidth={1.9}
+              dot={false}
+              activeDot={{ r: 3.5, fill: "rgba(253,224,71,1)", strokeWidth: 0 }}
+            />
+          </LineChart>
+        </ResponsiveContainer>
       </div>
     </div>
   );
