@@ -6,6 +6,8 @@ import { useI18n } from "@/lib/i18n";
 interface Props {
   /** Called when the user picks "New invoice". If omitted, no-op. */
   onNewInvoice?: () => void;
+  /** Called when the user picks "New expense". If omitted, navigates to /expenses?new=1. */
+  onNewExpense?: () => void;
   /** Called when the user picks "New quotation". If omitted, navigates to /quotations?new=1. */
   onNewQuotation?: () => void;
   /** Called when the user picks "New draft". If omitted, navigates to /drafts?new=1. */
@@ -18,7 +20,7 @@ interface Props {
   align?: "left" | "right";
 }
 
-export default function CreateMenu({ onNewInvoice, onNewQuotation, onNewDraft, variant = "header", align = "right", className }: Props) {
+export default function CreateMenu({ onNewInvoice, onNewExpense, onNewQuotation, onNewDraft, variant = "header", align = "right", className }: Props) {
   const { t, lang } = useI18n();
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -55,6 +57,11 @@ export default function CreateMenu({ onNewInvoice, onNewQuotation, onNewDraft, v
     setOpen(false);
     if (onNewInvoice) onNewInvoice();
     else router.push("/dashboard?new=1");
+  };
+  const handleExpense = () => {
+    setOpen(false);
+    if (onNewExpense) onNewExpense();
+    else router.push("/expenses?new=1");
   };
   const handleQuotation = () => {
     setOpen(false);
@@ -124,6 +131,19 @@ export default function CreateMenu({ onNewInvoice, onNewQuotation, onNewDraft, v
             <div className="flex-1">
               <div className="text-sm text-white font-bold">{t("nav.newInvoice") || (lang === "ar" ? "فاتورة جديدة" : "New Invoice")}</div>
               <div className="text-[10px] text-slate-400">{lang === "ar" ? "إصدار فاتورة للعميل" : "Issue an invoice to a client"}</div>
+            </div>
+          </button>
+
+          <button
+            type="button"
+            role="menuitem"
+            onClick={handleExpense}
+            className="w-full flex items-center gap-3 px-3 py-3 bg-slate-900 hover:bg-amber-600/20 transition-colors text-start group border-t border-slate-700/60"
+          >
+            <span className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-500/30 to-amber-600/20 border border-amber-500/40 flex items-center justify-center text-lg group-hover:scale-110 transition-transform">💸</span>
+            <div className="flex-1">
+              <div className="text-sm text-white font-bold">{t("nav.newExpense") || (lang === "ar" ? "مصروف جديد" : "New Expense")}</div>
+              <div className="text-[10px] text-slate-400">{lang === "ar" ? "تسجيل مصروف على النشاط" : "Record a business expense"}</div>
             </div>
           </button>
 

@@ -13,7 +13,8 @@
     "new": "New",
     "create": "Create",
     "createNew": "Create new",
-    "back": "Back"
+    "back": "Back",
+    "newExpense": "New Expense"
   },
   "home": {
     "title": "The Best Invoicing App",
@@ -22,9 +23,21 @@
     "cta": "Start for Free →",
     "hasAccount": "I have an account",
     "features": [
-      { "icon": "⚡", "title": "Fast Invoicing", "desc": "Create your invoice in seconds with an easy interface" },
-      { "icon": "📄", "title": "PDF Export", "desc": "Professional invoice template ready to print and share" },
-      { "icon": "💼", "title": "Perfect for Small Biz", "desc": "Complete system to manage your financial receivables" }
+      {
+        "icon": "⚡",
+        "title": "Fast Invoicing",
+        "desc": "Create your invoice in seconds with an easy interface"
+      },
+      {
+        "icon": "📄",
+        "title": "PDF Export",
+        "desc": "Professional invoice template ready to print and share"
+      },
+      {
+        "icon": "💼",
+        "title": "Perfect for Small Biz",
+        "desc": "Complete system to manage your financial receivables"
+      }
     ],
     "footer": "Invoicaty © {{year}} — All rights reserved"
   },
@@ -545,5 +558,27 @@
     "backupBtn": "Download Backup",
     "exporting": "Exporting…",
     "exported": "Exported ✅"
+  },
+  "expense": {
+    "title": "Expenses",
+    "add": "New Expense",
+    "edit": "Edit Expense",
+    "date": "Date",
+    "vendor": "Vendor",
+    "category": "Category",
+    "description": "Description",
+    "amount": "Amount",
+    "taxRate": "Tax %",
+    "status": "Status",
+    "paymentMethod": "Payment Method",
+    "cash": "Cash",
+    "bank": "Bank",
+    "paid": "Paid",
+    "pending": "Pending",
+    "cancelled": "Cancelled",
+    "noExpenses": "No expenses yet",
+    "noExpensesDesc": "Record your first expense to get started",
+    "search": "Search expenses...",
+    "allStatuses": "All Statuses"
   }
 }

@@ -5,6 +5,8 @@
 export type Language = 'ar' | 'en';
 export type BusinessType = 'influencer' | 'freelancer' | 'professional' | 'commerce' | 'small_business' | 'other';
 export type InvoiceStatus = 'Paid' | 'Not Paid' | 'Canceled';
+export type ExpenseStatus = 'Paid' | 'Pending' | 'Cancelled' | 'Deleted';
+export type PaymentMethod = 'Cash' | 'Bank';
 export type UserRole = 'user' | 'admin';
 
 export interface Currency {
@@ -74,6 +76,27 @@ export interface Invoice {
   total: number;
   notes: string;
 
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Expense {
+  id: string;
+  user_id: string;
+  serial: string;
+  date: string;
+  vendor: string;
+  category: string;
+  description: string;
+  amount: number;
+  currency: string;
+  tax_rate: number;
+  tax_amount: number;
+  total: number;
+  status: ExpenseStatus;
+  payment_method: PaymentMethod;
+  notes: string;
+  deleted_at?: string | null;
   created_at: string;
   updated_at: string;
 }
