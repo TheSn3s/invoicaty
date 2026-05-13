@@ -14,6 +14,7 @@ import StatsCards from "@/components/StatsCards";
 import FinancialOverviewChart from "@/components/FinancialOverviewChart";
 import InvoiceTable from "@/components/InvoiceTable";
 import CreateMenu from "@/components/CreateMenu";
+import NavigationMenu from "@/components/NavigationMenu";
 import AppFooter from "@/components/AppFooter";
 import { printInvoice } from "@/lib/print-invoice";
 import Link from "next/link";
@@ -228,6 +229,16 @@ export default function DashboardPage() {
       .map(({ label, income, expenses }) => ({ label, income, expenses }));
   }, [invoices, validExpenses, lang]);
 
+  const navItems = [
+    { href: "/dashboard", label: t("nav.dashboard") || (lang === "ar" ? "الرئيسية" : "Dashboard"), icon: "🏠" },
+    { href: "/expenses", label: t("expense.title") || (lang === "ar" ? "المصروفات" : "Expenses"), icon: "💸" },
+    { href: "/quotations", label: t("quotation.title") || (lang === "ar" ? "عروض الأسعار" : "Quotations"), icon: "📋" },
+    { href: "/drafts", label: t("nav.newDraft") || (lang === "ar" ? "المسودات" : "Drafts"), icon: "📝" },
+    { href: "/trash", label: lang === 'ar' ? 'سلة المهملات' : 'Trash', icon: "🗑️", badge: deletedCount },
+    { href: "/settings", label: t("nav.settings") || (lang === "ar" ? "الإعدادات" : "Settings"), icon: "⚙️" },
+    ...(profile?.role === 'admin' ? [{ href: "/admin", label: t("nav.admin") || "Admin", icon: "🛡" }] : []),
+  ];
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -250,18 +261,9 @@ export default function DashboardPage() {
               <p className="text-[10px] text-slate-400 truncate">{profile?.full_name || profile?.business_name || t("dashboard.welcome")}</p>
             </div>
           </div>
-          <div className="flex items-center gap-0.5 md:gap-1.5 flex-shrink-0">
+          <div className="flex items-center gap-1 md:gap-1.5 flex-shrink-0">
             <LanguageSwitcher />
-            {profile?.role === 'admin' && (
-              <Link href="/admin" className="text-slate-400 hover:text-white p-1.5 md:p-2 rounded-lg hover:bg-slate-700/50 transition-all text-sm" title={t("nav.admin")}>🛡</Link>
-            )}
-            <Link href="/quotations" className="text-slate-400 hover:text-white p-1.5 md:p-2 rounded-lg hover:bg-slate-700/50 transition-all text-sm" title={t("quotation.title")}>📋</Link>
-            <Link href="/expenses" className="text-slate-400 hover:text-white p-1.5 md:p-2 rounded-lg hover:bg-slate-700/50 transition-all text-sm" title={t("expense.title")}>💸</Link>
-            <Link href="/trash" className="relative text-slate-400 hover:text-white p-1.5 md:p-2 rounded-lg hover:bg-slate-700/50 transition-all text-sm" title={lang === 'ar' ? 'سلة المحذوفات' : 'Trash'}>
-              🗑️
-              {deletedCount > 0 && <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">{deletedCount}</span>}
-            </Link>
-            <Link href="/settings" className="text-slate-400 hover:text-white p-1.5 md:p-2 rounded-lg hover:bg-slate-700/50 transition-all text-sm" title={t("nav.settings")}>⚙️</Link>
+            <NavigationMenu items={navItems} align={lang === 'ar' ? 'left' : 'right'} />
             <CreateMenu
               onNewInvoice={() => { setEditInvoice(null); setShowModal(true); }}
               onNewExpense={() => router.push("/expenses?new=1")}

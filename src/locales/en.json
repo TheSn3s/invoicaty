@@ -14,7 +14,8 @@
     "create": "Create",
     "createNew": "Create new",
     "back": "Back",
-    "newExpense": "New Expense"
+    "newExpense": "New Expense",
+    "menu": "Menu"
   },
   "home": {
     "title": "The Best Invoicing App",
