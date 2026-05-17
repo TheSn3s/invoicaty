@@ -1,17 +1,11 @@
 {
   "appId": "com.invoicaty.app",
   "appName": "Invoicaty",
-  "server": {
-    "url": "https://invoicaty.com",
-    "hostname": "invoicaty.com",
-    "androidScheme": "https",
-    "cleartext": false
-  },
+  "webDir": "www",
   "ios": {
     "contentInset": "automatic",
     "allowsLinkPreview": false,
-    "preferredContentMode": "mobile",
-    "scheme": "https"
+    "preferredContentMode": "mobile"
   },
   "plugins": {
     "SplashScreen": {
