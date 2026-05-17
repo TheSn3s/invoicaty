@@ -104,7 +104,7 @@ export default function ExpensesPage() {
       category: data.category || "",
       description: data.description || "",
       amount,
-      currency: profile?.default_currency || "KWD",
+      currency: profile?.default_currency || "USD",
       tax_rate: taxRate,
       tax_amount: taxAmount,
       total,

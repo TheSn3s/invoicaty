@@ -13,6 +13,7 @@ import LogoCropper from "@/components/LogoCropper";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import type { Country, Currency, Language, BusinessType } from "@/lib/types";
+import { resolveDefaultCurrency } from "@/lib/currency-detection";
 
 const COLORS = [
   { value: "#f04444", nameKey: "red" },
@@ -49,6 +50,8 @@ export default function SettingsPage() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [countries, setCountries] = useState<Country[]>([]);
   const [currencies, setCurrencies] = useState<Currency[]>([]);
+  const [resolvedDefaultCurrency, setResolvedDefaultCurrency] = useState<string>("USD");
+  const [currencyManuallyChanged, setCurrencyManuallyChanged] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -97,16 +100,23 @@ export default function SettingsPage() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { router.push("/login"); return; }
 
-      const [{ data: prof }, { data: countriesData }, { data: currenciesData }] = await Promise.all([
+      const [{ data: prof }, { data: countriesData }, { data: currenciesData }, regionRes] = await Promise.all([
         supabase.from("profiles").select("*").eq("id", user.id).single(),
         supabase.from("countries").select("*").order("name_en"),
         supabase.from("currencies").select("*").order("code"),
+        fetch("/api/default-region", { cache: "no-store" }).then((res) => res.ok ? res.json() : null).catch(() => null),
       ]);
 
       setCountries(countriesData || []);
       setCurrencies(currenciesData || []);
 
       if (prof) {
+        const inferredCurrency = resolveDefaultCurrency({
+          manualCurrency: prof.default_currency,
+          countryCode: prof.country_code || regionRes?.countryCode,
+          fallback: regionRes?.currency || "USD",
+        });
+        setResolvedDefaultCurrency(inferredCurrency);
         setProfile(prof);
         setFullName(prof.full_name || "");
         setBusinessName(prof.business_name || "");
@@ -117,8 +127,8 @@ export default function SettingsPage() {
         setBankIban(prof.bank_iban || "");
         setBankHolder(prof.bank_holder || "");
         setBrandColor(prof.brand_color || "#f04444");
-        setCountryCode(prof.country_code || "");
-        setDefaultCurrency(prof.default_currency || "");
+        setCountryCode(prof.country_code || regionRes?.countryCode || "");
+        setDefaultCurrency(prof.default_currency || inferredCurrency);
         setTaxRate(String(prof.tax_rate ?? 0));
         setBusinessType((prof.business_type as BusinessType) || "");
         setCompanyName(prof.company_name || "");
@@ -135,7 +145,7 @@ export default function SettingsPage() {
     setCountryCode(code);
     const country = countries.find(c => c.code === code);
     if (country) {
-      if (country.default_currency) setDefaultCurrency(country.default_currency);
+      if (country.default_currency && !currencyManuallyChanged) setDefaultCurrency(country.default_currency);
       setTaxRate(String(country.default_tax_rate));
     }
   };
@@ -173,7 +183,7 @@ export default function SettingsPage() {
     if (!user) return;
     const { data: existing } = await supabase.from("invoices").select("serial").eq("user_id", user.id);
     let maxSerial = (existing || []).reduce((max, inv) => { const n = parseInt(inv.serial); return !isNaN(n) && n > max ? n : max; }, 0);
-    const toInsert = rows.map(row => { maxSerial++; return { user_id: user.id, serial: String(maxSerial).padStart(3, "0"), ...row, currency: defaultCurrency || "KWD" }; });
+    const toInsert = rows.map(row => { maxSerial++; return { user_id: user.id, serial: String(maxSerial).padStart(3, "0"), ...row, currency: defaultCurrency || resolvedDefaultCurrency }; });
     for (let i = 0; i < toInsert.length; i += 50) { await supabase.from("invoices").insert(toInsert.slice(i, i + 50)); }
     setShowImport(false);
     setExportDone(true);
@@ -758,7 +768,7 @@ export default function SettingsPage() {
 
                 <div>
                   <label className="block text-[11px] font-bold text-slate-400 mb-1.5">{t("settings.defaultCurrency")}</label>
-                  <select value={defaultCurrency} onChange={e => setDefaultCurrency(e.target.value)}
+                  <select value={defaultCurrency} onChange={e => { setDefaultCurrency(e.target.value); setCurrencyManuallyChanged(true); }}
                     className="w-full bg-slate-800/50 border border-slate-600/30 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-blue-500/40 outline-none">
                     <option value="">{t("settings.selectCurrency")}</option>
                     {currencies.map(c => (

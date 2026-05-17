@@ -5,6 +5,7 @@ import { trackFirstInvoice } from "@/lib/gtag";
 import { useRouter } from "next/navigation";
 import { useI18n } from "@/lib/i18n";
 import { getCurrencyLabel } from "@/lib/currency";
+import { resolveDefaultCurrency } from "@/lib/currency-detection";
 import type { Currency } from "@/lib/types";
 import InvoiceModal from "@/components/InvoiceModal";
 import DeleteModal from "@/components/DeleteModal";
@@ -33,6 +34,7 @@ interface Profile {
   full_name: string; business_name: string; phone: string; email: string;
   bank_name: string; bank_account: string; bank_iban: string; bank_holder: string;
   brand_color: string; role?: string; default_currency?: string;
+  country_code?: string | null;
   tax_rate?: number; logo_url?: string; onboarding_completed?: boolean;
 }
 
@@ -49,6 +51,8 @@ export default function DashboardPage() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [currencyData, setCurrencyData] = useState<Currency | null>(null);
+  const [resolvedDefaultCurrency, setResolvedDefaultCurrency] = useState<string>("USD");
+  const [currencyNoticeSource, setCurrencyNoticeSource] = useState<"geo" | "fallback" | "manual" | null>(null);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -81,24 +85,39 @@ export default function DashboardPage() {
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (!user || authError) { router.push("/login"); return; }
 
-    const [{ data: inv }, { data: prof }, { data: exp }] = await Promise.all([
+    const [{ data: inv }, { data: prof }, { data: exp }, regionRes] = await Promise.all([
       supabase.from("invoices").select("*").eq("user_id", user.id).order("date", { ascending: false }),
       supabase.from("profiles").select("*").eq("id", user.id).single(),
-      supabase.from("expenses").select("id, date, amount, total, status").eq("user_id", user.id).order("date", { ascending: false })
+      supabase.from("expenses").select("id, date, amount, total, status").eq("user_id", user.id).order("date", { ascending: false }),
+      fetch("/api/default-region", { cache: "no-store" }).then((res) => res.ok ? res.json() : null).catch(() => null),
     ]);
+
+    const inferredCurrency = resolveDefaultCurrency({
+      manualCurrency: prof?.default_currency,
+      countryCode: prof?.country_code || regionRes?.countryCode,
+      fallback: regionRes?.currency || "USD",
+    });
+    setResolvedDefaultCurrency(inferredCurrency);
+    setCurrencyNoticeSource(prof?.default_currency ? "manual" : (regionRes?.source || "fallback"));
 
     if (!prof) {
       const { data: newProf } = await supabase.from("profiles").upsert({
         id: user.id, full_name: user.user_metadata?.full_name || '', email: user.email || '',
+        default_currency: inferredCurrency,
+        country_code: regionRes?.countryCode || null,
       }).select().single();
       setProfile(newProf || null);
     } else {
       setProfile(prof);
-      // Load currency data
-      if (prof.default_currency) {
-        const { data: curr } = await supabase.from("currencies").select("*").eq("code", prof.default_currency).single();
-        if (curr) setCurrencyData(curr);
+      if (!prof.default_currency || !prof.country_code) {
+        await supabase.from("profiles").update({
+          default_currency: prof.default_currency || inferredCurrency,
+          country_code: prof.country_code || regionRes?.countryCode || null,
+          updated_at: new Date().toISOString(),
+        }).eq("id", user.id);
       }
+      const { data: curr } = await supabase.from("currencies").select("*").eq("code", prof.default_currency || inferredCurrency).single();
+      if (curr) setCurrencyData(curr);
     }
 
     setInvoices(inv || []);
@@ -132,7 +151,7 @@ export default function DashboardPage() {
       notes: data.notes || "",
       status: data.status, category: data.category,
       items: (data as { items?: unknown[] }).items || null,
-      currency: profile?.default_currency || 'KWD',
+      currency: profile?.default_currency || resolvedDefaultCurrency,
     };
 
     if (editInvoice) {
@@ -159,7 +178,7 @@ export default function DashboardPage() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
     let maxSerial = invoices.reduce((max, inv) => { const n = parseInt(inv.serial); return !isNaN(n) && n > max ? n : max; }, 0);
-    const toInsert = rows.map(row => { maxSerial++; return { user_id: user.id, serial: String(maxSerial).padStart(3, "0"), ...row, currency: profile?.default_currency || 'KWD' }; });
+    const toInsert = rows.map(row => { maxSerial++; return { user_id: user.id, serial: String(maxSerial).padStart(3, "0"), ...row, currency: profile?.default_currency || resolvedDefaultCurrency }; });
     for (let i = 0; i < toInsert.length; i += 50) { await supabase.from("invoices").insert(toInsert.slice(i, i + 50)); }
     setShowImport(false); loadData();
   };
@@ -303,8 +322,35 @@ export default function DashboardPage() {
                 </div>
               </div>
             </div>
+            {(profile?.default_currency || resolvedDefaultCurrency) && (
+              <div className="mt-5 rounded-2xl border border-blue-500/20 bg-blue-500/8 px-4 py-3 text-right">
+                <p className="text-sm font-bold text-blue-200">
+                  {lang === "ar"
+                    ? `العملة الافتراضية الحالية: ${profile?.default_currency || resolvedDefaultCurrency}`
+                    : `Current default currency: ${profile?.default_currency || resolvedDefaultCurrency}`}
+                </p>
+                <p className="mt-1 text-xs text-slate-300">
+                  {currencyNoticeSource === "manual"
+                    ? (lang === "ar"
+                        ? "تم اعتماد اختيارك من الإعدادات، وما راح يتغير بتغيّر موقعك."
+                        : "Your saved settings are being used and will not change when your location changes.")
+                    : currencyNoticeSource === "geo"
+                      ? (lang === "ar"
+                          ? "اخترناها لك بناءً على موقعك الحالي، وتقدر تغيّرها بأي وقت من الإعدادات قبل إرسال أول فاتورة."
+                          : "We picked this based on your current location. You can change it anytime in settings before sending your first invoice.")
+                      : (lang === "ar"
+                          ? "استخدمنا USD كخيار افتراضي لأن الموقع الحالي غير واضح، وتقدر تغيّرها بأي وقت من الإعدادات."
+                          : "We used USD as a safe default because your current location was unclear. You can change it anytime in settings.")}
+                </p>
+                <div className="mt-2">
+                  <Link href="/settings" className="text-xs font-bold text-blue-300 hover:text-blue-200 underline underline-offset-4">
+                    {lang === "ar" ? "تعديل العملة الافتراضية" : "Change default currency"}
+                  </Link>
+                </div>
+              </div>
+            )}
             {!profile?.onboarding_completed && (
-              <div className="text-center mt-6">
+            <div className="text-center mt-6">
                 <Link href="/onboarding" className="text-slate-500 hover:text-slate-300 text-xs underline transition-all">
                   {lang === 'ar' ? '⚙️ إعداد العملة والشعار وبيانات العمل' : '⚙️ Set up currency, logo & business info'}
                 </Link>

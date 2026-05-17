@@ -166,7 +166,7 @@ export default function AdminPage() {
 
     allInvoices.forEach((inv) => {
       const userId = inv.user_id as string;
-      const currency = (inv.currency as string) || "KWD";
+      const currency = (inv.currency as string) || "USD";
       const amount = Number(inv.total ?? inv.amount) || 0;
       invoiceCurrencyUsage.add(currency);
 

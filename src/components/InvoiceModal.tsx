@@ -54,7 +54,7 @@ export default function InvoiceModal({ invoice, onSave, onClose, currencySymbol,
   const [category, setCategory] = useState("");
   const [saving, setSaving] = useState(false);
   const { t, lang } = useI18n();
-  const symbol = currencySymbol || (lang === 'ar' ? 'د.ك' : 'KWD');
+  const symbol = currencySymbol || 'USD';
 
   useEffect(() => {
     if (invoice) {

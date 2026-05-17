@@ -244,7 +244,7 @@ export default function QuotationsPage() {
                   </div>
                   <div className="flex flex-wrap gap-1.5">
                     <button
-                      onClick={() => printQuotation({ ...q, currency: currencyData?.code || profile?.default_currency || 'KWD' }, profile)}
+                      onClick={() => printQuotation({ ...q, currency: currencyData?.code || profile?.default_currency || 'USD' }, profile)}
                       className="bg-purple-500/15 hover:bg-purple-500/25 text-purple-300 border border-purple-500/30 px-3 py-2 rounded-lg text-[11px] font-bold transition-all active:scale-95 flex items-center gap-1.5"
                       title={t("quotation.print")}
                     >
@@ -322,7 +322,7 @@ function QuotationModal({ quotation, onSave, onClose, currencySymbol, defaultTax
   quotation: Quotation | null; onSave: (d: Partial<Quotation> & { items: LineItem[] }) => void; onClose: () => void; currencySymbol: string; defaultTaxRate?: number;
 }) {
   const { t, lang } = useI18n();
-  const symbol = currencySymbol || (lang === 'ar' ? 'د.ك' : 'KWD');
+  const symbol = currencySymbol || 'USD';
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
   const [validUntil, setValidUntil] = useState("");
   const [client, setClient] = useState("");

@@ -13,7 +13,7 @@ export function getCurrencyLabel(
   currency: Currency | null | undefined,
   language: Language = 'en'
 ): string {
-  if (!currency) return language === 'ar' ? 'د.ك' : 'KWD';
+  if (!currency) return 'USD';
   const isArabicSymbol = /[\u0600-\u06FF]/.test(currency.symbol);
   if (isArabicSymbol) {
     return language === 'ar' ? currency.symbol : currency.code;
@@ -41,9 +41,8 @@ export function formatAmount(
   const label = getCurrencyLabel(currency, language);
   const isArabicSymbol = currency ? /[\u0600-\u06FF]/.test(currency.symbol) : false;
 
-  // Arabic symbols & codes go after the number; Western symbols go before
   if (!currency) {
-    return language === 'ar' ? `${formatted} ${label}` : `${formatted} ${label}`;
+    return `${formatted} ${label}`;
   }
   return isArabicSymbol || language === 'ar'
     ? `${formatted} ${label}`
