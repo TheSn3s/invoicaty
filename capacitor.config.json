@@ -3,13 +3,15 @@
   "appName": "Invoicaty",
   "server": {
     "url": "https://invoicaty.com",
+    "hostname": "invoicaty.com",
+    "androidScheme": "https",
     "cleartext": false
   },
   "ios": {
     "contentInset": "automatic",
-    "allowsLinkPreview": true,
+    "allowsLinkPreview": false,
     "preferredContentMode": "mobile",
-    "scheme": "invoicaty"
+    "scheme": "https"
   },
   "plugins": {
     "SplashScreen": {
