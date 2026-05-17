@@ -2,10 +2,14 @@ import UIKit
 import WebKit
 import Capacitor
 
-class InvoicatyViewController: CAPBridgeViewController {
+class InvoicatyViewController: CAPBridgeViewController, WKNavigationDelegate {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        // Set ourselves as the navigation delegate
+        webView?.navigationDelegate = self
+        
         // After Capacitor loads, navigate to the live site inside the WebView
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             if let url = URL(string: "https://invoicaty.com") {
@@ -15,7 +19,7 @@ class InvoicatyViewController: CAPBridgeViewController {
     }
 
     // Keep all navigation inside the WebView — never open Safari
-    override func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
         guard let url = navigationAction.request.url else {
             decisionHandler(.allow)
             return
@@ -43,6 +47,12 @@ class InvoicatyViewController: CAPBridgeViewController {
 
         // Allow capacitor local scheme
         if url.scheme == "capacitor" {
+            decisionHandler(.allow)
+            return
+        }
+
+        // Allow about:blank and data URLs
+        if url.scheme == "about" || url.scheme == "data" {
             decisionHandler(.allow)
             return
         }
