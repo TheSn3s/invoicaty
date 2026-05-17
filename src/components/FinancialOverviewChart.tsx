@@ -25,7 +25,7 @@ interface Props {
 
 export default function FinancialOverviewChart({ data, currencySymbol }: Props) {
   const { t, lang } = useI18n();
-  const symbol = currencySymbol || (lang === "ar" ? "د.ك" : "KWD");
+  const symbol = currencySymbol || "USD";
   const chartData = data.slice(-12);
 
   const maxValue = useMemo(

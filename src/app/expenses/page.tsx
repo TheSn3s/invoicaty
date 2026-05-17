@@ -317,7 +317,7 @@ function ExpenseModal({ expense, onSave, onClose, currencySymbol, defaultTaxRate
   defaultTaxRate?: number;
 }) {
   const { t, lang } = useI18n();
-  const symbol = currencySymbol || (lang === "ar" ? "د.ك" : "KWD");
+  const symbol = currencySymbol || "USD";
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
   const [vendor, setVendor] = useState("");
   const [category, setCategory] = useState("");

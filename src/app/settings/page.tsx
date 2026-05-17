@@ -443,7 +443,7 @@ export default function SettingsPage() {
     project: lang === "ar" ? "مشروع تجريبي" : "Sample Project",
     description: "",
     amount: 0,
-    currency: defaultCurrency || "KWD",
+    currency: defaultCurrency || resolvedDefaultCurrency,
     discount: 0,
     tax_rate: Number(taxRate) || 0,
     notes: lang === "ar" ? "شكراً لثقتكم بنا. يرجى السداد بعد الاستلام." : "Thank you for your business. Payment is due within 14 days of receipt.",

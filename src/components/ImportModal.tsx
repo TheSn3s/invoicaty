@@ -169,7 +169,7 @@ export default function ImportModal({ onImport, onClose }: Props) {
                       <div className="text-slate-500 text-[10px]">{inv.project} • {inv.date}</div>
                     </div>
                     <div className="text-left">
-                      <div className="font-inter font-bold text-white text-xs">{inv.amount.toLocaleString()} د.ك</div>
+                      <div className="font-inter font-bold text-white text-xs">{inv.amount.toLocaleString()}</div>
                       <div className={`text-[10px] ${inv.status === 'Paid' ? 'text-green-400' : 'text-red-400'}`}>
                         {inv.status === 'Paid' ? '✅' : '🚩'} {inv.status === 'Paid' ? 'مدفوع' : 'معلق'}
                       </div>
